@@ -1,0 +1,54 @@
+# Copyright 2020-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+include:
+  - local: '/.gitlab/ci/common.yml'
+  - local: '/.gitlab/ci/misc.yml'
+#  - local: '/.gitlab/ci/docs/sphinx.yml'
+  - local: '/.gitlab/ci/images/base.yml'
+#  - local: '/.gitlab/ci/images/alpine3.yml'
+#  - local: '/.gitlab/ci/images/centos7.yml'
+#  - local: '/.gitlab/ci/images/centos8.yml'
+  - local: '/.gitlab/ci/images/clang_format.yml'
+  - local: '/.gitlab/ci/images/conan.yml'
+#  - local: '/.gitlab/ci/images/hadolint.yml'
+  - local: '/.gitlab/ci/images/ubuntu2004.yml'
+#  - local: '/.gitlab/ci/images/ubuntu2304.yml'
+#  - local: '/.gitlab/ci/images/windows.yml'
+  - local: '/.gitlab/ci/lang/cmake/base.yml'
+  - local: '/.gitlab/ci/lang/cmake/lint/cmakelang.yml'
+  # - local: '/.gitlab/ci/lang/common/lint/codequality.yml'
+  - local: '/.gitlab/ci/lang/common/lint/codespell.yml'
+#  - local: '/.gitlab/ci/lang/common/lint/license_headers.yml'
+  - local: '/.gitlab/ci/lang/cpp/base.yml'
+  - local: '/.gitlab/ci/lang/cpp/build/base.yml'
+#  - local: '/.gitlab/ci/lang/cpp/build/centos7_gcc.yml'
+#  - local: '/.gitlab/ci/lang/cpp/build/centos8_gcc.yml'
+  - local: '/.gitlab/ci/lang/cpp/build/ubuntu2004_gcc.yml'
+#  - local: '/.gitlab/ci/lang/cpp/build/ubuntu2304_clang.yml'
+#  - local: '/.gitlab/ci/lang/cpp/build/ubuntu2304_gcc.yml'
+#  - local: '/.gitlab/ci/lang/cpp/build/windows.yml'
+  - local: '/.gitlab/ci/lang/cpp/lint/clang_tools.yml'
+  - local: '/.gitlab/ci/lang/cpp/lint/coverage.yml'
+  - local: '/.gitlab/ci/lang/cpp/lint/cppcheck.yml'
+  - local: '/.gitlab/ci/lang/cpp/lint/iostream.yml'
+  - local: '/.gitlab/ci/lang/cpp/lint/guardonce.yml'
+#  - local: '/.gitlab/ci/lang/docker/lint/hadolint.yml'
+  - local: '/.gitlab/ci/lang/py/base.yml'
+#  - local: '/.gitlab/ci/lang/py/lint/black.yml'
+#  - local: '/.gitlab/ci/lang/py/lint/flake8.yml'
+#  - local: '/.gitlab/ci/lang/py/lint/isort.yml'
+  - local: '/.gitlab/ci/lang/shell/lint/shellcheck.yml'
+  - local: '/.gitlab/ci/lang/shell/lint/shfmt.yml'
+#  - local: '/.gitlab/ci/lang/yaml/lint/yamllint.yml'

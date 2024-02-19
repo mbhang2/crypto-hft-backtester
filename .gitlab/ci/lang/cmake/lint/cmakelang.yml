@@ -1,0 +1,43 @@
+# Copyright 2020-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Format
+
+check:cmake:format:
+  extends: .check-cmake
+  allow_failure: true
+  script:
+    - check_cmake_files_formatting.sh
+  artifacts:
+    when: on_failure
+    expire_in: 1 day
+    expose_as: 'CmakeFormat Report'
+    name: "CmakeFormat-$CI_COMMIT_REF_SLUG"
+    paths:
+      - cmake_format.patch
+
+# Lint
+
+check:cmake:lint:
+  extends: .check-cmake
+  allow_failure: true
+  script:
+    - check_cmake_conventions.sh
+  artifacts:
+    when: on_failure
+    expire_in: 1 day
+    expose_as: 'CmakeLint Report'
+    name: "CmakeLint-$CI_COMMIT_REF_SLUG"
+    paths:
+      - cmake_lint.patch

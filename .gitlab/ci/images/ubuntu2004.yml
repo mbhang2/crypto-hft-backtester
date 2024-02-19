@@ -1,0 +1,49 @@
+# Copyright 2022-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+.ubuntu2004_changes: &ubuntu2004_changes
+  - conan/profiles/linux_*
+  - conan/conanfile.txt
+  - docker/Ubuntu2004.Dockerfile
+  - scripts/conan/*.sh
+  - scripts/os/setup_ubuntu2004.sh
+  - pyproject.toml
+
+.ubuntu2004_variables: &ubuntu2004_variables
+  DOCKER_IMAGE_NAME: "ubuntu2004:latest"
+  DOCKER_IMAGE_OS: "Ubuntu2004"
+
+build:docker:ubuntu2004:
+  stage: build
+  extends: .docker
+  variables:
+    <<: *ubuntu2004_variables
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        *ubuntu2004_changes
+
+deploy:docker:ubuntu2004:
+  stage: deploy
+  extends: .docker
+  variables:
+    <<: *ubuntu2004_variables
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: manual
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        *ubuntu2004_changes

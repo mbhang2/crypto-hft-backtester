@@ -1,0 +1,48 @@
+# Copyright 2022-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+.alpine3-image-changes: &alpine3-image-changes
+  - docker/Alpine3.Dockerfile
+  - scripts/os/install_files.sh
+  - scripts/os/setup_alpine3.sh
+  - pyproject.toml
+
+.alpine3-image-variables: &alpine3-image-variables
+  DOCKER_IMAGE_NAME: "alpine3:latest"
+  DOCKER_IMAGE_OS: "Alpine3"
+
+build:docker:alpine3:
+  stage: build
+  extends: .docker
+  variables:
+    <<: *alpine3-image-variables
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        *alpine3-image-changes
+
+deploy:docker:alpine3:
+  stage: deploy
+  extends: .docker
+  variables:
+    <<: *alpine3-image-variables
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: manual
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        *alpine3-image-changes
+    - !reference [.trigger-docker-on-linters-files-change, rules]

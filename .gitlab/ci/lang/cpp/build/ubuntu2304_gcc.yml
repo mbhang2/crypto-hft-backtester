@@ -1,0 +1,88 @@
+# Copyright 2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Build
+
+build:cpp:ubuntu2304:gcc:1:
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
+  extends: .build-cpp
+  variables:
+    BPROTO_CI_CMAKE_ARGS: >-
+      -DCMOPTS_ENABLE_LTO=OFF
+      -DCMOPTS_ENABLE_SANITIZER_ADDRESS=ON
+      -DCMOPTS_ENABLE_SANITIZER_LEAK=ON
+      -DCMOPTS_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=ON
+    CC: gcc
+    CXX: g++
+
+build:cpp:ubuntu2304:gcc:2:
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
+  extends: .build-cpp
+  variables:
+    BPROTO_CI_CMAKE_ARGS: >-
+      -DCMOPTS_ENABLE_LTO=ON
+      -DCMOPTS_ENABLE_VALGRING=ON
+    CC: gcc
+    CXX: g++
+
+# Test
+
+test:cpp:ubuntu2304:gcc:1:
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
+  extends: .test-cpp
+  needs:
+    - job: build:cpp:ubuntu2304:gcc:1
+      artifacts: true
+
+test:cpp:ubuntu2304:gcc:2:
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
+  extends: .test-cpp
+  needs:
+    - job: build:cpp:ubuntu2304:gcc:2
+      artifacts: true
+  script:
+    - cd build
+    - ctest -j${NPROC} -L "^DISABLE_MEMCHECK$" || true
+    - |-
+        if ! ctest -j${NPROC} -LE "^DISABLE_MEMCHECK$" -T memcheck ; then
+          shopt -s nullglob
+
+          for f in Testing/Temporary/MemoryChecker.*.log ; do
+            if grep -P 'ERROR SUMMARY: (?!0)\d+ errors' "${f}" > /dev/null ; then
+              echo -en "\033[0;33m\nMemory issues have been found in '${f}' file:\n\033[0m"
+              cat "${f}"
+            fi
+          done
+
+          shopt -u nullglob
+          exit 1
+        fi
+  artifacts:
+    reports:
+      junit:
+        - build/project/*/tests/*/test_results.xml
+
+# Report
+
+report:cpp:ubuntu2304:gcc:1:
+  extends: .report-build-cpp
+  needs:
+    - job: build:cpp:ubuntu2304:gcc:1
+      artifacts: true
+
+report:cpp:ubuntu2304:gcc:2:
+  extends: .report-build-cpp
+  needs:
+    - job: build:cpp:ubuntu2304:gcc:2
+      artifacts: true

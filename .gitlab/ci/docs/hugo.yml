@@ -1,0 +1,45 @@
+# Copyright 2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+.build-hugo-page:
+  image:
+    name: registry.gitlab.com/pages/hugo/hugo_extended:0.111.3
+    entrypoint: [""]
+  variables:
+    # GitLab CI/CD pipeline settings
+    GIT_SUBMODULE_DEPTH: 1
+    GIT_SUBMODULE_STRATEGY: normal
+    # Hugo settings
+    HUGO_ENV: production
+  before_script:
+    - hugo --gc --minify
+  script:
+    - echo
+
+build:docs:
+  extends: .build-hugo-page
+  only:
+    refs:
+      - merge_requests
+
+pages:
+  extends: .build-hugo-page
+  variables:
+    HUGO_BASEURL: "${CI_PAGES_URL}"
+  only:
+    refs:
+      - main
+  artifacts:
+    paths:
+      - public
