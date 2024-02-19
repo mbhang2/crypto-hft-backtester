@@ -1,0 +1,33 @@
+# Copyright 2023 Zinchenko Serhii <zinchenko.serhii@pm.me>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+include:
+  - project: 'crypto_back_testing'
+    ref: main
+    file:
+      - '/.gitlab/ci/common.yml'
+      - '/.gitlab/ci/misc.yml'
+      - '/.gitlab/ci/lang/cmake/base.yml'
+      - '/.gitlab/ci/lang/cmake/lint/cmakelang.yml'
+      # - '/.gitlab/ci/lang/common/lint/codequality.yml'
+      - '/.gitlab/ci/lang/common/lint/codespell.yml'
+      - '/.gitlab/ci/lang/common/lint/license_headers.yml'
+      - '/.gitlab/ci/lang/docker/lint/hadolint.yml'
+      - '/.gitlab/ci/lang/py/base.yml'
+      - '/.gitlab/ci/lang/py/lint/black.yml'
+      - '/.gitlab/ci/lang/py/lint/flake8.yml'
+      - '/.gitlab/ci/lang/py/lint/isort.yml'
+      - '/.gitlab/ci/lang/shell/lint/shellcheck.yml'
+      - '/.gitlab/ci/lang/shell/lint/shfmt.yml'
+      - '/.gitlab/ci/lang/yaml/lint/yamllint.yml'

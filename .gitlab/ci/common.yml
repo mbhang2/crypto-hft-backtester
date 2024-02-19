@@ -1,0 +1,73 @@
+# Copyright 2020-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+stages:
+  - build
+  - test
+  - check
+  - report
+  - deploy
+  - misc
+
+variables:
+  CLICOLOR_FORCE: "1"
+
+workflow:
+  rules:
+    - if: "$CI_MERGE_REQUEST_LABELS =~ /.*(ci::skip|workflow::paused).*/"
+      when: never
+    - when: always
+
+# --------------------------------------------------------------------- #
+# Triggers                                                              #
+# --------------------------------------------------------------------- #
+
+.only_review:
+  only:
+    refs:
+      - merge_requests
+  except:
+    changes:
+      - "./3rd-party"
+
+# --------------------------------------------------------------------- #
+# Job bases                                                             #
+# --------------------------------------------------------------------- #
+
+.check:
+  image:
+    name: $BPROTO_CI_IMAGES_REGISTRY/alpine3:latest
+    entrypoint: [""]
+  stage: check
+  dependencies: []
+  needs: []
+  before_script:
+    # Get a list of all changed files
+    - export BPROTO_CI_MERGE_REQUEST_CHANGED_FILES="$(filter_files.sh)"
+    # Expose suitable number of cores to be used
+    # nproc on GNU/Linux, sysctl on macOS
+    - export NPROC=$(nproc || sysctl -n hw.physicalcpu) 2>/dev/null
+    # Expose python packages to the terminal
+    - export PATH=~/.local/bin:$PATH
+
+# If job failed, upload logs in an easily downloadable form.
+.report:
+  image: alpine:3
+  stage: report
+  when: on_failure
+  variables:
+    GIT_CHECKOUT: "false"
+    GIT_STRATEGY: none
+  script:
+    - echo

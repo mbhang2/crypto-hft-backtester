@@ -1,0 +1,84 @@
+# Copyright 2022-2024 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# NOTE(b110011): Shared windows runners do not process image or services, so you
+#   can't set it that way. You should still be able to pull the other image and
+#   then execute commands / scripts inside it normally though.
+#
+#   FMI: https://stackoverflow.com/questions/65199082
+.base-cpp-windows-job:
+  tags:
+    - shared-windows
+    - windows
+    - windows-1809
+  timeout: 2h
+  variables:
+    ALLOWED_ENV_VARS: null
+    BPROTO_CI_CMAKE_BUILD_TYPE: "Release"
+    DOCKER_IMAGE: "${BPROTO_CI_IMAGES_REGISTRY}/windows:latest"
+    HELPER_SCRIPT: null
+  before_script:
+    - Start-Service -Name "docker"
+  script:
+    - docker login -u "${BPROTO_CI_DEPLOY_USER}" -p "${BPROTO_CI_DEPLOY_TOKEN}" "${CI_REGISTRY}"
+    - docker pull "${DOCKER_IMAGE}"
+    - $ALLOWED_ENV_VARS = $('-e ' + ${ALLOWED_ENV_VARS}.Replace(' ', ' -e ')).Split(' ')
+    - |-
+        docker run `
+          ${ALLOWED_ENV_VARS} `
+          --volume ${PWD}:${PWD} `
+          --workdir ${PWD} `
+          "${DOCKER_IMAGE}" `
+          powershell ${HELPER_SCRIPT}
+
+# Build
+
+build:cpp:windows:
+  extends:
+    - .build-cpp
+    - .base-cpp-windows-job
+  variables:
+    ALLOWED_ENV_VARS: >-
+      BPROTO_CI_CMAKE_ARGS
+      BPROTO_CI_CMAKE_BUILD_TYPE
+      BPROTO_CI_CMAKE_EXTRA_ARGS
+      CI_PROJECT_DIR
+      NUMBER_OF_PROCESSORS
+    BPROTO_CI_CMAKE_ARGS: "-DCMOPTS_ENABLE_LTO=ON"
+    HELPER_SCRIPT: "C:\\cicd\\build_cpp.ps1"
+
+# Test
+
+test:cpp:windows:
+  extends:
+    - .test-cpp
+    - .base-cpp-windows-job
+  needs:
+    - job: build:cpp:windows
+      artifacts: true
+  variables:
+    ALLOWED_ENV_VARS: >-
+      BPROTO_CI_CMAKE_BUILD_TYPE
+      BOOST_TEST_LOGGER
+      CTEST_OUTPUT_ON_FAILURE
+      NUMBER_OF_PROCESSORS
+    HELPER_SCRIPT: "C:\\cicd\\test_cpp.ps1"
+
+# Report
+
+report:cpp:windows:
+  extends: .report-build-cpp
+  needs:
+    - job: build:cpp:windows
+      artifacts: true

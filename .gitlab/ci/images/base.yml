@@ -1,0 +1,64 @@
+# Copyright 2022-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# To speed-up building of docker images, we try to utilize cached images:
+#   - https://stackoverflow.com/questions/55258711
+#   - https://stackoverflow.com/questions/71061889
+# But above solution doesn't work for multi-stage builds. Therefore we
+# we use the next idea from below SO thread.
+#   - https://stackoverflow.com/questions/52646303
+# To correctly cache multi-stage docker build, you need to specify
+# DOCKER_BUILDKIT=1 environment variable for your GitLab CI job.
+
+.docker:
+  image: docker:24.0.0
+  services:
+    - docker:24.0.0-dind
+  dependencies: []
+  needs: []
+  before_script:
+    - DOCKER_FILE="docker/${DOCKER_IMAGE_OS}.Dockerfile"
+    - LATEST_IMAGE="${BPROTO_CI_IMAGES_REGISTRY}/${DOCKER_IMAGE_NAME}"
+  script:
+    - docker login -u "${BPROTO_CI_DEPLOY_USER}" -p "${BPROTO_CI_DEPLOY_TOKEN}" "${CI_REGISTRY}"
+    - docker image pull "${LATEST_IMAGE}" || true
+    - |-
+        docker build \
+          --pull \
+          --cache-from "${LATEST_IMAGE}" \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
+          --tag "${DOCKER_IMAGE_NAME}" \
+          --file "${DOCKER_FILE}" \
+          .
+    # Push only on default branch, otherwise only check if image can be successfully built.
+    - |-
+        if [[ "${CI_COMMIT_REF_NAME}" == "${CI_DEFAULT_BRANCH}" ]]; then
+          docker tag "${DOCKER_IMAGE_NAME}" "${LATEST_IMAGE}"
+          docker push "${LATEST_IMAGE}"
+        fi
+
+.trigger-docker-on-linters-files-change:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - scripts/cicd/*
+        - scripts/cicd/lint/*
+        - .clang-format
+        - .clang-tidy
+        - .cmake-format.py
+        - .codespellrc
+        - .flake8
+        - .hadolint.yaml
+        - .license.tmpl
+        - .yamllint

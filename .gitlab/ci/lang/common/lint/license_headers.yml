@@ -1,0 +1,38 @@
+# Copyright 2020-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# There are other projects:
+#   - https://github.com/apache/skywalking-eyes
+#   - https://github.com/cloudposse/copyright-header
+#   - https://github.com/CodethinkLabs/python-consonant
+#   - https://github.com/google/addlicense
+#   - https://github.com/johann-petrak/licenseheaders
+#   - https://github.com/patrikha/copywrite
+
+check:code:license:
+  extends:
+    - .check
+  allow_failure: true
+  script:
+    - check_license_headers.sh
+  only:
+    refs:
+      - merge_requests
+  artifacts:
+    when: on_failure
+    expire_in: 1 day
+    expose_as: 'License Headers Report'
+    name: "LicenseHeaders-$CI_COMMIT_REF_SLUG"
+    paths:
+      - license_headers.log

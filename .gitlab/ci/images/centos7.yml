@@ -1,0 +1,49 @@
+# Copyright 2022-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+.centos7-image-changes: &centos7-image-changes
+  - conan/profiles/centos7_*
+  - conan/conanfile.txt
+  - docker/CentOS7.Dockerfile
+  - scripts/conan/*.sh
+  - scripts/os/setup_centos7.sh
+  - pyproject.toml
+
+.centos7-image-variables: &centos7-image-variables
+  DOCKER_IMAGE_NAME: "centos7:latest"
+  DOCKER_IMAGE_OS: "CentOS7"
+
+build:docker:centos7:
+  stage: build
+  extends: .docker
+  variables:
+    <<: *centos7-image-variables
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        *centos7-image-changes
+
+deploy:docker:centos7:
+  stage: deploy
+  extends: .docker
+  variables:
+    <<: *centos7-image-variables
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: manual
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        *centos7-image-changes

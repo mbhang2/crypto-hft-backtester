@@ -1,0 +1,72 @@
+# Copyright 2020-2023 Zinchenko Serhii <zinchenko.serhii@pm.me>.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+check:cpp:format:
+  image:
+    name: $BPROTO_CI_IMAGES_REGISTRY/clang-format:latest
+    entrypoint: [""]
+  extends:
+    - .check
+    - .only-review-cpp
+  script:
+    - check_cpp_files_formatting.sh
+  artifacts:
+    when: on_failure
+    expire_in: 1 day
+    expose_as: 'ClangFormat Report'
+    name: "ClangFormat-$CI_COMMIT_REF_SLUG"
+    paths:
+      - clang_format.patch
+
+.chck-cpp-clang-tidy:
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
+  stage: check
+  extends:
+    - .build-cpp
+  dependencies: []
+  needs: []
+  when: manual
+  variables:
+    CC: gcc
+    CXX: g++
+  script:
+    - check_cpp_conventions.sh
+  artifacts:
+    when: on_failure
+    expire_in: 1 day
+    paths:
+      - clang_tidy.log
+
+# This is a lightweight job that is run only against modified files.
+check:cpp:tidy:
+  extends:
+    - .chck-cpp-clang-tidy
+  artifacts:
+    expose_as: 'ClangTidy Report'
+    name: "ClangTidy-$CI_COMMIT_REF_SLUG"
+
+# This is a heavy and long-running job (>30min) that is run against the hole
+# project. It should be used only as a scheduled job and run each workday night
+# or at Sun and Wed nights.
+check:cpp:tidy (nightly):
+  extends:
+    - .chck-cpp-clang-tidy
+  only:  # Disable this section, which comes from '.build-cpp-docs' -> '.build-cpp'.
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $BPROTO_CI_ENABLE_NIGHTLY_CLANG_TIDY == "true"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: manual
+  artifacts:
+    expose_as: 'ClangTidy Nightly Report'
+    name: "ClangTidyNightly-$CI_COMMIT_REF_SLUG"
