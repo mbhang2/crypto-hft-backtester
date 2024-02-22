@@ -10,7 +10,14 @@
     <option name="reloaded" value="true" />
   </component>
   <component name="CMakeRunConfigurationManager">
-    <generated />
+    <generated>
+      <config projectName="crypto_back_testing" targetName="crypto_back_testing" />
+      <config projectName="crypto_back_testing" targetName="crypto_tests" />
+      <config projectName="crypto_back_testing" targetName="gmock_main" />
+      <config projectName="crypto_back_testing" targetName="gtest" />
+      <config projectName="crypto_back_testing" targetName="gmock" />
+      <config projectName="crypto_back_testing" targetName="gtest_main" />
+    </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -19,7 +26,76 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75c81f46-f40c-45d1-9eea-ad1018f6fab8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/build/googletest-build/googletest/generated/GTestConfig.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-build/googletest/generated/GTestConfigVersion.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-build/googletest/generated/gmock.pc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-build/googletest/generated/gmock_main.pc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-build/googletest/generated/gtest.pc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-build/googletest/generated/gtest_main.pc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-build" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-configure" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-done" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-download" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-gitclone-lastrun.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-gitinfo.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-install" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-mkdir" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/src/googletest-stamp/googletest-test" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/tmp/googletest-cfgcmd.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/tmp/googletest-gitclone.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/tmp/googletest-gitupdate.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-download/googletest-prefix/tmp/googletest-mkdirs.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/build/googletest-src" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/query/cache-v2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/query/cmakeFiles-v1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/query/codemodel-v2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/query/toolchains-v1" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/cache-v2-7a30d7dff94989fd70bb.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/cmakeFiles-v1-8fd9582b178c5969acb7.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/codemodel-v2-f88ae03fd4111f81fc98.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/directory-.-Debug-f5ebdc15457944623624.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/directory-googletest-build-Debug-04d27311aeded8dd35d1.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/directory-googletest-build.googlemock-Debug-36705c9dceb0b406b18b.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/directory-googletest-build.googletest-Debug-7b8e63e6e709e27ef4f4.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/index-2024-02-22T06-24-41-0860.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/target-crypto_back_testing-Debug-02e712cf24fde409724b.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/target-crypto_tests-Debug-8179b5ef2fc6e33ce9d1.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/target-gmock-Debug-4fc98f4f62aac5f2d228.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/target-gmock_main-Debug-8fbb220590161f532f86.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/target-gtest-Debug-4629133b90f66ed38e65.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/target-gtest_main-Debug-b3a597789293c04804d2.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/toolchains-v1-f5832eb80ef258639e5f.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/build.ninja" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-build/googletest/generated/GTestConfig.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-build/googletest/generated/GTestConfigVersion.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-build/googletest/generated/gmock.pc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-build/googletest/generated/gmock_main.pc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-build/googletest/generated/gtest.pc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-build/googletest/generated/gtest_main.pc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/.ninja_log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/build.ninja" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-build" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-configure" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-done" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-download" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-gitclone-lastrun.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-gitinfo.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-install" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-mkdir" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-patch-info.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-test" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/src/googletest-stamp/googletest-update-info.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/tmp/googletest-cfgcmd.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/tmp/googletest-gitclone.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/tmp/googletest-gitupdate.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-download/googletest-prefix/tmp/googletest-mkdirs.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/googletest-src" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitlab/ci/index.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.gitlab/ci/index.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,6 +138,9 @@
     &quot;second&quot;: &quot;89cbd4db-2153-42a1-bcc0-669ea4fbe002&quot;
   }
 }</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
     <option name="majorVersion" value="2024" />
@@ -79,33 +158,70 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "CMake Debug.${APP}.executor": "Debug",
-    "Docker.docker/Ubuntu2004.Dockerfile.executor": "Run",
-    "Docker.docker/Ubuntu2304.Dockerfile.executor": "Run",
-    "RunOnceActivity.RadMigrateCodeStyle": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "CICD__Deploy__Modification",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;CMake Debug.${APP}.executor&quot;: &quot;Debug&quot;,
+    &quot;Docker.docker/Ubuntu2004.Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker/Ubuntu2304.Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Docker.docker/Ubuntu2304.Dockerfile">
+    <configuration name="crypto_tests" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="crypto_back_testing" TARGET_NAME="crypto_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="crypto_back_testing" RUN_TARGET_NAME="crypto_tests" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="${APP}" type="CMakeListConfigurationType" factoryName="CMakeListConfigurationFactory" temporary="true">
       <method v="2" />
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="crypto_back_testing" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="crypto_back_testing" TARGET_NAME="crypto_back_testing" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="crypto_back_testing" RUN_TARGET_NAME="crypto_back_testing">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="gmock" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="crypto_back_testing" TARGET_NAME="gmock" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="gmock_main" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="crypto_back_testing" TARGET_NAME="gmock_main" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="gtest" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="crypto_back_testing" TARGET_NAME="gtest" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="gtest_main" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="crypto_back_testing" TARGET_NAME="gtest_main" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
       <deployment type="dockerfile">
@@ -140,9 +256,15 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="CMake Application.crypto_back_testing" />
+      <item itemvalue="CMake Application.gmock" />
+      <item itemvalue="CMake Application.gmock_main" />
+      <item itemvalue="CMake Application.gtest" />
+      <item itemvalue="CMake Application.gtest_main" />
       <item itemvalue="CMake Debug.${APP}" />
       <item itemvalue="Docker.docker/Ubuntu2304.Dockerfile" />
       <item itemvalue="Docker.docker/Ubuntu2004.Dockerfile" />
+      <item itemvalue="Google Test.crypto_tests" />
     </list>
     <recent_temporary>
       <list>
@@ -164,6 +286,8 @@
       <workItem from="1708242530721" duration="3129000" />
       <workItem from="1708275638352" duration="3166000" />
       <workItem from="1708321752188" duration="9809000" />
+      <workItem from="1708583077099" duration="75000" />
+      <workItem from="1708583172990" duration="443000" />
     </task>
     <servers />
   </component>
