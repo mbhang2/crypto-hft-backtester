@@ -30,7 +30,7 @@ build:docker:hadolint:
       changes:
         *hadolint-image-changes
 
-deploy:docker:hadolint:
+.deploy:docker:hadolint:
   stage: deploy
   extends: .docker
   variables:

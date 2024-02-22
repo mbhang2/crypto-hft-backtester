@@ -31,7 +31,7 @@ build:docker:clang-format:
       changes:
         *clang-format-image-changes
 
-deploy:docker:clang-format:
+.deploy:docker:clang-format:
   stage: deploy
   extends: .docker
   variables:

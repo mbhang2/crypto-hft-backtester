@@ -34,7 +34,7 @@ build:docker:ubuntu2004:
       changes:
         *ubuntu2004_changes
 
-deploy:docker:ubuntu2004:
+.deploy:docker:ubuntu2004:
   stage: deploy
   extends: .docker
   variables:
