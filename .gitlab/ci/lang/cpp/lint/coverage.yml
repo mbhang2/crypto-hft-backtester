@@ -17,9 +17,7 @@
 # It also worth to mention that such an artifact can occupy quite a lot of
 # space.
 check:cpp:coverage:
-  image:
-    name: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
-    entrypoint: [""]
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
   stage: check
   extends:
     - .build-cpp

@@ -13,9 +13,7 @@
 # limitations under the License.
 
 check:cpp:cppcheck:
-  image:
-    name: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
-    entrypoint: [""]
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
   stage: check
   extends:
     - .build-cpp

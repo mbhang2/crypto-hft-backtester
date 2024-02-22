@@ -13,7 +13,7 @@
 # limitations under the License.
 
 remove_old_pipelines:
-  image: $BPROTO_CI_IMAGES_REGISTRY/alpine3:latest
+  image: alpine:latest
   stage: misc
   dependencies: []
   needs: []
