@@ -46,9 +46,7 @@ workflow:
 # --------------------------------------------------------------------- #
 
 .check:
-  image:
-    name: $BPROTO_CI_IMAGES_REGISTRY/alpine3:latest
-    entrypoint: [""]
+  image: alpine:latest
   stage: check
   dependencies: []
   needs: []

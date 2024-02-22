@@ -15,12 +15,7 @@
 # Build
 
 build:cpp:ubuntu2004:gcc:
-  image:
-    name: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2004:latest
-    entrypoint: [""]
-  script:
-    - apt-get update
-    - apt-get install -y cmake
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2004:latest
   extends:
     - .build-cpp
     - .only-review-cpp
@@ -34,12 +29,7 @@ build:cpp:ubuntu2004:gcc:
 # Test
 
 test:cpp:ubuntu2004:gcc:
-  image:
-    name: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2004:latest
-    entrypoint: [""]
-  script:
-    - apt-get update
-    - apt-get install -y cmake
+  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2004:latest
   extends: .test-cpp
   needs:
     - job: build:cpp:ubuntu2004:gcc
