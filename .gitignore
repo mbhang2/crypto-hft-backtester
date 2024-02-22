@@ -53,6 +53,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 cmkae-build-debug/
+cmake-build-debug/
 
 ### Windows template
 # Windows thumbnail cache files
