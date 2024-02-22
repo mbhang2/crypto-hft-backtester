@@ -17,4 +17,4 @@ check:cpp:iostream:
     - .check
     - .only-review-cpp
   script:
-    - check_cpp_iostream.sh
+    - bash ./scripts/cicd/lint/check_cpp_iostream.sh

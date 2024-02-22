@@ -16,7 +16,7 @@ check:shell:lint:
   extends:
     - .check
   script:
-    - check_shell_conventions.sh
+    - ./scripts/cicd/lint/check_shell_conventions.sh
   only:
     refs:
       - merge_requests

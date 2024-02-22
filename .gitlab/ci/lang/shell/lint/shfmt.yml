@@ -16,7 +16,7 @@ check:shell:format:
   extends:
     - .check
   script:
-    - check_shell_files_formatting.sh
+    - ./scripts/cicd/lint/check_shell_files_formatting.sh
   only:
     refs:
       - merge_requests

@@ -17,7 +17,7 @@ check:python:flake8:
     - .check
     - .only-review-python
   script:
-    - bash check_python_conventions.sh
+    - bash ./scripts/cicd/lint/check_python_conventions.sh
   artifacts:
     when: on_failure
     expire_in: 1 day

@@ -15,7 +15,7 @@
 # Build
 
 build:cpp:ubuntu2004:gcc:
-  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2004:latest
+  image: ubuntu2004:latest
   extends:
     - .build-cpp
     - .only-review-cpp
@@ -29,7 +29,7 @@ build:cpp:ubuntu2004:gcc:
 # Test
 
 test:cpp:ubuntu2004:gcc:
-  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2004:latest
+  image: ubuntu2004:latest
   extends: .test-cpp
   needs:
     - job: build:cpp:ubuntu2004:gcc

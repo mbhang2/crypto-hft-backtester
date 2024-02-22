@@ -17,7 +17,7 @@ check:code:spelling:
     - .check
     - .only_review
   script:
-    - find_typos.sh
+    - ./scripts/cicd/lint/find_typos.sh
   artifacts:
     when: on_failure
     expire_in: 1 day
@@ -30,7 +30,7 @@ check:commits:spelling:
   extends:
     - .check
   script:
-    - check_commit_messages.sh
+    - ./scripts/cicd/lint/check_commit_messages.sh
   only:
     refs:
       - merge_requests

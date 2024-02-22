@@ -18,7 +18,7 @@ check:cmake:format:
   extends: .check-cmake
   allow_failure: true
   script:
-    - check_cmake_files_formatting.sh
+    - ./scripts/cicd/lint/check_cmake_files_formatting.sh
   artifacts:
     when: on_failure
     expire_in: 1 day
@@ -33,7 +33,7 @@ check:cmake:lint:
   extends: .check-cmake
   allow_failure: true
   script:
-    - check_cmake_conventions.sh
+    - ./scripts/cicd/lint/check_cmake_conventions.sh
   artifacts:
     when: on_failure
     expire_in: 1 day

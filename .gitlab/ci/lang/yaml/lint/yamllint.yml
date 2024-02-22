@@ -16,7 +16,7 @@ check:yaml:format:
   extends:
     - .check
   script:
-    - check_yaml_files_formatting.sh
+    - ./scripts/cicd/lint/check_yaml_files_formatting.sh
   only:
     refs:
       - merge_requests
