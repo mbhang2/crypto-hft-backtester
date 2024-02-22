@@ -26,7 +26,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75c81f46-f40c-45d1-9eea-ad1018f6fab8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitlab/ci/common.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.gitlab/ci/common.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitlab/ci/index.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.gitlab/ci/index.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
