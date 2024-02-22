@@ -13,9 +13,7 @@
 # limitations under the License.
 
 .build-hugo-page:
-  image:
-    name: registry.gitlab.com/pages/hugo/hugo_extended:0.111.3
-    entrypoint: [""]
+  image: registry.gitlab.com/pages/hugo/hugo_extended:0.111.3
   variables:
     # GitLab CI/CD pipeline settings
     GIT_SUBMODULE_DEPTH: 1

@@ -13,9 +13,7 @@
 # limitations under the License.
 
 check:cpp:format:
-  image:
-    name: $BPROTO_CI_IMAGES_REGISTRY/clang-format:latest
-    entrypoint: [""]
+  image: $BPROTO_CI_IMAGES_REGISTRY/clang-format:latest
   extends:
     - .check
     - .only-review-cpp

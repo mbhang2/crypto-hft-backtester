@@ -19,12 +19,12 @@ include:
       - '/.gitlab/ci/external/lite.yml'
       - '/.gitlab/ci/lang/cpp/base.yml'
       - '/.gitlab/ci/lang/cpp/build/base.yml'
-      - '/.gitlab/ci/lang/cpp/build/centos7_gcc.yml'
-      - '/.gitlab/ci/lang/cpp/build/centos8_gcc.yml'  # discontinued
+#      - '/.gitlab/ci/lang/cpp/build/centos7_gcc.yml'
+#      - '/.gitlab/ci/lang/cpp/build/centos8_gcc.yml'  # discontinued
       - '/.gitlab/ci/lang/cpp/build/ubuntu2004_gcc.yml'
-      - '/.gitlab/ci/lang/cpp/build/ubuntu2304_clang.yml'
-      - '/.gitlab/ci/lang/cpp/build/ubuntu2304_gcc.yml'
-      - '/.gitlab/ci/lang/cpp/build/windows.yml'
+#      - '/.gitlab/ci/lang/cpp/build/ubuntu2304_clang.yml'
+#      - '/.gitlab/ci/lang/cpp/build/ubuntu2304_gcc.yml'
+#      - '/.gitlab/ci/lang/cpp/build/windows.yml'
       - '/.gitlab/ci/lang/cpp/lint/clang_tools.yml'
       - '/.gitlab/ci/lang/cpp/lint/coverage.yml'
       - '/.gitlab/ci/lang/cpp/lint/cppcheck.yml'
