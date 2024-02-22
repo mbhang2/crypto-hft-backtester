@@ -20,7 +20,7 @@ check:docker:lint:
   needs: []
   script:
     - export BPROTO_CI_MERGE_REQUEST_CHANGED_FILES="$(filter_files.sh)"
-    - bash check_docker_conventions.sh
+    - bash ./scripts/cicd/lint/check_docker_conventions.sh
   only:
     refs:
       - merge_requests

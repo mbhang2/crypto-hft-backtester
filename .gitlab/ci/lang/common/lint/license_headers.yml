@@ -25,7 +25,7 @@ check:code:license:
     - .check
   allow_failure: true
   script:
-    - check_license_headers.sh
+    - ./scripts/cicd/lint/check_license_headers.sh
   only:
     refs:
       - merge_requests

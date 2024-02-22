@@ -17,7 +17,7 @@ check:python:isort:
     - .check
     - .only-review-python
   script:
-    - bash check_python_imports.sh
+    - ./scripts/cicd/lint/bash check_python_imports.sh
   artifacts:
     when: on_failure
     expire_in: 1 day
