@@ -25,7 +25,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75c81f46-f40c-45d1-9eea-ad1018f6fab8" name="Changes" comment="" />
+    <list default="true" id="75c81f46-f40c-45d1-9eea-ad1018f6fab8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitlab/ci/common.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.gitlab/ci/common.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,9 +70,6 @@
     &quot;second&quot;: &quot;89cbd4db-2153-42a1-bcc0-669ea4fbe002&quot;
   }
 }</component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -90,33 +90,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "CMake Debug.${APP}.executor": "Debug",
-    "Docker.docker/Conan.Dockerfile.executor": "Run",
-    "Docker.docker/Ubuntu2004.Dockerfile.executor": "Run",
-    "Docker.docker/Ubuntu2304.Dockerfile.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.RadMigrateCodeStyle": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "CICD__setup",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;CMake Debug.${APP}.executor&quot;: &quot;Debug&quot;,
+    &quot;Docker.docker/Ubuntu2004.Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker/Ubuntu2304.Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Docker.docker/Ubuntu2004.Dockerfile">
+}</component>
+  <component name="RunManager" selected="Docker.docker/Ubuntu2304.Dockerfile">
     <configuration name="crypto_tests" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="crypto_back_testing" TARGET_NAME="crypto_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="crypto_back_testing" RUN_TARGET_NAME="crypto_tests" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -162,15 +161,6 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="docker/Conan.Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
-      <deployment type="dockerfile">
-        <settings>
-          <option name="containerName" value="" />
-          <option name="sourceFilePath" value="docker/Conan.Dockerfile" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
     <configuration name="docker/Ubuntu2004.Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
       <deployment type="dockerfile">
         <settings>
@@ -204,16 +194,14 @@
       <item itemvalue="CMake Application.gtest" />
       <item itemvalue="CMake Application.gtest_main" />
       <item itemvalue="CMake Debug.${APP}" />
-      <item itemvalue="Docker.docker/Conan.Dockerfile" />
       <item itemvalue="Docker.docker/Ubuntu2304.Dockerfile" />
       <item itemvalue="Docker.docker/Ubuntu2004.Dockerfile" />
       <item itemvalue="Google Test.crypto_tests" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Docker.docker/Ubuntu2004.Dockerfile" />
-        <item itemvalue="Docker.docker/Conan.Dockerfile" />
         <item itemvalue="Docker.docker/Ubuntu2304.Dockerfile" />
+        <item itemvalue="Docker.docker/Ubuntu2004.Dockerfile" />
         <item itemvalue="CMake Debug.${APP}" />
       </list>
     </recent_temporary>
@@ -231,7 +219,7 @@
       <workItem from="1708275638352" duration="3166000" />
       <workItem from="1708321752188" duration="9809000" />
       <workItem from="1708583077099" duration="75000" />
-      <workItem from="1708583172990" duration="3865000" />
+      <workItem from="1708583172990" duration="526000" />
     </task>
     <servers />
   </component>
