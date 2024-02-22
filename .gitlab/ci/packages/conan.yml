@@ -44,7 +44,7 @@ build:conan:
       changes:
         *conan-changes
 
-deploy:conan:
+.deploy:conan:
   stage: deploy
   extends: .conan-base
   before_script:
