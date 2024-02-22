@@ -18,7 +18,7 @@ remove_old_pipelines:
   dependencies: []
   needs: []
   script:
-    - remove_old_pipelines.py
+    - python ./scripts/cicd/remove_old_pipelines.py
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $BPROTO_CI_ENABLE_PIPELINES_CLEANUP == "true"'
     - if: '$CI_PIPELINE_SOURCE == "web"'

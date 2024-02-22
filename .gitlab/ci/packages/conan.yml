@@ -13,7 +13,7 @@
 # limitations under the License.
 
 .conan-base:
-  image: $BPROTO_CI_IMAGES_REGISTRY/conan:latest
+  image: conanio/gcc9:latest
   script:
     - |-
         declare -r name="${BPROTO_CI_CONAN_PACKAGE_NAME}"
@@ -49,7 +49,7 @@ deploy:conan:
   extends: .conan-base
   before_script:
     - conan remote add gitlab "${BPROTO_CI_CONAN_PACKAGES_REGISTRY}"
-    - conan user "${BPROTO_CI_DEPLOY_USER}" -r gitlab -p "${BPROTO_CI_DEPLOY_TOKEN}"
+    - conan user "${CI_DEPLOY_USER}" -r gitlab -p "${CI_DEPLOY_TOKEN}"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never

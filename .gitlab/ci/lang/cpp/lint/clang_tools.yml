@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 check:cpp:format:
-  image: $BPROTO_CI_IMAGES_REGISTRY/clang-format:latest
+  image: kitware/cmake:ci-gcc_cxx_modules-x86_64-2023-09-21
   extends:
     - .check
     - .only-review-cpp
   script:
-    - check_cpp_files_formatting.sh
+    - bash ./scripts/cicd/lint/check_cpp_files_formatting.sh
   artifacts:
     when: on_failure
     expire_in: 1 day
@@ -28,7 +29,7 @@ check:cpp:format:
       - clang_format.patch
 
 .chck-cpp-clang-tidy:
-  image: $BPROTO_CI_IMAGES_REGISTRY/ubuntu2304:latest
+  image: kitware/cmake:ci-gcc_cxx_modules-x86_64-2023-09-21
   stage: check
   extends:
     - .build-cpp
@@ -39,7 +40,7 @@ check:cpp:format:
     CC: gcc
     CXX: g++
   script:
-    - check_cpp_conventions.sh
+    - bash ./scripts/cicd/lint/check_cpp_conventions.sh
   artifacts:
     when: on_failure
     expire_in: 1 day

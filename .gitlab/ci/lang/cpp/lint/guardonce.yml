@@ -17,7 +17,7 @@ check:cpp:include_guards:
     - .check
     - .only-review-hpp
   script:
-    - check_cpp_include_guards.sh
+    - bash ./scripts/cicd/lint/check_cpp_include_guards.sh
   artifacts:
     when: on_failure
     expire_in: 1 day
