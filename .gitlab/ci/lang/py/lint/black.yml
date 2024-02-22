@@ -17,7 +17,7 @@ check:python:black:
     - .check
     - .only-review-python
   script:
-    - bash check_python_files_formatting.sh
+    - bash ./scripts/cicd/lint/check_python_files_formatting.sh
   artifacts:
     when: on_failure
     expire_in: 1 day
