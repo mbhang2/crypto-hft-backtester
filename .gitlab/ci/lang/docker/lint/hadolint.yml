@@ -12,4 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+check:docker:lint:
+  image:
+    name: $BPROTO_CI_IMAGES_REGISTRY/hadolint:latest
+  stage: check
+  dependencies: []
+  needs: []
+  script:
+    - export BPROTO_CI_MERGE_REQUEST_CHANGED_FILES="$(filter_files.sh)"
+    - bash check_docker_conventions.sh
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.Dockerfile"
+  artifacts:
+    when: on_failure
+    expire_in: 1 day
+    expose_as: 'HadoLint Report'
+    name: "HadoLint-$CI_COMMIT_REF_SLUG"
+    paths:
+      - hadolint.log

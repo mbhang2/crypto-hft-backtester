@@ -67,7 +67,7 @@ Checks: >
   -readability-redundant-access-specifiers
 CheckOptions:
   - key: bugprone-assert-side-effect.AssertMacros
-    value: 'assert,crypto_back_testing_ASSERT,crypto_back_testing_ASSERT_MSG'
+    value: 'assert,BPROTO_ASSERT,BPROTO_ASSERT_MSG'
 
   - key: bugprone-suspicious-enum-usage.StrictMode
     value: true
@@ -157,9 +157,9 @@ CheckOptions:
   - key: readability-identifier-naming.MacroDefinitionCase
     value: UPPER_CASE
   - key: readability-identifier-naming.MacroDefinitionIgnoredRegexp
-    value: '^(BOOST_TEST_MODULE|MAGIC_ENUM_.*|__crypto_back_testing_[A-Z_]+__)$'
+    value: '^(BOOST_TEST_MODULE|MAGIC_ENUM_.*|__BPROTO_[A-Z_]+__)$'
   - key: readability-identifier-naming.MacroDefinitionPrefix
-    value: 'crypto_back_testing_'
+    value: 'BPROTO_'
   - key: readability-identifier-naming.MacroDefinitionSuffix
     value: ''
   - key: readability-identifier-naming.MemberCase

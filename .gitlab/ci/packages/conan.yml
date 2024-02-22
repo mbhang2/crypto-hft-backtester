@@ -13,9 +13,7 @@
 # limitations under the License.
 
 .conan-base:
-  image:
-    name: $BPROTO_CI_IMAGES_REGISTRY/conan:latest
-    entrypoint: [""]
+  image: $BPROTO_CI_IMAGES_REGISTRY/conan:latest
   script:
     - |-
         declare -r name="${BPROTO_CI_CONAN_PACKAGE_NAME}"

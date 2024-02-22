@@ -23,9 +23,7 @@
       *sphinx-files-changes
 
 build:docs:
-  image:
-    name: "${BPROTO_CI_IMAGES_REGISTRY}/alpine3:latest"
-    entrypoint: [""]
+  image: "${BPROTO_CI_IMAGES_REGISTRY}/alpine3:latest"
   stage: build
   extends:
     - .only-review-sphinx-files
@@ -61,9 +59,7 @@ report:docs:
       - ./
 
 pages:
-  image:
-    name: "${BPROTO_CI_IMAGES_REGISTRY}/alpine3:latest"
-    entrypoint: [""]
+  image: "${BPROTO_CI_IMAGES_REGISTRY}/alpine3:latest"
   stage: deploy
   dependencies: []
   needs: []
