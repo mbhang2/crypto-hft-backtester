@@ -24,6 +24,7 @@ enable_testing()
 #   2. Maintaining a static copy of GoogleTest along with the source code.
 #      Aside from committing unnecessary code to the repo, it will make it
 #      difficult to maintain versions of GoogleTest
+########################################################################
 
 configure_file(CMakeLists.txt.googletest.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
@@ -47,8 +48,9 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 ########################################################################
 
 set(APP "crypto_back_testing")
-set(APP_HEADERS "include")
-set(APP_SOURCES "src/BackTesting.cpp")
+set(APP_HEADERS "include" "include/Backtesting/")
+set(APP_SOURCES "src/BackTesting.cpp"
+        include/Backtesting/order.h)
 set(APP_TESTER "crypto_tests")
 set(APP_TESTS "tests/CryptoTest.cpp")
 
