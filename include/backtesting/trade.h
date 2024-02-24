@@ -2,6 +2,7 @@
 
 #include <string>
 #include "exchange.h"
+#include "security.h"
 
 using namespace std;
 
@@ -14,7 +15,7 @@ class Trade {
         /**
          * Constructor to create a trade.
          */
-        Trade(const string& security_, const string& timestamp_, int side_, double size_, double price_, Exchange exchange_): 
+        Trade(Security security_, const string& timestamp_, int side_, double size_, double price_, Exchange exchange_): 
                 security(security_), timestamp(timestamp_), side(side_), size(size_), price(price_), exchange(exchange_) {}
 
         /**
@@ -25,7 +26,7 @@ class Trade {
         /**
          * Getter for security.
          */
-        string getSecurity() const {return security;}
+        Security getSecurity() const {return security;}
 
         /**
          * Getter for timestamp.
@@ -53,7 +54,7 @@ class Trade {
         Exchange getExchange() {return exchange;}
 
     protected:
-        const string security;      /*< Name of the security */
+        Security security;          /*< Name of the security */
         const string timestamp;     /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
         int side;                   /*< -1 for SELL, 1 for BUY */
         double size;                /*< Quantity of the order */
