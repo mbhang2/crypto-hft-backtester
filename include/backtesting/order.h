@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include "exchange.h"
+#include "security.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ class Order {
          * Constructor to create an order.
          * @todo add sanity check for security and unrealistic price
          */
-        Order(const string& security_, const string& timestamp_, const string& type_, int side_, double size_, double price_, OrderState state_, Exchange exchange_ = Exchange()): 
+        Order(Security security_, const string& timestamp_, const string& type_, int side_, double size_, double price_, OrderState state_, Exchange exchange_ = Exchange()): 
                 security(security_), timestamp(timestamp_), type(type_), side(side_), size(size_), price(price_), state(state_), exchange(exchange_) {
                     // Sanity checks
                     if (side != 1 && side != -1) {
@@ -38,7 +39,7 @@ class Order {
                         std::cerr << "Invalid order size: " << size_ << std::endl;
                         state = OrderState::Rejected;
                     }
-                    if (type == "LIMIT" && price_ <= 0.0) {
+                    if ((type == "LIMIT" || type == "STOPLIMIT") && price_ <= 0.0) {
                         std::cerr << "Invalid order price: " << price_ << std::endl;
                         state = OrderState::Rejected;
                     }
@@ -80,7 +81,7 @@ class Order {
         /**
          * Getter for security.
          */
-        string getSecurity() const {return security;}
+        Security getSecurity() const {return security;}
 
         /**
          * Getter for timestamp.
@@ -118,9 +119,9 @@ class Order {
         Exchange getExchange() {return exchange;}
 
     protected:
-        const string security;      /*< Name of the security */
+        Security security           /*< Security */
         const string timestamp;     /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
-        const string type;           /*< Order type */
+        const string type;          /*< Order type */
         int side;                   /*< -1 for SELL, 1 for BUY */
         double size;                /*< Quantity of the order */
         double price;               /*< Price for LIMIT and STOP LIMIT orders. -1 for MARKET and STOP orders */
@@ -137,7 +138,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(const string& security_, const string& timestamp_, int side_, double size_, double price_, OrderState state_): 
+    Limit(Security security_, const string& timestamp_, int side_, double size_, double price_, OrderState state_): 
             Order(security_, timestamp_, "LIMIT", side_, size_, price_, state_) {}
 
     /**
@@ -192,7 +193,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(const string& security_, const string& timestamp_, int side_, double size_, OrderState state_): 
+    Market(Security security_, const string& timestamp_, int side_, double size_, OrderState state_): 
             Order(security_, timestamp_, "MARKET", side_, size_, -1.0, state_) {}
 
     /**
@@ -227,7 +228,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(const string& security_, const string& timestamp_, int side_, double size_, double trigger_price_, OrderState state_): 
+    Stop(Security security_, const string& timestamp_, int side_, double size_, double trigger_price_, OrderState state_): 
             Order(security_, timestamp_, "STOP", side_, size_, -1.0, state_) {
                 triggered = false, trigger_price = trigger_price_;
             }
@@ -293,7 +294,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(const string& security_, const string& timestamp_, int side_, double size_, double price_, double trigger_price_, OrderState state_): 
+    StopLimit(Security security_, const string& timestamp_, int side_, double size_, double price_, double trigger_price_, OrderState state_): 
             Order(security_, timestamp_, "STOPLIMIT", side_, size_, price_, state_) {
                 triggered = false, trigger_price = trigger_price_;
             }
