@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -15,6 +16,18 @@ class Security {
          */
         Security(const string& base_, const string& quote_):
                 base(base_), quote(quote_) {}
+
+        /**
+         * Destructor.
+         */
+        virtual ~Security() {}
+
+        /**
+         * Override print function
+         */
+        void print() const {
+            std::cout << base << "/" << quote << std::endl;
+        }   
 
         /**
          * Equal operator. 
