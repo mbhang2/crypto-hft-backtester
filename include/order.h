@@ -2,7 +2,9 @@
 
 #include <cstdint>
 #include <iostream>
+#include <optional>
 #include <string>
+#include "exchange.h"
 
 using namespace std;
 
@@ -25,8 +27,8 @@ class Order {
          * Constructor to create an order.
          * @todo add sanity check for security and unrealistic price
          */
-        Order(const string& security_, const string& timestamp_, const string& type_, int side_, double size_, double price_, OrderState state_): 
-                security(security_), timestamp(timestamp_), type(type_), side(side_), size(size_), price(price_), state(state_) {
+        Order(const string& security_, const string& timestamp_, const string& type_, int side_, double size_, double price_, OrderState state_, Exchange exchange_ = Exchange()): 
+                security(security_), timestamp(timestamp_), type(type_), side(side_), size(size_), price(price_), state(state_), exchange(exchange_) {
                     // Sanity checks
                     if (side != 1 && side != -1) {
                         std::cerr << "Invalid order side: " << side << std::endl;
@@ -110,6 +112,11 @@ class Order {
          */
         OrderState getOrderState() {return state;}
 
+        /**
+         * Getter for exchange.
+         */
+        Exchange getExchange() {return exchange;}
+
     protected:
         const string security;      /*< Name of the security */
         const string timestamp;     /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
@@ -117,6 +124,7 @@ class Order {
         int side;                   /*< -1 for SELL, 1 for BUY */
         double size;                /*< Quantity of the order */
         double price;               /*< Price for LIMIT and STOP LIMIT orders. -1 for MARKET and STOP orders */
+        Exchange exchange;          /*< Target exchange for an order (optional) */
         OrderState state;           /*< State of the order */
 };
 
