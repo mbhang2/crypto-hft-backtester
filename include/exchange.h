@@ -21,6 +21,11 @@ class Exchange {
         Exchange(const std::string& name_, int receiving_latency_, int sending_latency_): 
                 name(name_), receiving_latency(receiving_latency_), sending_latency(sending_latency_) {}
 
+        /**
+         * Destructor
+         */
+        virtual ~Exchange() {}
+
     protected:
         std::string name;           /*< Exchange name */
         int receiving_latency;      /*< Latency from an exchange in nanoseconds */
