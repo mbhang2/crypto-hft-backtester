@@ -23,11 +23,12 @@ class Security {
         virtual ~Security() {}
 
         /**
-         * Override print function
+         * Override << operator
          */
-        void print() const {
-            std::cout << base << "/" << quote << std::endl;
-        }   
+        friend std::ostream& operator<<(std::ostream& os, const Security& sec) {
+            os << sec.base << "/" << sec.quote;
+            return os;
+        }
 
         /**
          * Equal operator. 

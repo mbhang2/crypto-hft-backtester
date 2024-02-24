@@ -15,8 +15,8 @@ class Trade {
         /**
          * Constructor to create a trade.
          */
-        Trade(Security security_, const string& timestamp_, int side_, double size_, double price_, Exchange exchange_): 
-                security(security_), timestamp(timestamp_), side(side_), size(size_), price(price_), exchange(exchange_) {}
+        Trade(Security security_, const string& timestamp_, int side_, double size_, double price_): 
+                security(security_), timestamp(timestamp_), side(side_), size(size_), price(price_) {}
 
         /**
          * Destructor
