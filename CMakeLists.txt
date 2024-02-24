@@ -48,9 +48,9 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 ########################################################################
 
 set(APP "crypto_back_testing")
-set(APP_HEADERS "include" "include/Backtesting/")
+set(APP_HEADERS "include" "include/backtesting/")
 set(APP_SOURCES "src/BackTesting.cpp"
-        include/Backtesting/order.h)
+        include/backtesting/order.h)
 set(APP_TESTER "crypto_tests")
 set(APP_TESTS "tests/CryptoTest.cpp")
 

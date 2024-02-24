@@ -5,6 +5,10 @@
 
 using namespace std;
 
+
+/**
+ * Abstract class for trades.
+ */
 class Trade {
     public:
         /**
