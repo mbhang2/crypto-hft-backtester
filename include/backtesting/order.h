@@ -9,6 +9,9 @@
 
 using namespace std;
 
+/**
+ * Enumeration class for order state
+ */
 enum class OrderState {
     Working,
     Filled,
@@ -16,6 +19,32 @@ enum class OrderState {
     Cancelled,
     Rejected
 };
+
+/**
+ * << operator overload for OrderState class.
+ */
+std::ostream& operator<<(std::ostream& os, const OrderState& state) {
+    switch (state) {
+        case OrderState::Working:
+            os << "Working";
+            break;
+        case OrderState::Filled:
+            os << "Filled";
+            break;
+        case OrderState::PartiallyFilled:
+            os << "Partially Filled";
+            break;
+        case OrderState::Cancelled:
+            os << "Cancelled";
+            break;
+        case OrderState::Rejected:
+            os << "Rejected";
+            break;
+        default:
+            os << "Unknown"; // Handle any other values gracefully
+    }
+    return os;
+}
 
 
 /**
@@ -28,8 +57,8 @@ class Order {
          * Constructor to create an order.
          * @todo add sanity check for security and unrealistic price
          */
-        Order(Security security_, const string& timestamp_, const string& type_, int side_, double size_, double price_, OrderState state_, Exchange exchange_ = Exchange()): 
-                security(security_), timestamp(timestamp_), type(type_), side(side_), size(size_), price(price_), state(state_), exchange(exchange_) {
+        Order(Security security_, const string& timestamp_, const string& type_, int side_, double size_, double price_): 
+                security(security_), timestamp(timestamp_), type(type_), side(side_), size(size_), price(price_) {
                     // Sanity checks
                     if (side != 1 && side != -1) {
                         std::cerr << "Invalid order side: " << side << std::endl;
@@ -57,11 +86,6 @@ class Order {
          * @return Boolean whether the order could be filled
          */
         virtual bool checkFillability(double best_bid, double best_ask) const = 0;
-
-        /**
-         * Modifies the order.
-         */
-        virtual void modifyOrder() const = 0;
 
 
         /**
@@ -96,37 +120,37 @@ class Order {
         /**
          * Getter for side.
          */
-        int getSide() {return side;}
+        int getSide() const {return side;}
 
         /**
          * Getter for size.
          */
-        double getSize() {return size;}
+        double getSize() const {return size;}
 
         /**
          * Getter for price.
          */
-        double getPrice() {return price;}
+        double getPrice() const {return price;}
 
         /**
          * Getter for orderState.
          */
-        OrderState getOrderState() {return state;}
+        OrderState getOrderState() const {return state;}
 
         /**
          * Getter for exchange.
          */
-        Exchange getExchange() {return exchange;}
+        Exchange getExchange() const {return exchange;}
 
     protected:
-        Security security           /*< Security */
+        Security security;          /*< Security */
         const string timestamp;     /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
         const string type;          /*< Order type */
         int side;                   /*< -1 for SELL, 1 for BUY */
         double size;                /*< Quantity of the order */
         double price;               /*< Price for LIMIT and STOP LIMIT orders. -1 for MARKET and STOP orders */
         Exchange exchange;          /*< Target exchange for an order (optional) */
-        OrderState state;           /*< State of the order */
+        OrderState state = OrderState::Working;     /*< State of the order */
 };
 
 
@@ -138,8 +162,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(Security security_, const string& timestamp_, int side_, double size_, double price_, OrderState state_): 
-            Order(security_, timestamp_, "LIMIT", side_, size_, price_, state_) {}
+    Limit(Security security_, const string& timestamp_, int side_, double size_, double price_): 
+            Order(security_, timestamp_, "LIMIT", side_, size_, price_) {}
 
     /**
      * Checks if the order could be filled.
@@ -172,6 +196,10 @@ public:
             std::cerr << "Invalid order price: " << modified_price << std::endl;
             return;
         }
+        if (filled_size < 0.0) {
+            std::cerr << "Invalid filled_size: " << filled_size << std::endl;
+            return;
+        }
 
         if (filled_size == size) {
             state = OrderState::Filled;
@@ -181,6 +209,23 @@ public:
         }
 
         size = modified_size, price = modified_price;
+    }
+
+    /**
+     * Override << operator for Limit class.
+     */
+    friend std::ostream& operator<<(std::ostream& os, const Limit& limit) {
+        string s = (limit.getSide() == 1) ? "Buy" : "Sell";
+        os << "========== Order Information ==========" << endl;
+        os << "Security: " << limit.getSecurity() << endl;
+        os << "Timestamp: " << limit.getTimestamp() << endl;
+        os << "Order Type: " << limit.getOrderType() << endl;
+        os << "Side: " << s << endl;
+        os << "Size: " << limit.getSize() << endl;
+        os << "Price: " << limit.getPrice() << endl;
+        os << "Order State: " << limit.getOrderState() << endl;
+        os << "=======================================" << endl;
+        return os;
     }
 };
 
@@ -193,8 +238,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(Security security_, const string& timestamp_, int side_, double size_, OrderState state_): 
-            Order(security_, timestamp_, "MARKET", side_, size_, -1.0, state_) {}
+    Market(Security security_, const string& timestamp_, int side_, double size_): 
+            Order(security_, timestamp_, "MARKET", side_, size_, -1.0) {}
 
     /**
      * Checks if the order could be filled.
@@ -217,6 +262,22 @@ public:
         
         state = OrderState::Filled;
     }
+
+    /**
+     * Override << operator for Market class.
+     */
+    friend std::ostream& operator<<(std::ostream& os, const Market& market) {
+        string s = (market.getSide() == 1) ? "Buy" : "Sell";
+        os << "========== Order Information ==========" << endl;
+        os << "Security: " << market.getSecurity() << endl;
+        os << "Timestamp: " << market.getTimestamp() << endl;
+        os << "Order Type: " << market.getOrderType() << endl;
+        os << "Side: " << s << endl;
+        os << "Size: " << market.getSize() << endl;
+        os << "Order State: " << market.getOrderState() << endl;
+        os << "=======================================" << endl;
+        return os;
+    }
 };
 
 
@@ -228,8 +289,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security security_, const string& timestamp_, int side_, double size_, double trigger_price_, OrderState state_): 
-            Order(security_, timestamp_, "STOP", side_, size_, -1.0, state_) {
+    Stop(Security security_, const string& timestamp_, int side_, double size_, double trigger_price_): 
+            Order(security_, timestamp_, "STOP", side_, size_, -1.0) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -259,6 +320,10 @@ public:
         }
         if (modified_trigger_price <= 0.0) {
             std::cerr << "Invalid order trigger price: " << modified_trigger_price << std::endl;
+            return;
+        }
+        if (filled_size < 0.0) {
+            std::cerr << "Invalid filled_size: " << filled_size << std::endl;
             return;
         }
 
@@ -294,8 +359,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(Security security_, const string& timestamp_, int side_, double size_, double price_, double trigger_price_, OrderState state_): 
-            Order(security_, timestamp_, "STOPLIMIT", side_, size_, price_, state_) {
+    StopLimit(Security security_, const string& timestamp_, int side_, double size_, double price_, double trigger_price_): 
+            Order(security_, timestamp_, "STOPLIMIT", side_, size_, price_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -334,6 +399,10 @@ public:
         }
         if (modified_trigger_price <= 0.0) {
             std::cerr << "Invalid order trigger price: " << modified_trigger_price << std::endl;
+            return;
+        }
+        if (filled_size < 0.0) {
+            std::cerr << "Invalid filled_size: " << filled_size << std::endl;
             return;
         }
 
