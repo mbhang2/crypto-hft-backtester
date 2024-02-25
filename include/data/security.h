@@ -51,8 +51,8 @@ class Security {
         struct Hash {
             size_t operator()(const Security& sec) const {
                 // Combine the hash values of base and quote
-                size_t baseHash = std::hash<std::string>{}(sec.base);
-                size_t quoteHash = std::hash<std::string>{}(sec.quote);
+                size_t baseHash = hash<string>{}(sec.base);
+                size_t quoteHash = hash<string>{}(sec.quote);
                 return baseHash ^ (quoteHash << 1); // XOR and shift
             }
         };
