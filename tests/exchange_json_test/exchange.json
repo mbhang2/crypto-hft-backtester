@@ -1,0 +1,55 @@
+{
+    "Binance": {
+        "nanosecondLatencyTo": 1000,
+        "nanosecondLatencyFrom": 800,
+        "tradeingRules": {
+            "BTC/USDT": {
+                "spot": {
+                    "tickSize": 0.01,
+                    "minimumOrderSize": 5,
+                    "maximumMarketOrderAmount": 123.30824441
+                }, 
+                "perpetual": {
+
+                }
+            },
+            "ETH/USDT": {
+                "spot": {
+                    "tickSize": 0.01,
+                    "minimumOrderSize": 5,
+                    "maximumMarketOrderAmount": 1966.78167083
+                }, 
+                "perpetual": {
+
+                }
+            },
+            "BNB/USDT": {
+                "spot": {
+                    "tickSize": 0.1,
+                    "minimumOrderSize": 5,
+                    "maximumMarketOrderAmount": 13207.314625
+                }, 
+                "perpetual": {
+
+                }
+            }, 
+            "XRP/USDT": {
+                "spot": {
+                    "tickSize": 0.00001,
+                    "minimumOrderSize": 5,
+                    "maximumMarketOrderAmount": 7060750.70833333
+                }, 
+                "perpetual": {
+
+                }
+            }
+        }
+    },
+    "OKX": {
+        "nanosecondLatencyTo": 1200,
+        "nanosecondLatencyFrom": 1000,
+        "tradeingRules": {
+            
+        }
+    }
+}
