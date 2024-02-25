@@ -2,40 +2,27 @@
 #include "../include/data/security.h"
 #include "../include/data/exchange.h"
 #include "../include/backtesting/order.h"
+#include "../include/backtesting/trade.h"
 
 using namespace std;
 
 
 int main() {
     Security BTCUSDT("BTC", "USDT");
+    Security ETHUSDT("ETH", "USDT");
+    Security XRPUSDT("XRP", "USDT");
+    Security BCHUSDT("BCH", "USDT");
 
-    StopLimit sb(BTCUSDT, "2024-02-24 12:30:05.123456789", 1, 1.5, 50000.50, 50001);
+    Exchange Binance("Binance", 1000, 1000);
 
-    cout << sb << endl;
+    Binance.loadTickSizesFromJson("tests/exchange_json_test/binance.json");
+    cout << "Testing tick size configuration" << endl;
+    cout << "Tick size for " << BTCUSDT << " is " << Binance.getTickSize(BTCUSDT) << endl;
+    cout << "Tick size for " << ETHUSDT << " is " << Binance.getTickSize(ETHUSDT) << endl;
+    cout << "Tick size for " << XRPUSDT << " is " << Binance.getTickSize(XRPUSDT) << endl;
 
-    double current_price = 50005;
-    double bb1 = 50000;
-    double bo1 = 50000.5;
-
-    cout << "Testing Stop Limit Buy Order @50000.5 with trigger price @ 50001 where current price = 50005" << endl;
-    sb.checkTriggered(current_price);
-    cout << sb.checkFillability(bb1,bo1) << endl;
-    cout << sb.isTriggered() << endl;
-
-    cout << "Testing Stop Limit Buy Order @50000.5 where best offer = 50000.25" << endl;
-    bo1 = 50000.25;
-    cout << sb.checkFillability(bb1, bo1) << endl;
-
-    sb.fillOrder(0.5);
-    cout << "Filled 0.5" << endl;
-    cout << sb.getFilledSize() << endl;
-    cout << sb << endl;
-
-    cout << "Filled 1.0" << endl;
-    sb.fillOrder(1.0);
-    cout << sb << endl;
-
-    // cout << stop_buy << endl;
+    cout << "**Ticksize for BCH/USDT is not provided in json file for testing purposes" << endl;
+    cout << "Tick size for " << BCHUSDT << " is " << Binance.getTickSize(BCHUSDT) << endl;
 
     return 0;
 }
