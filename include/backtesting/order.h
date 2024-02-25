@@ -4,8 +4,8 @@
 #include <iostream>
 #include <optional>
 #include <string>
-#include "exchange.h"
-#include "security.h"
+#include "../data/exchange.h"
+#include "../data/security.h"
 
 using namespace std;
 
@@ -85,7 +85,27 @@ class Order {
          * @param best_ask The best ask price of the given security
          * @return Boolean whether the order could be filled
          */
-        virtual bool checkFillability(double best_bid, double best_ask) const = 0;
+        bool checkFillability() const {return false;}
+
+        /**
+         * Fills the order and change the order status accordingly
+         * @param qty Quantity to fill.
+        */
+        void fillOrder(double qty) {
+            // Sanity checks
+            if (qty <= 0 || qty > size - filled_size) {
+                std::cerr << "Invalid fill quantity: " << qty << std::endl;
+                return;
+            }
+
+            filled_size += qty;
+
+            if (filled_size == size) {
+                state = OrderState::Filled;
+            } else {
+                state = OrderState::PartiallyFilled;
+            }
+        }
 
 
         /**
@@ -128,6 +148,11 @@ class Order {
         double getSize() const {return size;}
 
         /**
+         * Getter for filled size.
+         */
+        double getFilledSize() const {return filled_size;}
+
+        /**
          * Getter for price.
          */
         double getPrice() const {return price;}
@@ -148,6 +173,7 @@ class Order {
         const string type;          /*< Order type */
         int side;                   /*< -1 for SELL, 1 for BUY */
         double size;                /*< Quantity of the order */
+        double filled_size = 0.0;         /*< Quantify filled of the order */
         double price;               /*< Price for LIMIT and STOP LIMIT orders. -1 for MARKET and STOP orders */
         Exchange exchange;          /*< Target exchange for an order (optional) */
         OrderState state = OrderState::Working;     /*< State of the order */
@@ -171,7 +197,7 @@ public:
      * @param best_ask The best ask price of the given security
      * @return Boolean whether the order could be filled
      */
-    bool checkFillability(double best_bid, double best_ask) const override {
+    bool checkFillability(double best_bid, double best_ask) const {
         if (!isLiveOrder()) {return false;}
         if (side == 1 && price >= best_ask) {return true;}
         if (side == -1 && price <= best_bid) {return true;}
@@ -180,32 +206,20 @@ public:
     }
 
     /**
-     * Modifies the order. Could be used not only when user changes the order, but also when the order is partially filled.
+     * Modifies the order. 
      * @param modified_size New size of the order
      * @param modified_price New price of the order
-     * @param filled_size Filled quantity if this function is called after being filled
      */
-    void modifyOrder(double modified_size, double modified_price, double filled_size) {
+    void modifyOrder(double modified_size, double modified_price) {
         // Sanity checks
         if (!isLiveOrder()) {return;}
-        if (modified_size <= 0.0) {
+        if (modified_size <= 0.0 || modified_size <= filled_size) {
             std::cerr << "Invalid order size: " << modified_size << std::endl;
             return;
         }
         if (modified_price <= 0.0) {
             std::cerr << "Invalid order price: " << modified_price << std::endl;
             return;
-        }
-        if (filled_size < 0.0) {
-            std::cerr << "Invalid filled_size: " << filled_size << std::endl;
-            return;
-        }
-
-        if (filled_size == size) {
-            state = OrderState::Filled;
-            return;
-        } else if (filled_size > 0.0) {
-            state = OrderState::PartiallyFilled;
         }
 
         size = modified_size, price = modified_price;
@@ -247,20 +261,10 @@ public:
      * @param best_ask The best ask price of the given security
      * @return Boolean whether the order could be filled
      */
-    bool checkFillability(double best_bid, double best_ask) const override {
+    bool checkFillability() const {
         if (!isLiveOrder()) {return false;}
 
         return true;
-    }
-
-    /**
-     * Modifies the order. Only used to change order state to filled.
-     */
-    void modifyOrder() {
-        // Sanity checks
-        if (!isLiveOrder()) {return;}
-        
-        state = OrderState::Filled;
     }
 
     /**
@@ -300,10 +304,28 @@ public:
      * @param best_ask The best ask price of the given security
      * @return Boolean whether the order could be filled
      */
-    bool checkFillability(double best_bid, double best_ask) const override {
+    bool checkFillability() const {
         if (!isLiveOrder() || !triggered) {return false;}
 
         return true;
+    }
+
+    /**
+     * Checks if the order could be triggered based on current price.
+     * @param current_price Current trading price of a security.
+     * @return Boolean whether the order is triggered
+     */
+    bool checkTriggered(double current_price) {
+        if (current_price <= 0.0) {
+            std::cerr << "Invalid current price: " << current_price << std::endl;
+            return false;
+        }
+
+        if ((side == 1 && current_price >= trigger_price) || (side == -1 && current_price <= trigger_price)) {
+            triggered = true;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -311,10 +333,10 @@ public:
      * @param modified_size New size of the order
      * @param modified_trigger_price New trigger price of the order
      */
-    void modifyOrder(double modified_size, double modified_trigger_price,  double filled_size) {
+    void modifyOrder(double modified_size, double modified_trigger_price, double current_price) {
         // Sanity checks
-        if (!isLiveOrder()) {return;}
-        if (modified_size <= 0.0) {
+        if (!isLiveOrder() || checkTriggered(current_price)) {return;}
+        if (modified_size <= 0.0 || modified_size <= filled_size) {
             std::cerr << "Invalid order size: " << modified_size << std::endl;
             return;
         }
@@ -322,27 +344,38 @@ public:
             std::cerr << "Invalid order trigger price: " << modified_trigger_price << std::endl;
             return;
         }
-        if (filled_size < 0.0) {
-            std::cerr << "Invalid filled_size: " << filled_size << std::endl;
-            return;
-        }
 
-        if (filled_size > 0) {
-            state = OrderState::Filled;
-            return;
-        }
         size = modified_size, trigger_price = modified_trigger_price;
     }
 
     /**
      * Getter for triggered.
      */
-    bool checkTriggered() {return triggered;}
+    bool isTriggered() const {return triggered;}
 
     /**
      * Getter for trigger price.
      */
-    double getTriggerPrice() {return trigger_price;}
+    double getTriggerPrice() const {return trigger_price;}
+
+    /**
+     * Override << operator for Limit class.
+     */
+    friend std::ostream& operator<<(std::ostream& os, const Stop& stop) {
+        string s = (stop.getSide() == 1) ? "Buy" : "Sell";
+        string trigger_status = (stop.isTriggered() == 1) ? "Triggered" : "Not Triggered";
+        os << "========== Order Information ==========" << endl;
+        os << "Security: " << stop.getSecurity() << endl;
+        os << "Timestamp: " << stop.getTimestamp() << endl;
+        os << "Order Type: " << stop.getOrderType() << endl;
+        os << "Side: " << s << endl;
+        os << "Size: " << stop.getSize() << endl;
+        os << "Trigger Price: " << stop.getTriggerPrice() << endl;
+        os << "Trigger Status: " << trigger_status << endl;
+        os << "Order State: " << stop.getOrderState() << endl;
+        os << "=======================================" << endl;
+        return os;
+    }
 
 private:
     bool triggered;         /*< Whether the trigger price has been hit */
@@ -370,12 +403,30 @@ public:
      * @param best_ask The best ask price of the given security
      * @return Boolean whether the order could be filled
      */
-    bool checkFillability(double best_bid, double best_ask) const override {
+    bool checkFillability(double best_bid, double best_ask) const {
         if (!isLiveOrder() || !triggered) {return false;}
 
         if (side == 1 && price >= best_ask) {return true;}
         if (side == -1 && price <= best_bid) {return true;}
 
+        return false;
+    }
+
+    /**
+     * Checks if the order could be triggered based on current price.
+     * @param current_price Current trading price of a security.
+     * @return Boolean whether the order is triggered
+     */
+    bool checkTriggered(double current_price) {
+        if (current_price <= 0.0) {
+            std::cerr << "Invalid current price: " << current_price << std::endl;
+            return false;
+        }
+
+        if ((side == 1 && current_price >= trigger_price) || (side == -1 && current_price <= trigger_price)) {
+            triggered = true;
+            return true;
+        }
         return false;
     }
 
@@ -386,10 +437,10 @@ public:
      * @param modified_trigger_price New trigger price of the order
      * @param filled_size Filled quantity if this function is called after being filled
      */
-    void modifyOrder(double modified_size, double modified_price, double modified_trigger_price, double filled_size) {
+    void modifyOrder(double modified_size, double modified_price, double modified_trigger_price, double current_price) {
         // Sanity checks
-        if (!isLiveOrder()) {return;}
-        if (modified_size <= 0.0) {
+        if (!isLiveOrder() || checkTriggered(current_price)) {return;}
+        if (modified_size <= 0.0 || modified_size <= filled_size) {
             std::cerr << "Invalid order size: " << modified_size << std::endl;
             return;
         }
@@ -401,32 +452,39 @@ public:
             std::cerr << "Invalid order trigger price: " << modified_trigger_price << std::endl;
             return;
         }
-        if (filled_size < 0.0) {
-            std::cerr << "Invalid filled_size: " << filled_size << std::endl;
-            return;
-        }
 
-        if (filled_size == size) {
-            state = OrderState::Filled;
-            return;
-        } else if (filled_size > 0.0) {
-            state = OrderState::PartiallyFilled;
-        }
-
-        size = modified_size, price = modified_price;
-
-        if (!triggered) {trigger_price=modified_trigger_price;}
+        size = modified_size, price = modified_price, trigger_price = modified_trigger_price;
     }
 
     /**
      * Getter for triggered.
      */
-    bool checkTriggered() {return triggered;}
+    bool isTriggered() const {return triggered;}
 
     /**
      * Getter for trigger price.
      */
-    double getTriggerPrice() {return trigger_price;}
+    double getTriggerPrice() const {return trigger_price;}
+
+    /**
+     * Override << operator for Limit class.
+     */
+    friend std::ostream& operator<<(std::ostream& os, const StopLimit& stoplimit) {
+        string s = (stoplimit.getSide() == 1) ? "Buy" : "Sell";
+        string trigger_status = (stoplimit.isTriggered() == 1) ? "Triggered" : "Not Triggered";
+        os << "========== Order Information ==========" << endl;
+        os << "Security: " << stoplimit.getSecurity() << endl;
+        os << "Timestamp: " << stoplimit.getTimestamp() << endl;
+        os << "Order Type: " << stoplimit.getOrderType() << endl;
+        os << "Side: " << s << endl;
+        os << "Size: " << stoplimit.getSize() << endl;
+        os << "Price: " << stoplimit.getPrice() << endl;
+        os << "Trigger Price: " << stoplimit.getTriggerPrice() << endl;
+        os << "Trigger Status: " << trigger_status << endl;
+        os << "Order State: " << stoplimit.getOrderState() << endl;
+        os << "=======================================" << endl;
+        return os;
+    }
 
 private:
     bool triggered;         /*< Whether the trigger price has been hit */
