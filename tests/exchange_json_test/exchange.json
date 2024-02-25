@@ -43,12 +43,18 @@
 
                 }
             }
+        }, 
+        "feeStructure": {
+
         }
     },
     "OKX": {
         "nanosecondLatencyTo": 1200,
         "nanosecondLatencyFrom": 1000,
         "tradeingRules": {
+            
+        },
+        "feeStructure": {
             
         }
     }

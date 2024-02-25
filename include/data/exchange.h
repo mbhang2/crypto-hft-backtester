@@ -72,6 +72,11 @@ class Exchange {
             return -1.0; // Could not find tick size
         }
 
+        /**
+         * Getter for the exchange name.
+         */
+        string getName() {return name;}
+
     protected:
         std::string name;           /*< Exchange name */
         int receiving_latency;      /*< Latency from an exchange in nanoseconds */
