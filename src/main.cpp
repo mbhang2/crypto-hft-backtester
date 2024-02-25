@@ -24,5 +24,9 @@ int main() {
     cout << "**Ticksize for BCH/USDT is not provided in json file for testing purposes" << endl;
     cout << "Tick size for " << BCHUSDT << " is " << Binance.getTickSize(BCHUSDT) << endl;
 
+    Limit l(BTCUSDT, "2024-02-24 12:30:05.123456789", 1, 1.5, 50000.00, Binance);
+
+    cout << l << endl;
+
     return 0;
 }

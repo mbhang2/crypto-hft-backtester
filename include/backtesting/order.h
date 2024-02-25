@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <iostream>
-#include <optional>
 #include <string>
 #include "../data/exchange.h"
 #include "../data/security.h"
@@ -49,7 +48,6 @@ std::ostream& operator<<(std::ostream& os, const OrderState& state) {
 
 /**
  * Abstract class for orders.
- * @todo Add exchange option
  */
 class Order {
     public:
@@ -57,8 +55,8 @@ class Order {
          * Constructor to create an order.
          * @todo add sanity check for security and unrealistic price
          */
-        Order(Security security_, const string& timestamp_, const string& type_, int side_, double size_, double price_): 
-                security(security_), timestamp(timestamp_), type(type_), side(side_), size(size_), price(price_) {
+        Order(Security security_, const string& timestamp_, const string& type_, int side_, double size_, double price_, Exchange exchange_): 
+                security(security_), timestamp(timestamp_), type(type_), side(side_), size(size_), price(price_), exchange(exchange_) {
                     // Sanity checks
                     if (side != 1 && side != -1) {
                         std::cerr << "Invalid order side: " << side << std::endl;
@@ -188,8 +186,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(Security security_, const string& timestamp_, int side_, double size_, double price_): 
-            Order(security_, timestamp_, "LIMIT", side_, size_, price_) {}
+    Limit(Security security_, const string& timestamp_, int side_, double size_, double price_, Exchange exchange_): 
+            Order(security_, timestamp_, "LIMIT", side_, size_, price_, exchange_) {}
 
     /**
      * Checks if the order could be filled.
@@ -232,6 +230,7 @@ public:
         string s = (limit.getSide() == 1) ? "Buy" : "Sell";
         os << "========== Order Information ==========" << endl;
         os << "Security: " << limit.getSecurity() << endl;
+        os << "Exchange: " << limit.getExchange().getName() << endl;
         os << "Timestamp: " << limit.getTimestamp() << endl;
         os << "Order Type: " << limit.getOrderType() << endl;
         os << "Side: " << s << endl;
@@ -252,8 +251,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(Security security_, const string& timestamp_, int side_, double size_): 
-            Order(security_, timestamp_, "MARKET", side_, size_, -1.0) {}
+    Market(Security security_, const string& timestamp_, int side_, double size_, Exchange exchange_): 
+            Order(security_, timestamp_, "MARKET", side_, size_, -1.0, exchange_) {}
 
     /**
      * Checks if the order could be filled.
@@ -274,6 +273,7 @@ public:
         string s = (market.getSide() == 1) ? "Buy" : "Sell";
         os << "========== Order Information ==========" << endl;
         os << "Security: " << market.getSecurity() << endl;
+        os << "Exchange: " << market.getExchange().getName() << endl;
         os << "Timestamp: " << market.getTimestamp() << endl;
         os << "Order Type: " << market.getOrderType() << endl;
         os << "Side: " << s << endl;
@@ -293,8 +293,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security security_, const string& timestamp_, int side_, double size_, double trigger_price_): 
-            Order(security_, timestamp_, "STOP", side_, size_, -1.0) {
+    Stop(Security security_, const string& timestamp_, int side_, double size_, double trigger_price_, Exchange exchange_): 
+            Order(security_, timestamp_, "STOP", side_, size_, -1.0, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -366,6 +366,7 @@ public:
         string trigger_status = (stop.isTriggered() == 1) ? "Triggered" : "Not Triggered";
         os << "========== Order Information ==========" << endl;
         os << "Security: " << stop.getSecurity() << endl;
+        os << "Exchange: " << stop.getExchange().getName() << endl;
         os << "Timestamp: " << stop.getTimestamp() << endl;
         os << "Order Type: " << stop.getOrderType() << endl;
         os << "Side: " << s << endl;
@@ -392,8 +393,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(Security security_, const string& timestamp_, int side_, double size_, double price_, double trigger_price_): 
-            Order(security_, timestamp_, "STOPLIMIT", side_, size_, price_) {
+    StopLimit(Security security_, const string& timestamp_, int side_, double size_, double price_, double trigger_price_, Exchange exchange_): 
+            Order(security_, timestamp_, "STOPLIMIT", side_, size_, price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -474,6 +475,7 @@ public:
         string trigger_status = (stoplimit.isTriggered() == 1) ? "Triggered" : "Not Triggered";
         os << "========== Order Information ==========" << endl;
         os << "Security: " << stoplimit.getSecurity() << endl;
+        os << "Exchange: " << stoplimit.getExchange().getName() << endl;
         os << "Timestamp: " << stoplimit.getTimestamp() << endl;
         os << "Order Type: " << stoplimit.getOrderType() << endl;
         os << "Side: " << s << endl;
