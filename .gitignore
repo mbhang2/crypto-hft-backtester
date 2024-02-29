@@ -133,4 +133,5 @@ Temporary Items
 **/.idea/workspace.xml **/.idea/tasks.xml
 .idea/
 
-./build/
+/build/
+/googletest/
