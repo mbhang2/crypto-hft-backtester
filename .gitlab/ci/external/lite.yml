@@ -18,12 +18,8 @@ include:
     file:
       - '/.gitlab/ci/common.yml'
       - '/.gitlab/ci/misc.yml'
-      - '/.gitlab/ci/lang/cmake/base.yml'
-      - '/.gitlab/ci/lang/cmake/lint/cmakelang.yml'
-      # - '/.gitlab/ci/lang/common/lint/codequality.yml'
       - '/.gitlab/ci/lang/common/lint/codespell.yml'
       - '/.gitlab/ci/lang/common/lint/license_headers.yml'
-      - '/.gitlab/ci/lang/docker/lint/hadolint.yml'
       - '/.gitlab/ci/lang/py/base.yml'
       - '/.gitlab/ci/lang/py/lint/black.yml'
       - '/.gitlab/ci/lang/py/lint/flake8.yml'
