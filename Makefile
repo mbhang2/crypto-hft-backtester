@@ -1,6 +1,6 @@
 # Variables
 CC = g++
-CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs --coverage-dir=build/coverage
+CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs -fprofile-dir=build/coverage
 LDFLAGS = --coverage
 APP = crypto_back_testing
 APP_TESTER = crypto_tests
@@ -15,6 +15,8 @@ ifeq ($(ARCH),x86_64)
   CMAKE_ARCH = -DCMAKE_OSX_ARCHITECTURES=x86_64
 else ifeq ($(ARCH),arm64)
   CMAKE_ARCH = -DCMAKE_OSX_ARCHITECTURES=arm64
+else
+  CMAKE_ARCH = ""
 endif
 
 # Targets
@@ -29,6 +31,7 @@ $(GTEST_DIR):
 
 $(APP_TESTER): $(APP_SOURCES) $(APP_TESTS)
 	$(CC) $(CFLAGS) -o build/$@ $^ -I$(GTEST_DIR)/googletest/include -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -pthread $(LDFLAGS)
+	mv *.gcno build/coverage
 
 
 .PHONY: clean
