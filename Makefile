@@ -31,6 +31,7 @@ $(GTEST_DIR):
 
 $(APP_TESTER): $(APP_SOURCES) $(APP_TESTS)
 	$(CC) $(CFLAGS) -o build/$@ $^ -I$(GTEST_DIR)/googletest/include -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -pthread $(LDFLAGS)
+	mkdir -p ./build/coverage
 	mv *.gcno build/coverage
 
 
