@@ -23,6 +23,7 @@ endif
 all: $(GTEST_DIR) $(APP) $(APP_TESTER)
 
 $(APP): $(APP_SOURCES)
+	mkdir build -p
 	$(CC) $(CFLAGS) -o build/$@ $^ $(LDFLAGS)
 
 $(GTEST_DIR):
