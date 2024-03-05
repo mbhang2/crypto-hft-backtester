@@ -70,6 +70,9 @@ class Order {
                         std::cerr << "Invalid order price: " << price_ << std::endl;
                         state = OrderState::Rejected;
                     }
+
+                    // Generate unique id
+                    id = reinterpret_cast<uint32_t>(this);
                 }
         
         /**
@@ -121,6 +124,11 @@ class Order {
         }
 
         /**
+         * Getter for unique id.
+         */
+        uint32_t getID() const {return id;}
+
+        /**
          * Getter for security.
          */
         Security getSecurity() const {return security;}
@@ -166,6 +174,7 @@ class Order {
         Exchange getExchange() const {return exchange;}
 
     protected:
+        uint32_t id;                /*< Unique ID */
         Security security;          /*< Security */
         const string timestamp;     /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
         const string type;          /*< Order type */
