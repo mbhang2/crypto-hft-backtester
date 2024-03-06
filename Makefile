@@ -4,8 +4,16 @@ CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs -fprofile-dir=buil
 LDFLAGS = --coverage
 APP = crypto_back_testing
 APP_TESTER = crypto_tests
+
+##############################################
+# only need to change this part
+# add more source files here to be compiled
 APP_SOURCES = src/BackTesting.cpp src/main.cpp
+
+# add more test files here to be compiled
 APP_TESTS = tests/CryptoTest.cpp
+##############################################
+
 GTEST_DIR = googletest
 GTEST_REPO = https://github.com/google/googletest.git
 GTEST_TAG = v1.14.0
