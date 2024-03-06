@@ -264,4 +264,6 @@ CheckOptions:
     value: ''
 FormatStyle: none
 HeaderFilterRegex: '^project\/.*$'
+InheritParentConfig: false
+User:
 WarningsAsErrors: '*'
