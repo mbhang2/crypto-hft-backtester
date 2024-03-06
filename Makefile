@@ -24,7 +24,7 @@ all: $(GTEST_DIR) $(APP) $(APP_TESTER)
 
 $(APP): $(APP_SOURCES)
 	rm -rf build
-	mkdir build -p
+	mkdir -p build
 	$(CC) $(CFLAGS) -o build/$@ $^ $(LDFLAGS)
 
 $(GTEST_DIR):
