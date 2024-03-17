@@ -1,12 +1,17 @@
 #pragma once
 
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include "../data/exchange.h"
 #include "../data/security.h"
 
 using namespace std;
+
+/*
+ * @todo enable quote currency order for market and stop orders
+ */
 
 /**
  * Enumeration class for order state
@@ -22,7 +27,7 @@ enum class OrderState {
 /**
  * << operator overload for OrderState class.
  */
-std::ostream& operator<<(std::ostream& os, const OrderState& state) {
+ostream& operator<<(ostream& os, const OrderState& state) {
     switch (state) {
         case OrderState::Working:
             os << "Working";
@@ -45,6 +50,42 @@ std::ostream& operator<<(std::ostream& os, const OrderState& state) {
     return os;
 }
 
+/**
+ * Enumeration class for market type
+ */
+enum class MarketType {
+    Spot,
+    Futures
+};
+
+/**
+ * Enumeration class for market type
+ */
+enum class MarginType {
+    NoMargin,
+    Cross,
+    Isolated
+};
+
+/**
+ * << operator overload for OrderState class.
+ */
+ostream& operator<<(ostream& os, const MarginType& margin_type) {
+    switch (margin_type) {
+        case MarginType::NoMargin:
+            os << "No Margin";
+            break;
+        case MarginType::Isolated:
+            os << "Isolated";
+            break;
+        case MarginType::Cross:
+            os << "Cross";
+            break;
+        default:
+            os << "Unknown"; // Handle any other values gracefully
+    }
+    return os;
+}
 
 /**
  * Abstract class for orders.
@@ -55,24 +96,76 @@ class Order {
          * Constructor to create an order.
          * @todo add sanity check for security and unrealistic price
          */
-        Order(Security security_, const string& timestamp_, const string& type_, int side_, double size_, double price_, Exchange exchange_): 
-                security(security_), timestamp(timestamp_), type(type_), side(side_), size(size_), price(price_), exchange(exchange_) {
-                    // Sanity checks
+        Order(Security security_, const MarketType market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_ ,double price_, Exchange exchange_): 
+                security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
+                    // Sanity checking zero and negative inputs
                     if (side != 1 && side != -1) {
-                        std::cerr << "Invalid order side: " << side << std::endl;
+                        cerr << "Invalid order side: " << side << endl;
                         state = OrderState::Rejected;
                     }
-                    if (size_ <= 0.0) {
-                        std::cerr << "Invalid order size: " << size_ << std::endl;
+                    if (quote_currency_size == 0.0 && base_currency_size == 0.0) {
+                        cerr << "Please provide non-zero order size" << endl;
+                        state = OrderState::Rejected;
+                    }
+                    if (quote_currency_size_ < 0.0) {
+                        cerr << "Invalid order size: " << quote_currency_size_ << security.getQuote() << endl;
+                        state = OrderState::Rejected;
+                    }
+                    if (base_currency_size_ < 0.0) {
+                        cerr << "Invalid order size: " << base_currency_size_ << security.getBase() << endl;
                         state = OrderState::Rejected;
                     }
                     if ((type == "LIMIT" || type == "STOPLIMIT") && price_ <= 0.0) {
-                        std::cerr << "Invalid order price: " << price_ << std::endl;
+                        cerr << "Invalid order price: " << price_ << security.getQuote() << endl;
+                        state = OrderState::Rejected;
+                    }
+                    if (base_currency_size != 0 && quote_currency_size != 0) {
+                        cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
                         state = OrderState::Rejected;
                     }
 
-                    // Generate unique id
-                    // id = reinterpret_cast<uint32_t>(this);
+                    // Sanity checking price
+                    if (countDigitsAfterDecimal(price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
+                        cerr << "Invalid price of " << price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+                    }
+
+
+                    // Sanity checking leverage
+                    if (leverage < 1) {
+                        cerr << "Invalid leverage: " << leverage_ << "x" << endl;
+                        state = OrderState::Rejected;
+                    }
+                    if (leverage == 1 && margin_type != MarginType::NoMargin) {
+                        cerr << "If leverage is 1x, margin type should be 'NoMargin'" << endl;
+                        state = OrderState::Rejected;
+                    }
+                    if (market_type == MarketType::Spot && margin_type == MarginType::Isolated && leverage_ > exchange.getSpotTradeRules(security_)[10]) {
+                        cerr << "Leverage " << leverage_ << "x is greater than the spot isolated margin limit of " << exchange.getSpotTradeRules(security_)[10] << "x" << endl;
+                        state = OrderState::Rejected;
+                    }
+                    if (market_type == MarketType::Spot && margin_type == MarginType::Cross && leverage_ > exchange.getSpotTradeRules(security_)[11]) {
+                        cerr << "Leverage " << leverage_ << "x is greater than the spot cross margin limit of " << exchange.getSpotTradeRules(security_)[11] << "x" << endl;
+                        state = OrderState::Rejected;
+                    }
+
+                    // Sanity checking order size
+                    if (base_currency_size == 0) {
+                        double base_currency_min_size = exchange.getSpotTradeRules(security_)[1];
+                        base_currency_size = int((quote_currency_size / price)/base_currency_min_size) * base_currency_min_size;
+                    } else if (quote_currency_size == 0) {
+                        quote_currency_size = base_currency_size * price;
+                    }
+
+
+                    if (quote_currency_size * leverage < exchange.getSpotTradeRules(security_)[2]) {
+                        cerr << "Order value " << quote_currency_size * leverage << security.getQuote() << " is lesser than the minimum trade size " << exchange.getSpotTradeRules(security_)[2] << security.getQuote() << endl;
+                    }
+
+
+                    leverage_adjusted_base_currency_size = leverage * base_currency_size;
+
+                    // Sanity checking minimum trade size
+
                 }
         
         /**
@@ -94,14 +187,14 @@ class Order {
         */
         void fillOrder(double qty) {
             // Sanity checks
-            if (qty <= 0 || qty > size - filled_size) {
-                std::cerr << "Invalid fill quantity: " << qty << std::endl;
+            if (qty <= 0 || qty > leverage_adjusted_base_currency_size - filled_size) {
+                cerr << "Invalid fill quantity: " << qty << endl;
                 return;
             }
 
             filled_size += qty;
 
-            if (filled_size == size) {
+            if (filled_size == leverage_adjusted_base_currency_size) {
                 state = OrderState::Filled;
             } else {
                 state = OrderState::PartiallyFilled;
@@ -149,9 +242,24 @@ class Order {
         int getSide() const {return side;}
 
         /**
-         * Getter for size.
+         * Getter for base currency size.
          */
-        double getSize() const {return size;}
+        double getBaseCurrencySize() const {return base_currency_size;}
+
+        /**
+         * Getter for quote currency size.
+         */
+        double getQuoteCurrencySize() const {return quote_currency_size;}
+
+        /**
+         * Getter for leverage
+         */
+        unsigned getLeverage() const {return leverage;}
+
+        /**
+         * Getter for leverage adjusted base currency size.
+         */
+        double getLeverageAdjustedBaseCurrencySize() const {return leverage_adjusted_base_currency_size;}
 
         /**
          * Getter for filled size.
@@ -173,16 +281,40 @@ class Order {
          */
         Exchange getExchange() const {return exchange;}
 
+        /**
+         * Getter for margin type.
+         */
+        MarginType getMarginType() const {return margin_type;}
+
+        /**
+         * Finds the number of digits after the decimal point
+         * @param value number to find the number of decimal digits
+         * @return number of decimal digits
+         */
+        int countDigitsAfterDecimal(double value) {
+            string valueStr = to_string(value);
+            size_t decimalPos = valueStr.find('.');
+            if (decimalPos != string::npos) {
+                return valueStr.length() - decimalPos - 1;
+            }
+            return 0; // No decimal point found
+        }
+
     protected:
         uint32_t id;                /*< Unique ID */
-        Security security;          /*< Security */
+        const MarketType market_type;     /*< Market type */
+        const Security security;          /*< Security */
         const string timestamp;     /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
         const string type;          /*< Order type */
-        int side;                   /*< -1 for SELL, 1 for BUY */
-        double size;                /*< Quantity of the order */
-        double filled_size = 0.0;         /*< Quantify filled of the order */
+        const int side;                   /*< -1 for SELL, 1 for BUY */
+        double base_currency_size;  /*< Quantity of the order in base currency before leverage (For BTC/USDT, order size in BTC) */
+        double quote_currency_size; /*< Quantity of the order in quote currency before leverage (For BTC/USDT, order size in USDT) */
+        unsigned leverage;          /*< Leverage of the order */
+        const MarginType margin_type;      /*< Margin type of the order */
+        double leverage_adjusted_base_currency_size;      /*< Leverage adjusted base currency size */
+        double filled_size = 0.0;   /*< Quantify filled of the order */
         double price;               /*< Price for LIMIT and STOP LIMIT orders. -1 for MARKET and STOP orders */
-        Exchange exchange;          /*< Target exchange for an order (optional) */
+        const Exchange exchange;          /*< Target exchange for an order (optional) */
         OrderState state = OrderState::Working;     /*< State of the order */
 };
 
@@ -195,8 +327,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(Security security_, const string& timestamp_, int side_, double size_, double price_, Exchange exchange_): 
-            Order(security_, timestamp_, "LIMIT", side_, size_, price_, exchange_) {}
+    Limit(Security security_, const MarketType market_type_ ,const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {}
 
     /**
      * Checks if the order could be filled.
@@ -214,28 +346,62 @@ public:
 
     /**
      * Modifies the order. 
-     * @param modified_size New size of the order
+     * @param modified_base_currency_size New size of the order in base currency
+     * @param modified_quote_currency_size New size of the order in quote currency
      * @param modified_price New price of the order
      */
-    void modifyOrder(double modified_size, double modified_price) {
+    void modifyOrder(double modified_base_currency_size, double modified_quote_currency_size, double modified_price) {
         // Sanity checks
         if (!isLiveOrder()) {return;}
-        if (modified_size <= 0.0 || modified_size <= filled_size) {
-            std::cerr << "Invalid order size: " << modified_size << std::endl;
+        if (modified_price <= 0.0) {
+            cerr << "Invalid order price: " << modified_price << endl;
             return;
         }
-        if (modified_price <= 0.0) {
-            std::cerr << "Invalid order price: " << modified_price << std::endl;
+        if (modified_base_currency_size == 0.0 && modified_quote_currency_size == 0.0) {
+            cerr << "Invalid order size: 0" << security.getQuote() << endl;
+            return;
+        }
+        if (modified_base_currency_size < 0.0) {
+            cerr << "Invalid order size: " << modified_base_currency_size << security.getBase() << endl;
+            return;
+        }
+        if (modified_quote_currency_size < 0.0) {
+            cerr << "Invalid order size: " << modified_quote_currency_size << security.getQuote() << endl;
+            return;
+        }
+        if (base_currency_size != 0 && quote_currency_size != 0) {
+            cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
+            return;
+        }
+        if (countDigitsAfterDecimal(modified_price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
+            cerr << "Invalid price of " << modified_price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
             return;
         }
 
-        size = modified_size, price = modified_price;
+        double new_base_currency_size = modified_base_currency_size;
+        double new_quote_currency_size = modified_quote_currency_size;
+
+        if (new_base_currency_size == 0) {
+            double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
+            new_base_currency_size = int((new_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
+        } else if (new_quote_currency_size == 0) {
+            new_quote_currency_size = new_base_currency_size * price;
+        }
+
+        double new_leverage_adjusted_base_currency_size = leverage * new_base_currency_size;
+
+        if (new_leverage_adjusted_base_currency_size <= filled_size) {
+            cerr << "Modified order size of " << new_leverage_adjusted_base_currency_size << " is lesser than the already filled size of " << filled_size << security.getBase() << endl;
+            return;
+        }
+
+        base_currency_size = new_base_currency_size, quote_currency_size = new_quote_currency_size, leverage_adjusted_base_currency_size = new_leverage_adjusted_base_currency_size, price = modified_price;
     }
 
     /**
      * Override << operator for Limit class.
      */
-    friend std::ostream& operator<<(std::ostream& os, const Limit& limit) {
+    friend ostream& operator<<(ostream& os, const Limit& limit) {
         string s = (limit.getSide() == 1) ? "Buy" : "Sell";
         os << "========== Order Information ==========" << endl;
         os << "Security: " << limit.getSecurity() << endl;
@@ -243,8 +409,11 @@ public:
         os << "Timestamp: " << limit.getTimestamp() << endl;
         os << "Order Type: " << limit.getOrderType() << endl;
         os << "Side: " << s << endl;
-        os << "Size: " << limit.getSize() << endl;
-        os << "Price: " << limit.getPrice() << endl;
+        os << "Size: " << limit.getBaseCurrencySize() << limit.getSecurity().getBase() << endl;
+        os << "Margin Type: " << limit.getMarginType() << endl;
+        os << "Leverage: " << limit.getLeverage() << "x" << endl;
+        os << "Leverage Adjusted Size: " << limit.getLeverageAdjustedBaseCurrencySize() << limit.getSecurity().getBase() << endl;
+        os << "Price: " << limit.getPrice() << limit.getSecurity().getQuote() << endl;
         os << "Order State: " << limit.getOrderState() << endl;
         os << "=======================================" << endl;
         return os;
@@ -260,8 +429,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(Security security_, const string& timestamp_, int side_, double size_, Exchange exchange_): 
-            Order(security_, timestamp_, "MARKET", side_, size_, -1.0, exchange_) {}
+    Market(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, unsigned leverage_, const MarginType margintype_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, -1.0, leverage_, margintype_, -1.0, exchange_) {}
 
     /**
      * Checks if the order could be filled.
@@ -278,7 +447,7 @@ public:
     /**
      * Override << operator for Market class.
      */
-    friend std::ostream& operator<<(std::ostream& os, const Market& market) {
+    friend ostream& operator<<(ostream& os, const Market& market) {
         string s = (market.getSide() == 1) ? "Buy" : "Sell";
         os << "========== Order Information ==========" << endl;
         os << "Security: " << market.getSecurity() << endl;
@@ -286,7 +455,10 @@ public:
         os << "Timestamp: " << market.getTimestamp() << endl;
         os << "Order Type: " << market.getOrderType() << endl;
         os << "Side: " << s << endl;
-        os << "Size: " << market.getSize() << endl;
+        os << "Size: " << market.getBaseCurrencySize() << market.getSecurity().getBase() << endl;
+        os << "Margin Type: " << market.getMarginType() << endl;
+        os << "Leverage: " << market.getLeverage() << "x" << endl;
+        os << "Leverage Adjusted Size: " << market.getLeverageAdjustedBaseCurrencySize() << market.getSecurity().getBase() << endl;
         os << "Order State: " << market.getOrderState() << endl;
         os << "=======================================" << endl;
         return os;
@@ -302,8 +474,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security security_, const string& timestamp_, int side_, double size_, double trigger_price_, Exchange exchange_): 
-            Order(security_, timestamp_, "STOP", side_, size_, -1.0, exchange_) {
+    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, -1.0, leverage_, margintype_, -1.0, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -326,7 +498,7 @@ public:
      */
     bool checkTriggered(double current_price) {
         if (current_price <= 0.0) {
-            std::cerr << "Invalid current price: " << current_price << std::endl;
+            cerr << "Invalid current price: " << current_price << endl;
             return false;
         }
 
@@ -339,22 +511,56 @@ public:
 
     /**
      * Modifies the order. Could be used not only when user changes the order, but also when the order is partially filled.
-     * @param modified_size New size of the order
+     * @param modified_base_currency_size New size of the order in base currency
+     * @param modified_quote_currency_size New size of the order in quote currency
      * @param modified_trigger_price New trigger price of the order
      */
-    void modifyOrder(double modified_size, double modified_trigger_price, double current_price) {
+    void modifyOrder(double modified_base_currency_size, double modified_quote_currency_size, double modified_trigger_price) {
         // Sanity checks
-        if (!isLiveOrder() || checkTriggered(current_price)) {return;}
-        if (modified_size <= 0.0 || modified_size <= filled_size) {
-            std::cerr << "Invalid order size: " << modified_size << std::endl;
+        if (!isLiveOrder() || triggered) {return;}
+        if (modified_base_currency_size == 0.0 && modified_quote_currency_size == 0.0) {
+            cerr << "Invalid order size: 0" << security.getQuote() << endl;
+            return;
+        }
+        if (modified_base_currency_size < 0.0) {
+            cerr << "Invalid order size: " << modified_base_currency_size << security.getBase() << endl;
+            return;
+        }
+        if (modified_quote_currency_size < 0.0) {
+            cerr << "Invalid order size: " << modified_quote_currency_size << security.getQuote() << endl;
+            return;
+        }
+        if (base_currency_size != 0 && quote_currency_size != 0) {
+            cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
+            return;
+        }
+        if (countDigitsAfterDecimal(modified_trigger_price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
+            cerr << "Invalid trigger price of " << modified_trigger_price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+            return;
+        }
+        
+        double new_base_currency_size = modified_base_currency_size;
+
+        // if (new_base_currency_size == 0) {
+        //     double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
+        //     new_base_currency_size = int((new_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
+        // } else if (new_quote_currency_size == 0) {
+        //     new_quote_currency_size = new_base_currency_size * price;
+        // }
+
+        double new_leverage_adjusted_base_currency_size = leverage * new_base_currency_size;
+
+        if (new_leverage_adjusted_base_currency_size <= filled_size) {
+            cerr << "Modified order size of " << new_leverage_adjusted_base_currency_size << " is lesser than the already filled size of " << filled_size << security.getBase() << endl;
             return;
         }
         if (modified_trigger_price <= 0.0) {
-            std::cerr << "Invalid order trigger price: " << modified_trigger_price << std::endl;
+            cerr << "Invalid order trigger price: " << modified_trigger_price << endl;
             return;
         }
 
-        size = modified_size, trigger_price = modified_trigger_price;
+        base_currency_size = new_base_currency_size, leverage_adjusted_base_currency_size = new_leverage_adjusted_base_currency_size, trigger_price = modified_trigger_price;
+        // quote_currency_size = new_quote_currency_size;
     }
 
     /**
@@ -370,7 +576,7 @@ public:
     /**
      * Override << operator for Limit class.
      */
-    friend std::ostream& operator<<(std::ostream& os, const Stop& stop) {
+    friend ostream& operator<<(ostream& os, const Stop& stop) {
         string s = (stop.getSide() == 1) ? "Buy" : "Sell";
         string trigger_status = (stop.isTriggered() == 1) ? "Triggered" : "Not Triggered";
         os << "========== Order Information ==========" << endl;
@@ -379,8 +585,11 @@ public:
         os << "Timestamp: " << stop.getTimestamp() << endl;
         os << "Order Type: " << stop.getOrderType() << endl;
         os << "Side: " << s << endl;
-        os << "Size: " << stop.getSize() << endl;
-        os << "Trigger Price: " << stop.getTriggerPrice() << endl;
+        os << "Size: " << stop.getBaseCurrencySize() << stop.getSecurity().getBase() << endl;
+        os << "Margin Type: " << stop.getMarginType() << endl;
+        os << "Leverage: " << stop.getLeverage() << "x" << endl;
+        os << "Leverage Adjusted Size: " << stop.getLeverageAdjustedBaseCurrencySize() << stop.getSecurity().getBase() << endl;
+        os << "Trigger Price: " << stop.getTriggerPrice() << stop.getSecurity().getQuote() << endl;
         os << "Trigger Status: " << trigger_status << endl;
         os << "Order State: " << stop.getOrderState() << endl;
         os << "=======================================" << endl;
@@ -402,8 +611,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(Security security_, const string& timestamp_, int side_, double size_, double price_, double trigger_price_, Exchange exchange_): 
-            Order(security_, timestamp_, "STOPLIMIT", side_, size_, price_, exchange_) {
+    StopLimit(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -429,7 +638,7 @@ public:
      */
     bool checkTriggered(double current_price) {
         if (current_price <= 0.0) {
-            std::cerr << "Invalid current price: " << current_price << std::endl;
+            cerr << "Invalid current price: " << current_price << endl;
             return false;
         }
 
@@ -442,28 +651,65 @@ public:
 
     /**
      * Modifies the order. Could be used not only when user changes the order, but also when the order is partially filled.
-     * @param modified_size New size of the order
+     * @param modified_base_currency_size New size of the order in base currency
+     * @param modified_quote_currency_size New size of the order in quote currency
      * @param modified_price New price of the order
      * @param modified_trigger_price New trigger price of the order
-     * @param filled_size Filled quantity if this function is called after being filled
      */
-    void modifyOrder(double modified_size, double modified_price, double modified_trigger_price, double current_price) {
+    void modifyOrder(double modified_base_currency_size, double modified_quote_currency_size, double modified_price, double modified_trigger_price) {
         // Sanity checks
-        if (!isLiveOrder() || checkTriggered(current_price)) {return;}
-        if (modified_size <= 0.0 || modified_size <= filled_size) {
-            std::cerr << "Invalid order size: " << modified_size << std::endl;
-            return;
-        }
-        if (modified_price <= 0.0) {
-            std::cerr << "Invalid order price: " << modified_price << std::endl;
+        if (!isLiveOrder()) {return;}
+        if (modified_trigger_price != trigger_price && triggered) {
+            cerr << "Cannot modify trigger price once triggered" << endl;
             return;
         }
         if (modified_trigger_price <= 0.0) {
-            std::cerr << "Invalid order trigger price: " << modified_trigger_price << std::endl;
+            cerr << "Invalid order trigger price: " << modified_trigger_price << endl;
+            return;
+        }
+        if (modified_base_currency_size == 0.0 && modified_quote_currency_size == 0.0) {
+            cerr << "Invalid order size: 0" << security.getQuote() << endl;
+            return;
+        }
+        if (modified_base_currency_size < 0.0) {
+            cerr << "Invalid order size: " << modified_base_currency_size << security.getBase() << endl;
+            return;
+        }
+        if (modified_quote_currency_size < 0.0) {
+            cerr << "Invalid order size: " << modified_quote_currency_size << security.getQuote() << endl;
+            return;
+        }
+        if (base_currency_size != 0 && quote_currency_size != 0) {
+            cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
+            return;
+        }
+        if (countDigitsAfterDecimal(modified_price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
+            cerr << "Invalid price of " << modified_price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+            return;
+        }
+        if (countDigitsAfterDecimal(modified_trigger_price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
+            cerr << "Invalid trigger price of " << modified_trigger_price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
             return;
         }
 
-        size = modified_size, price = modified_price, trigger_price = modified_trigger_price;
+        double new_base_currency_size = modified_base_currency_size;
+        double new_quote_currency_size = modified_quote_currency_size;
+
+        if (new_base_currency_size == 0) {
+            double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
+            new_base_currency_size = int((new_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
+        } else if (new_quote_currency_size == 0) {
+            new_quote_currency_size = new_base_currency_size * price;
+        }
+
+        double new_leverage_adjusted_base_currency_size = leverage * new_base_currency_size;
+
+        if (new_leverage_adjusted_base_currency_size <= filled_size) {
+            cerr << "Modified order size of " << new_leverage_adjusted_base_currency_size << " is lesser than the already filled size of " << filled_size << security.getBase() << endl;
+            return;
+        }
+
+        base_currency_size = new_base_currency_size, quote_currency_size = new_quote_currency_size, leverage_adjusted_base_currency_size = new_leverage_adjusted_base_currency_size, price = modified_price, trigger_price = modified_trigger_price;
     }
 
     /**
@@ -479,7 +725,7 @@ public:
     /**
      * Override << operator for Limit class.
      */
-    friend std::ostream& operator<<(std::ostream& os, const StopLimit& stoplimit) {
+    friend ostream& operator<<(ostream& os, const StopLimit& stoplimit) {
         string s = (stoplimit.getSide() == 1) ? "Buy" : "Sell";
         string trigger_status = (stoplimit.isTriggered() == 1) ? "Triggered" : "Not Triggered";
         os << "========== Order Information ==========" << endl;
@@ -488,7 +734,10 @@ public:
         os << "Timestamp: " << stoplimit.getTimestamp() << endl;
         os << "Order Type: " << stoplimit.getOrderType() << endl;
         os << "Side: " << s << endl;
-        os << "Size: " << stoplimit.getSize() << endl;
+        os << "Size: " << stoplimit.getBaseCurrencySize() << stoplimit.getSecurity().getBase() << endl;
+        os << "Margin Type: " << stoplimit.getMarginType() << endl;
+        os << "Leverage: " << stoplimit.getLeverage() << "x" << endl;
+        os << "Leverage Adjusted Size: " << stoplimit.getLeverageAdjustedBaseCurrencySize() << stoplimit.getSecurity().getBase() << endl;
         os << "Price: " << stoplimit.getPrice() << endl;
         os << "Trigger Price: " << stoplimit.getTriggerPrice() << endl;
         os << "Trigger Status: " << trigger_status << endl;
