@@ -72,7 +72,7 @@ class Order {
                     }
 
                     // Generate unique id
-                    id = reinterpret_cast<uint32_t>(this);
+                    // id = reinterpret_cast<uint32_t>(this);
                 }
         
         /**

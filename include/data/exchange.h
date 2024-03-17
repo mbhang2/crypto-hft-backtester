@@ -4,11 +4,13 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include "security.h"
 #include "../rapidjson/document.h"
+#include "../rapidjson/filereadstream.h"
 
+using namespace rapidjson;
 using namespace std;
-
 
 /**
  * Abstract class for exchagnes.
@@ -23,8 +25,7 @@ class Exchange {
         /**
          * Constructor to create an exchange
          */
-        Exchange(const std::string& name_, int receiving_latency_, int sending_latency_): 
-                name(name_), receiving_latency(receiving_latency_), sending_latency(sending_latency_) {}
+        Exchange(const string& name_): name(name_) {}
 
         /**
          * Destructor
@@ -32,44 +33,66 @@ class Exchange {
         virtual ~Exchange() {}
 
         /**
-         * Reads tick size from json file and stores it in an unordered_map.
+         * Reads json file and stores latencies, trade rules, and fee structures.
          * @param filename Filename of the Json file to read.
         */
-        void loadTickSizesFromJson(const std::string& filename) {
-            std::ifstream file(filename);
-            if (!file.is_open()) {
-                std::cerr << "Error opening file: " << filename << std::endl;
-                return;
+        bool loadJson(const string& json_file_path) {
+            FILE* json_file = fopen(json_file_path.c_str(), "r");
+            if (!json_file) {
+                cerr << "Error opening JSON file: " << json_file_path << endl;
+                return false;
             }
 
-            std::string json((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            rapidjson::Document doc;
-            doc.Parse(json.c_str());
+            char buffer[65536];
+            FileReadStream fs(json_file, buffer, sizeof(buffer));
+            Document data;
+            data.ParseStream(fs);
+            fclose(json_file);
 
-            for (const auto& member : doc.GetObject()) {
-                if (member.value.IsNumber()) {
-                    std::string securityName = member.name.GetString();
-                    size_t slashPos = securityName.find('/');
-                    if (slashPos != std::string::npos) {
-                        std::string base = securityName.substr(0, slashPos);
-                        std::string quote = securityName.substr(slashPos + 1);
-                        Security sec(base, quote);
-                        tick_size[sec] = member.value.GetDouble();
+            // Case-insensitive search for the exchange name
+            for (auto& exchange : data.GetObject()) {
+                if (exchange.name.GetString() == name) {
+                    // Extract latency values
+                    sending_latency = exchange.value["nanosecondLatencyTo"].GetInt();
+                    receiving_latency = exchange.value["nanosecondLatencyFrom"].GetInt();
+
+                    // Extract trading rules for Spot/Margin
+                    const Value& spot_margin_rules = exchange.value["tradeingRules"]["Spot/Margin"];
+                    for (auto& security : spot_margin_rules.GetObject()) {
+                        string security_str = security.name.GetString();
+                        size_t slash_pos = security_str.find('/');
+                        Security sec(security_str.substr(0, slash_pos), security_str.substr(slash_pos + 1));
+
+                        // Save rule values
+                        const Value& rule_values = security.value;
+                        vector<double> rule_vector;
+                        for (auto& v : rule_values.GetArray()) {
+                            rule_vector.push_back(v.GetDouble());
+                        }
+                        spot_trading_rules[sec] = rule_vector;
                     }
+                    return true; // Found the exchange
                 }
             }
+
+            cerr << "Exchange not found in JSON data." << endl;
+            return false;
         }
 
+
         /**
-         * Getter for the tick size of the security within the exchange.
-         * @param sec Security that we would like the tick size.
+         * Getter for the trade rules of the security within the exchange.
+         * @param sec Security that we would like the trade rules.
         */
-        double getTickSize(const Security& sec) const {
-            auto it = tick_size.find(sec);
-            if (it != tick_size.end()) {
+        vector<double> getSpotTradeRules(const Security& sec) const {
+            auto it = spot_trading_rules.find(sec);
+            if (it != spot_trading_rules.end()) {
                 return it->second;
             }
-            return -1.0; // Could not find tick size
+
+            // Could not find tick size
+            cerr << "Trading Rule not found for given security." << endl;
+            return vector<double>();
         }
 
         /**
@@ -77,9 +100,19 @@ class Exchange {
          */
         string getName() {return name;}
 
+        /**
+         * Getter for the receiving latency.
+         */
+        int getReceivingLatency() {return receiving_latency;}
+
+        /**
+         * Getter for the sending latency.
+         */
+        int getSendingLatency() {return sending_latency;}
+
     protected:
-        std::string name;           /*< Exchange name */
+        string name;           /*< Exchange name */
         int receiving_latency;      /*< Latency from an exchange in nanoseconds */
-        int sending_latency;        /*< Laency to an exchange in nanoseconds */
-        std::unordered_map<Security, double, Security::Hash> tick_size;      /*< Map storing tick size per security (Hash was used to ensure the same objects to store the same tick size) */
+        int sending_latency;        /*< Laency to an exchange in nanoseconds */ 
+        unordered_map<Security, vector<double>, Security::Hash> spot_trading_rules; /*< Map storing trade rules per security for spot/margin market (Hash was used to ensure the same objects to store the same tick size) */
 };
