@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include "../include/backtesting/order.h"
 #include "../include/backtesting/trade.h"
 #include "../include/data/exchange.h"
@@ -13,19 +14,22 @@ int main(int  /*argc*/, char**  /*argv*/) {
     Security DOTUSDT = Security("DOT", "USDT");
     Security DOGEUSDT = Security("DOGE", "USDT");
 
-    if (Binance.loadJson("./tests/exchange_json_test/exchange.json")) {
-        std::cout << "Load successful" << endl;
-        std::cout << "DOT/USDT tick size at Binance is " << Binance.getSpotTradeRules(DOTUSDT)[0] << DOTUSDT.getQuote() << endl;
-        std::cout << "DOGE/USDT tick size at Binance is " << Binance.getSpotTradeRules(DOGEUSDT)[0] << DOGEUSDT.getQuote() << endl;
-        std::cout << "Receiving latency for Binance is " << Binance.getReceivingLatency() << "nanoseconds" << endl;
-        std::cout << "Max market order quantity for BTC/USDT in Binance is " << Binance.getSpotTradeRules(BTCUSDT)[5] << BTCUSDT.getQuote() << endl;
-    }
+    Binance.loadJson("./tests/exchange_json_test/exchange.json");
 
-    if (Okx.loadJson("./tests/exchange_json_test/exchange.json")) {
-        std::cout << "Load successful" << endl;
-        std::cout << "DOT/USDT tick size at Okx is " << Okx.getSpotTradeRules(DOTUSDT)[0] << DOTUSDT.getQuote() << endl;
-        std::cout << "DOGE/USDT tick size at Okx is " << Okx.getSpotTradeRules(DOGEUSDT)[0] << DOGEUSDT.getQuote() << endl;
-        std::cout << "Receiving latency for Okx is " << Okx.getReceivingLatency() << "nanoseconds" << endl;
-        std::cout << "Max market order value for BTC/USDT in Okx is " << Okx.getSpotTradeRules(BTCUSDT)[6] << BTCUSDT.getQuote() << endl;
-    }
+    cout << Binance.getSpotMakerFee() << endl;
+
+    Binance.setSpotTradingFee(5);
+
+    cout << Binance.getSpotMakerFee() << endl;
+
+    cout << Binance.getFuturesMakerFee() << endl;
+
+    Binance.setFuturesTradingFee(5);
+
+    cout << Binance.getFuturesMakerFee() << endl;
+    
+    // cout << std::fixed << std::setprecision(7) << Binance.getSpotTradeRules(BTCUSDT)[1] << endl;
+    Limit limit(BTCUSDT, MarketType::Spot, "2024-03-22 12:30:15.123456789", 1, 0, 0.1, 5, MarginType::Cross, 67650.37, Binance);
+
+    cout << limit << setprecision(9) << endl;
 }
