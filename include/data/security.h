@@ -23,6 +23,16 @@ class Security {
         virtual ~Security() {}
 
         /**
+         * Getter for base
+         */
+        string getBase() const {return base;}
+
+        /**
+         * Getter for quote
+         */
+        string getQuote() const {return quote;}
+
+        /**
          * Override << operator
          */
         friend std::ostream& operator<<(std::ostream& os, const Security& sec) {
