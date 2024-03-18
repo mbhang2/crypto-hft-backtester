@@ -93,6 +93,8 @@ class Order {
          */
         Order(Security security_, const MarketType market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_ ,double price_, Exchange exchange_): 
                 security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
+                    id = ++next_id; // Assign a unique order id
+                    
                     // Sanity checking zero and negative inputs
                     if (side != 1 && side != -1) {
                         cerr << "Invalid order side: " << side << endl;
@@ -335,21 +337,25 @@ class Order {
         }
 
     protected:
-        uint32_t id;                /*< Unique ID */
-        const MarketType market_type;     /*< Market type */
-        const Security security;          /*< Security */
-        const string timestamp;     /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
-        const string type;          /*< Order type */
-        const int side;                   /*< -1 for SELL, 1 for BUY */
-        double base_currency_size;  /*< Quantity of the order in base currency before leverage (For BTC/USDT, order size in BTC) */
-        double quote_currency_size; /*< Quantity of the order in quote currency before leverage (For BTC/USDT, order size in USDT) */
-        unsigned leverage;          /*< Leverage of the order */
-        const MarginType margin_type;      /*< Margin type of the order */
-        double leverage_adjusted_base_currency_size;      /*< Leverage adjusted base currency size */
-        double filled_size = 0.0;   /*< Quantify filled of the order */
-        double price;               /*< Price for LIMIT and STOP LIMIT orders. -1 for MARKET and STOP orders */
-        const Exchange exchange;          /*< Target exchange for an order (optional) */
-        OrderState state = OrderState::Working;     /*< State of the order */
+        int id;                         /*< Unique ID */
+        const MarketType market_type;   /*< Market type */
+        const Security security;        /*< Security */
+        const string timestamp;         /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
+        const string type;              /*< Order type */
+        const int side;                 /*< -1 for SELL, 1 for BUY */
+        double base_currency_size;      /*< Quantity of the order in base currency before leverage (For BTC/USDT, order size in BTC) */
+        double quote_currency_size;     /*< Quantity of the order in quote currency before leverage (For BTC/USDT, order size in USDT) */
+        unsigned leverage;              /*< Leverage of the order */
+        const MarginType margin_type;   /*< Margin type of the order */
+        double leverage_adjusted_base_currency_size;    /*< Leverage adjusted base currency size */
+        double filled_size = 0.0;       /*< Quantify filled of the order */
+        double price;                   /*< Price for LIMIT and STOP LIMIT orders. Current price for MARKET and STOP orders */
+        const Exchange exchange;        /*< Target exchange for an order (optional) */
+        OrderState state = OrderState::Working;         /*< State of the order */
+        vector<int> child_trade_id;     /*< Vector of trade ids executed from this order */
+
+    private:
+        static int next_id; /*< Static member to track the next available ID */ 
 };
 
 

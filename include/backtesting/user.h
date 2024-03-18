@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "../data/exchange.h"
+#include "../record/orderlog.h"
 
 using namespace std;
 
@@ -43,6 +44,11 @@ public:
     vector<Exchange> getExchanges() const { return exchange_list; }
 
     /**
+     * Getter for user's order log
+     */
+    OrderLog getOrderLog() const { return orderlog; }
+
+    /**
      * Add exchange to the list
      * @param exchange exchange to add
      */
@@ -68,4 +74,5 @@ public:
     double futures_balance; /*< Futures balance */
     static int next_id; /*< Static member to track the next available ID */ 
     vector<Exchange> exchange_list; /*< List of exchanges for the user */
+    OrderLog orderlog;  /*< Order log */
 };
