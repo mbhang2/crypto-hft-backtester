@@ -9,10 +9,6 @@
 
 using namespace std;
 
-/*
- * @todo enable quote currency order for market and stop orders
- */
-
 /**
  * Enumeration class for order state
  */
@@ -94,7 +90,6 @@ class Order {
     public:
         /**
          * Constructor to create an order.
-         * @todo add sanity check for security and unrealistic price
          */
         Order(Security security_, const MarketType market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_ ,double price_, Exchange exchange_): 
                 security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
@@ -102,31 +97,39 @@ class Order {
                     if (side != 1 && side != -1) {
                         cerr << "Invalid order side: " << side << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
                     if (quote_currency_size == 0.0 && base_currency_size == 0.0) {
                         cerr << "Please provide non-zero order size" << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
                     if (quote_currency_size_ < 0.0) {
                         cerr << "Invalid order size: " << quote_currency_size_ << security.getQuote() << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
                     if (base_currency_size_ < 0.0) {
                         cerr << "Invalid order size: " << base_currency_size_ << security.getBase() << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
                     if ((type == "LIMIT" || type == "STOPLIMIT") && price_ <= 0.0) {
                         cerr << "Invalid order price: " << price_ << security.getQuote() << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
                     if (base_currency_size != 0 && quote_currency_size != 0) {
                         cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
 
                     // Sanity checking price
                     if (countDigitsAfterDecimal(price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
                         cerr << "Invalid price of " << price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+                        state = OrderState::Rejected;
+                        return;
                     }
 
 
@@ -134,37 +137,68 @@ class Order {
                     if (leverage < 1) {
                         cerr << "Invalid leverage: " << leverage_ << "x" << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
                     if (leverage == 1 && margin_type != MarginType::NoMargin) {
                         cerr << "If leverage is 1x, margin type should be 'NoMargin'" << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
                     if (market_type == MarketType::Spot && margin_type == MarginType::Isolated && leverage_ > exchange.getSpotTradeRules(security_)[10]) {
                         cerr << "Leverage " << leverage_ << "x is greater than the spot isolated margin limit of " << exchange.getSpotTradeRules(security_)[10] << "x" << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
                     if (market_type == MarketType::Spot && margin_type == MarginType::Cross && leverage_ > exchange.getSpotTradeRules(security_)[11]) {
                         cerr << "Leverage " << leverage_ << "x is greater than the spot cross margin limit of " << exchange.getSpotTradeRules(security_)[11] << "x" << endl;
                         state = OrderState::Rejected;
+                        return;
                     }
 
-                    // Sanity checking order size
+                    // Sanity checking minimum order size
                     if (base_currency_size == 0) {
-                        double base_currency_min_size = exchange.getSpotTradeRules(security_)[1];
+                        double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
                         base_currency_size = int((quote_currency_size / price)/base_currency_min_size) * base_currency_min_size;
                     } else if (quote_currency_size == 0) {
                         quote_currency_size = base_currency_size * price;
                     }
 
-
-                    if (quote_currency_size * leverage < exchange.getSpotTradeRules(security_)[2]) {
-                        cerr << "Order value " << quote_currency_size * leverage << security.getQuote() << " is lesser than the minimum trade size " << exchange.getSpotTradeRules(security_)[2] << security.getQuote() << endl;
-                    }
-
-
                     leverage_adjusted_base_currency_size = leverage * base_currency_size;
 
-                    // Sanity checking minimum trade size
+
+                    if (market_type == MarketType::Spot && leverage_adjusted_base_currency_size < exchange.getSpotTradeRules(security)[1]) {
+                        cerr << "Order value " << leverage_adjusted_base_currency_size << security.getBase() << " is lesser than the minimum trade size " << exchange.getSpotTradeRules(security)[1] << security.getBase() << endl;
+                        state = OrderState::Rejected;
+                        return;
+                    }
+                    if (market_type == MarketType::Spot && quote_currency_size * leverage < exchange.getSpotTradeRules(security)[2]) {
+                        cerr << "Order value " << quote_currency_size * leverage << security.getQuote() << " is lesser than the minimum trade size " << exchange.getSpotTradeRules(security)[2] << security.getQuote() << endl;
+                        state = OrderState::Rejected;
+                        return;
+                    }
+
+                    // Sanity checking maximum trade size
+                    if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange.getSpotTradeRules(security)[3] != -1 && leverage_adjusted_base_currency_size > exchange.getSpotTradeRules(security)[3])) {
+                        cerr << "Order value " << leverage_adjusted_base_currency_size << security.getBase() << " is greater than the maximum trade size " << exchange.getSpotTradeRules(security)[3] << security.getBase() << endl;
+                        state = OrderState::Rejected;
+                        return;
+                    }
+                    if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange.getSpotTradeRules(security)[4] != -1 && leverage * quote_currency_size > exchange.getSpotTradeRules(security)[4])) {
+                        cerr << "Order value " << leverage * quote_currency_size << security.getQuote() << " is greater than the maximum trade size " << exchange.getSpotTradeRules(security)[4] << security.getQuote() << endl;
+                        state = OrderState::Rejected;
+                        return;
+                    }
+                    if (market_type == MarketType::Spot && (type == "MARKET" || type == "STOP") && (exchange.getSpotTradeRules(security)[5] != -1 && leverage_adjusted_base_currency_size > exchange.getSpotTradeRules(security)[5])) {
+                        cerr << "Order value " << leverage_adjusted_base_currency_size << security.getBase() << " is greater than the maximum trade size " << exchange.getSpotTradeRules(security)[5] << security.getBase() << endl;
+                        state = OrderState::Rejected;
+                        return;
+                    }
+                    if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange.getSpotTradeRules(security)[6] != -1 && leverage * quote_currency_size > exchange.getSpotTradeRules(security)[6])) {
+                        cerr << "Order value " << leverage * quote_currency_size << security.getQuote() << " is greater than the maximum trade size " << exchange.getSpotTradeRules(security)[6] << security.getQuote() << endl;
+                        state = OrderState::Rejected;
+                        return;
+                    }
+
 
                 }
         
@@ -429,8 +463,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, unsigned leverage_, const MarginType margintype_, Exchange exchange_): 
-            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, -1.0, leverage_, margintype_, -1.0, exchange_) {}
+    Market(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double current_price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_) {}
 
     /**
      * Checks if the order could be filled.
@@ -474,8 +508,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_): 
-            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, -1.0, leverage_, margintype_, -1.0, exchange_) {
+    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double current_price_, double trigger_price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
