@@ -30,6 +30,38 @@ Our goal is to produce a backtesting software for cryptocurrency with the follow
   * GitLab
 
 ## Project Timeline
+- **02/26/2024**: 
+  - *Goal:* 
+    - Completion of the orderbook prototype.
+    - Completion of unit test on orders and exchanges.
+
+- **04/02/2024**: 
+  - *Goal:*
+    - Create an order matching engine (OME) prototype having self-matching prevention.
+    - Completion of unit test on order book.
+
+- **04/09/2024**: 
+  - *Goals:*
+    - Combine everything to have the back-end prototype.
+    - Completion of unit test on OME.
+
+- **04/16/2024**: 
+  - *Goals*: 
+    - Completion of back-end side of backtester.
+
+- **04/23/2024**: 
+  - *Goals*: 
+    -  Start workin on latency analysis.
+
+- **04/30/2024**: 
+  - *Goals*: 
+    - Start working on reach goals on implementing API connection to major exchanges.
+    - Start working on the final report
+
+- **05/07/2024**: 
+  - *Goals*: 
+    - Final review of the project and report.
+
 
 
 ## Project Goals
@@ -45,9 +77,9 @@ Our goal is to produce a backtesting software for cryptocurrency with the follow
 
   ## Deliverables
 
-- **Code Repository:**
+- **Code Repository:** Located on GitLab documenting development process.
 
-- **Report:**
+- **Report:**  Located on Gitlab containing detailed description on the architecture, documentations, key features, and usages.  
 
 ## Team Members
 
