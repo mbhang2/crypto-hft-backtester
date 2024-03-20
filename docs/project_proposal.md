@@ -51,7 +51,8 @@ Our goal is to produce a backtesting software for cryptocurrency with the follow
 
 - **04/23/2024**: 
   - *Goals*: 
-    -  Start workin on latency analysis.
+    - Completion of overall unit test.
+    - Start working on latency analysis.
 
 - **04/30/2024**: 
   - *Goals*: 
