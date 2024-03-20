@@ -88,9 +88,9 @@ Our goal is to produce a backtesting software for cryptocurrency with the follow
   - Graduation Semester: Spring 2024
   - Future Plans: Master's in Financial Engineering (MSFE)
 
-- [Team Member 2]:
-  - Graduation Semester:
-  - Future Plans:
+- [Team Member 2]: Jerry (Jiayuan) Hong
+  - Graduation Semester: Spring 2025
+  - Future Plans: Work at a software engineer in a trading company
 
 - [Team Member 3]:
   - Graduation Semester:
