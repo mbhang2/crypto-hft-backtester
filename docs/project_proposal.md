@@ -90,7 +90,7 @@ Our goal is to produce a backtesting software for cryptocurrency with the follow
 
 - [Team Member 2]: Jerry (Jiayuan) Hong
   - Graduation Semester: Spring 2025
-  - Future Plans: Work at a software engineer in a trading company
+  - Future Plans: Software Engineer in a trading company
 
 - [Team Member 3]:
   - Graduation Semester:
