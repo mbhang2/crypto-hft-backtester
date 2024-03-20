@@ -1,18 +1,65 @@
-Submit a 3-5 page project proposal for your team project. 
+# Project Proposal
 
-At this point, you should have a fairly detailed understanding of what your semester project for the course will be.
+## Project Overview
 
-You should now, within your project repo, write up a .MD file called "PROJECT_PROPOSAL.md"
+Our goal is to produce a backtesting software for cryptocurrency with the following features:
 
-Your write up should include the following:
+- **Supporting All Exchanges with Their Own Trade Rules**
+- **Latency Analysis**
+- **Configurable Fee Structure**
 
-which specifically technologies, libraries, frameworks, languages, etc, you intend to use or investigate using for your project
-what specific hardware your project will need (are you running on VMs locally on your laptops, do you require use of the lab machines and bare metal, raspberry pis, AWS, etc).
-what frameworks, libraries, etc, you will use for CI/CD (automated testing, deployment, etc)
-if your project has any user interface aspects (GUIs, webpages, etc), a brief mockup of what you expect the UI to look like. 
-detailed timeline of what needs to be done and when to complete your project
-Breakdown of 1: bare minimum target for your project to not be a failure, 2: expected completion goals, and 3. "Reach" goals (more advanced work that, given enough time, your team hopes to also accomplish). 
-detailed specification of what each individual team member will be contributing to the project (and ensuring this aligns with everyone's actual skills or ability to learn new skills). 
-any external resources your project may depend on or require (including anything you need from me). 
-What are the final deliverable(s) of your project. 
-Please also include a brief list of each team member, which semester they expect to graduate, and if graduating but applying to grad school, whether you may be pursuing additional degrees at UIUC after graduation. 
+## Technologies and Tools
+
+- **Programming Languages**:  
+  * C++
+
+- **Libraries and Frameworks**: 
+  * RapidJson 
+  * Google Tests
+
+- **Cryptocurrency Exchanges**: 
+  * Binance
+  * Bybit
+  * Coinbase
+  * Okx
+
+## CI/CD (Continuous Integration/Continuous Deployment)
+
+- **Automated Testing**: 
+  * Google Test
+  * GitLab
+
+## Project Timeline
+
+
+## Project Goals
+
+1. **Bare Minimum Target**: 
+  * Create a backtesting software that accepts any crypto exchange and security. 
+  * Enable more user freedom through having variables configurable.
+2. **Expected Completion Goals**: 
+  * Provide latency analysis (Latency vs P&L)
+  * Simulate more realistic fills/slippages for backtesting
+3. **Reach Goals**: 
+  * Not only provide backtesting feature, but also allow users to directly connect to an exchange through APIs, so that users could paper trade or live trade. 
+
+  ## Deliverables
+
+- **Code Repository:**
+
+- **Report:**
+
+## Team Members
+
+- [Team Member 1]: Min Hyuk "Michael" Bhang
+  - Graduation Semester: Spring 2024
+  - Future Plans: Master's in Financial Engineering (MSFE)
+
+- [Team Member 2]:
+  - Graduation Semester:
+  - Future Plans:
+
+- [Team Member 3]:
+  - Graduation Semester:
+  - Future Plans:
+
