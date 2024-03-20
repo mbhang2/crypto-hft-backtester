@@ -4,9 +4,9 @@
 
 Our goal is to produce a backtesting software for cryptocurrency with the following features:
 
-- **Supporting All Exchanges with Their Own Trade Rules**
-- **Latency Analysis**
-- **Configurable Fee Structure**
+- Supporting All Exchanges with Their Own Trade Rules
+- Latency Analysis
+- Configurable Fee Structure
 
 ## Technologies and Tools
 
