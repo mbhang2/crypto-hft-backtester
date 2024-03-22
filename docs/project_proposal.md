@@ -92,7 +92,7 @@ Our goal is to produce a backtesting software for cryptocurrency with the follow
   - Graduation Semester: Spring 2025
   - Future Plans: Software Engineer in a trading company
 
-- [Team Member 3]:
-  - Graduation Semester:
-  - Future Plans:
+- [Team Member 3]: Ze-Xuan Liu
+  - Graduation Semester: Summer 2027
+  - Future Plans: Buy-side Quant
 
