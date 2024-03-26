@@ -116,7 +116,7 @@ class Order {
                         state = OrderState::Rejected;
                         return;
                     }
-                    if ((type == "LIMIT" || type == "STOPLIMIT") && price_ <= 0.0) {
+                    if (price_ <= 0.0) {
                         cerr << "Invalid order price: " << price_ << security.getQuote() << endl;
                         state = OrderState::Rejected;
                         return;
@@ -514,8 +514,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double current_price_, double trigger_price_, Exchange exchange_): 
-            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_) {
+    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
