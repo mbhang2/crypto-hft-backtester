@@ -263,6 +263,11 @@ class Order {
         Security getSecurity() const {return security;}
 
         /**
+         * Getter for market type.
+         */
+        MarketType getMarketType() const {return market_type;}
+
+        /**
          * Getter for timestamp.
          */
         string getTimestamp() const {return timestamp;}
