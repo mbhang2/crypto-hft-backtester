@@ -146,6 +146,11 @@ class Order {
                         state = OrderState::Rejected;
                         return;
                     }
+                    if (leverage != 1 && margin_type == MarginType::NoMargin) {
+                        cerr << "If leverage is not 1x, margin type should not be 'NoMargin'" << endl;
+                        state = OrderState::Rejected;
+                        return;
+                    }
                     if (market_type == MarketType::Spot && margin_type == MarginType::Isolated && leverage_ > exchange.getSpotTradeRules(security_)[10]) {
                         cerr << "Leverage " << leverage_ << "x is greater than the spot isolated margin limit of " << exchange.getSpotTradeRules(security_)[10] << "x" << endl;
                         state = OrderState::Rejected;
