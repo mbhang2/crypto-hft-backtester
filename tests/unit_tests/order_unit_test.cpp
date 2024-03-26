@@ -90,8 +90,26 @@ EXPECT_EQ(limit.getTimestamp(), "2023-12-31 23:59:59.999999999");
 EXPECT_EQ(limit.getOrderType(), "LIMIT");
 EXPECT_EQ(limit.getSide(), 1);
 EXPECT_EQ(limit.getBaseCurrencySize(), 10.0);
+EXPECT_EQ(limit.getLeverage(), 1);
+EXPECT_EQ(limit.getMarginType(), MarginType::NoMargin);
 EXPECT_EQ(limit.getPrice(), 60850.0);
 EXPECT_EQ(limit.getExchange().getName(), binance.getName());
+}
+
+TEST(LimitOrderTest, FillabilityTest) {
+// Create a Limit Buy Order object
+Limit limit_buy(btcusdt, MarketType::Spot,"2023-12-31 23:59:59.999999999", 1, 10, 0, 1, MarginType::NoMargin, 60850.25, binance);
+
+// Check filability (Only should be fillable if best ask is same or lower than the buy price)
+EXPECT_FALSE(limit_buy.checkFillability(60850.25, 60850.75));
+EXPECT_TRUE(limit_buy.checkFillability(60849.75, 60850.25));
+
+// Create a Limit Sell Order object
+Limit limit_sell(btcusdt, MarketType::Spot,"2023-12-31 23:59:59.999999999", -1, 10, 0, 1, MarginType::NoMargin, 60850.25, binance);
+
+// Check filability (Only should be fillable if best bid is same or higher than the buy price)
+EXPECT_FALSE(limit_sell.checkFillability(60850.00, 60850.25));
+EXPECT_TRUE(limit_sell.checkFillability(60850.25, 60850.75));
 }
 
 // TEST(OrderTest, FillOrderTest) {
