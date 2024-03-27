@@ -224,7 +224,7 @@ class Order {
 
         /**
          * Fills the order and change the order status accordingly
-         * @param qty Quantity to fill.
+         * @param qty Base currency quantity to fill.
         */
         void fillOrder(double qty) {
             // Sanity checks

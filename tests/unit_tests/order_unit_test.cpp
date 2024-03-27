@@ -81,7 +81,7 @@ EXPECT_EQ(market_quote_max.getOrderState(), OrderState::Rejected);
 
 TEST(LimitOrderTest, ConstructorTest) {
 // Create a Limit Order object
-Limit limit(btcusdt, MarketType::Spot,"2023-12-31 23:59:59.999999999", 1, 10, 0, 1, MarginType::NoMargin, 60850.0, binance);
+Limit limit(btcusdt, MarketType::Spot,"2023-12-31 23:59:59.999999999", 1, 10, 0, 1, MarginType::NoMargin, 10.0, binance);
 
 // Check that the Order object was created correctly
 EXPECT_EQ(limit.getSecurity(), btcusdt);
@@ -90,6 +90,7 @@ EXPECT_EQ(limit.getTimestamp(), "2023-12-31 23:59:59.999999999");
 EXPECT_EQ(limit.getOrderType(), "LIMIT");
 EXPECT_EQ(limit.getSide(), 1);
 EXPECT_EQ(limit.getBaseCurrencySize(), 10.0);
+EXPECT_EQ(limit.getQuoteCurrencySize(), 100);
 EXPECT_EQ(limit.getLeverage(), 1);
 EXPECT_EQ(limit.getMarginType(), MarginType::NoMargin);
 EXPECT_EQ(limit.getPrice(), 60850.0);
@@ -110,6 +111,44 @@ Limit limit_sell(btcusdt, MarketType::Spot,"2023-12-31 23:59:59.999999999", -1, 
 // Check filability (Only should be fillable if best bid is same or higher than the buy price)
 EXPECT_FALSE(limit_sell.checkFillability(60850.00, 60850.25));
 EXPECT_TRUE(limit_sell.checkFillability(60850.25, 60850.75));
+}
+
+TEST(LimitOrderTest, FillOrderTest) {
+// Create a Limit Buy Order object
+Limit limit(btcusdt, MarketType::Spot,"2023-12-31 23:59:59.999999999", 1, 100, 0, 1, MarginType::NoMargin, 10, binance);
+
+limit.fillOrder(11); // Should not fill
+EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getOrderState() == OrderState::Working);
+
+limit.fillOrder(4.5);
+EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getOrderState() == OrderState::PartiallyFilled && limit.getFilledSize() == 4.5 && limit.isLiveOrder());
+
+limit.fillOrder(6);
+EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getFilledSize() == 4.5);
+
+limit.fillOrder(5.5);
+EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getFilledSize() == 10 && limit.getOrderState() == OrderState::Filled && !limit.isLiveOrder());
+}
+
+TEST(LimitOrderTest, ModifyOrderTest) {
+// Create a Limit Buy Order object
+Limit limit(btcusdt, MarketType::Spot,"2023-12-31 23:59:59.999999999", 1, 10, 0, 1, MarginType::NoMargin, 10, binance);
+
+limit.modifyOrder(12, 10, 10);  // Should output cerr
+EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getQuoteCurrencySize() == 100);
+
+limit.modifyOrder(0, 400, 20);  // Should change base currency size to 20
+EXPECT_TRUE(limit.getBaseCurrencySize() == 20 && limit.getQuoteCurrencySize() == 400 && limit.getPrice() == 20);
+
+limit.fillOrder(10);
+limit.modifyOrder(5, 0, 12);    // Should fail
+EXPECT_TRUE(limit.getBaseCurrencySize() == 20 && limit.getQuoteCurrencySize() == 400 && limit.getPrice() == 20 && limit.getFilledSize() == 10);
+limit.modifyOrder(0, 190, 12);  // Should fail
+EXPECT_TRUE(limit.getBaseCurrencySize() == 20 && limit.getQuoteCurrencySize() == 400 && limit.getPrice() == 20 && limit.getFilledSize() == 10);
+
+limit.modifyOrder(15, 0, 12);
+EXPECT_TRUE(limit.getBaseCurrencySize() == 15 && limit.getQuoteCurrencySize() == 180 && limit.getPrice() == 12 && limit.getFilledSize() == 10);
+// limit.modifyOrder(0, )
 }
 
 // TEST(OrderTest, FillOrderTest) {
