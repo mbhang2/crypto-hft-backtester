@@ -65,6 +65,7 @@ public:
     void AddOrder(double price_level, double order_size, bool is_our_order)
     {
         // Ensure the price level exists
+        // TODO Combine rest orders
         AddLevel(price_level);
 
         if (book[price_level].empty() || !book[price_level].back().second
@@ -126,6 +127,8 @@ public:
             cout << "}" << "\n\n";
         }
     }
+    // TODO When someone cancel order, positions of order
+    // Input: series of order; Output: profits
 
     static std::string marketTypeToString(MarketType type) {
     switch (type) {

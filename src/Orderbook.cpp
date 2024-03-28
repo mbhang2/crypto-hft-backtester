@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-
+// simulate multiple stategies: different users
+// orderbook with exchange
 
 int main() {    
     Exchange exchange("Binance");
