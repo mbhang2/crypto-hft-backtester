@@ -16,6 +16,7 @@ using namespace std;
 
 /**
  * Abstract class for exchagnes.
+ * @todo: Have a method to configure latency per each day
  */
 class Exchange {
     public:

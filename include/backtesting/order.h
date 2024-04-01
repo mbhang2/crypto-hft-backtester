@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include "../data/exchange.h"
 #include "../data/security.h"
@@ -11,8 +12,10 @@ using namespace std;
 
 /**
  * Enumeration class for order state
+ * @todo: Add a state where packet is on the way to the exchange
  */
 enum class OrderState {
+    SentToExchange,
     Working,
     Filled,
     PartiallyFilled,
@@ -25,6 +28,9 @@ enum class OrderState {
  */
 ostream& operator<<(ostream& os, const OrderState& state) {
     switch (state) {
+        case OrderState::SentToExchange:
+            os << "Sent to Exchange";
+            break;
         case OrderState::Working:
             os << "Working";
             break;
@@ -85,6 +91,9 @@ ostream& operator<<(ostream& os, const MarginType& margin_type) {
 
 /**
  * Abstract class for orders.
+ * @todo Make sure the exchange's market type support certain order type
+ * @todo Rate limit per session (later)
+ * @todo Throw exception, catch and log the error
  */
 class Order {
     public:
@@ -97,39 +106,39 @@ class Order {
                     
                     // Sanity checking zero and negative inputs
                     if (side != 1 && side != -1) {
-                        cerr << "Invalid order side: " << side << endl;
+                        throw invalid_argument("Order side must be 1 (buy) or -1 (sell)");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (quote_currency_size == 0.0 && base_currency_size == 0.0) {
-                        cerr << "Please provide non-zero order size" << endl;
+                        throw invalid_argument("Order size must be non-zero");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (quote_currency_size_ < 0.0) {
-                        cerr << "Invalid order size: " << quote_currency_size_ << security.getQuote() << endl;
+                        throw invalid_argument("Quote currency order size must be non-negative");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (base_currency_size_ < 0.0) {
-                        cerr << "Invalid order size: " << base_currency_size_ << security.getBase() << endl;
+                        throw invalid_argument("Base currency order size must be non-negative");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (price_ <= 0.0) {
-                        cerr << "Invalid order price: " << price_ << security.getQuote() << endl;
+                        throw invalid_argument("Order price must be positive");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (base_currency_size != 0 && quote_currency_size != 0) {
-                        cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
+                        throw invalid_argument("Order size must only provided in base currency or quote currency, not both");
                         state = OrderState::Rejected;
                         return;
                     }
 
                     // Sanity checking price
                     if (countDigitsAfterDecimal(price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
-                        cerr << "Invalid price of " << price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+                        throw invalid_argument("Price must obey the minimum tick size");
                         state = OrderState::Rejected;
                         return;
                     }
@@ -137,27 +146,27 @@ class Order {
 
                     // Sanity checking leverage
                     if (leverage < 1) {
-                        cerr << "Invalid leverage: " << leverage_ << "x" << endl;
+                        throw invalid_argument("Leverage must be greater than or equal to 1");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (leverage == 1 && margin_type != MarginType::NoMargin) {
-                        cerr << "If leverage is 1x, margin type should be 'NoMargin'" << endl;
+                        throw invalid_argument("If leverage is 1x, margin type must be 'NoMargin'");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (leverage != 1 && margin_type == MarginType::NoMargin) {
-                        cerr << "If leverage is not 1x, margin type should not be 'NoMargin'" << endl;
+                        throw invalid_argument("If leverage is not 1x, margin type must not be 'NoMargin'");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (market_type == MarketType::Spot && margin_type == MarginType::Isolated && leverage_ > exchange.getSpotTradeRules(security_)[10]) {
-                        cerr << "Leverage " << leverage_ << "x is greater than the spot isolated margin limit of " << exchange.getSpotTradeRules(security_)[10] << "x" << endl;
+                        throw invalid_argument("Leverage must not exceed the maximum spot isolated leverage limit");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (market_type == MarketType::Spot && margin_type == MarginType::Cross && leverage_ > exchange.getSpotTradeRules(security_)[11]) {
-                        cerr << "Leverage " << leverage_ << "x is greater than the spot cross margin limit of " << exchange.getSpotTradeRules(security_)[11] << "x" << endl;
+                        throw invalid_argument("Leverage must not exceed the maximum spot cross leverage limit");
                         state = OrderState::Rejected;
                         return;
                     }
@@ -174,34 +183,34 @@ class Order {
 
 
                     if (market_type == MarketType::Spot && leverage_adjusted_base_currency_size < exchange.getSpotTradeRules(security)[1]) {
-                        cerr << "Order value " << leverage_adjusted_base_currency_size << security.getBase() << " is lesser than the minimum trade size " << exchange.getSpotTradeRules(security)[1] << security.getBase() << endl;
+                        throw invalid_argument("Order value must be greater than the minimum order value");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (market_type == MarketType::Spot && quote_currency_size * leverage < exchange.getSpotTradeRules(security)[2]) {
-                        cerr << "Order value " << quote_currency_size * leverage << security.getQuote() << " is lesser than the minimum trade size " << exchange.getSpotTradeRules(security)[2] << security.getQuote() << endl;
+                        throw invalid_argument("Order value must be greater than the minimum order value");
                         state = OrderState::Rejected;
                         return;
                     }
 
                     // Sanity checking maximum trade size
                     if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange.getSpotTradeRules(security)[3] != -1 && leverage_adjusted_base_currency_size > exchange.getSpotTradeRules(security)[3])) {
-                        cerr << "Order value " << leverage_adjusted_base_currency_size << security.getBase() << " is greater than the maximum trade size " << exchange.getSpotTradeRules(security)[3] << security.getBase() << endl;
+                        throw invalid_argument("Order value must not exceed the maximum limit order value");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange.getSpotTradeRules(security)[4] != -1 && leverage * quote_currency_size > exchange.getSpotTradeRules(security)[4])) {
-                        cerr << "Order value " << leverage * quote_currency_size << security.getQuote() << " is greater than the maximum trade size " << exchange.getSpotTradeRules(security)[4] << security.getQuote() << endl;
+                        throw invalid_argument("Order value must not exceed the maximum limit order value");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (market_type == MarketType::Spot && (type == "MARKET" || type == "STOP") && (exchange.getSpotTradeRules(security)[5] != -1 && leverage_adjusted_base_currency_size > exchange.getSpotTradeRules(security)[5])) {
-                        cerr << "Order value " << leverage_adjusted_base_currency_size << security.getBase() << " is greater than the maximum trade size " << exchange.getSpotTradeRules(security)[5] << security.getBase() << endl;
+                        throw invalid_argument("Order value must not exceed the maximum market order value");
                         state = OrderState::Rejected;
                         return;
                     }
                     if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange.getSpotTradeRules(security)[6] != -1 && leverage * quote_currency_size > exchange.getSpotTradeRules(security)[6])) {
-                        cerr << "Order value " << leverage * quote_currency_size << security.getQuote() << " is greater than the maximum trade size " << exchange.getSpotTradeRules(security)[6] << security.getQuote() << endl;
+                        throw invalid_argument("Order value must not exceed the maximum market order value");
                         state = OrderState::Rejected;
                         return;
                     }
@@ -226,16 +235,23 @@ class Order {
          * Fills the order and change the order status accordingly
          * @param qty Base currency quantity to fill.
         */
-        void fillOrder(double qty) {
+        void fillOrder(double qty, double filled_price) {
             // Sanity checks
-            if (qty <= 0 || qty > leverage_adjusted_base_currency_size - filled_size) {
-                cerr << "Invalid fill quantity: " << qty << endl;
+            if (qty <= 0) {
+                throw invalid_argument("Filled quantity should be positive");
                 return;
             }
+            if (qty > leverage_adjusted_base_currency_size) {
+                throw invalid_argument("Filled quantity should not be greater than the order size");
+            }
 
+            average_fill_price = (average_fill_price * filled_size + filled_price * qty)/(filled_size+qty);
             filled_size += qty;
+            base_currency_size -= qty;
+            quote_currency_size = base_currency_size * price;
+            leverage_adjusted_base_currency_size = base_currency_size * leverage;
 
-            if (filled_size == leverage_adjusted_base_currency_size) {
+            if (base_currency_size > 0) {
                 state = OrderState::Filled;
             } else {
                 state = OrderState::PartiallyFilled;
@@ -359,6 +375,7 @@ class Order {
         const MarginType margin_type;   /*< Margin type of the order */
         double leverage_adjusted_base_currency_size;    /*< Leverage adjusted base currency size */
         double filled_size = 0.0;       /*< Quantify filled of the order */
+        double average_fill_price;      /*< Average filled price of the order */
         double price;                   /*< Price for LIMIT and STOP LIMIT orders. Current price for MARKET and STOP orders */
         const Exchange exchange;        /*< Target exchange for an order (optional) */
         OrderState state = OrderState::Working;         /*< State of the order */
@@ -404,48 +421,40 @@ public:
         // Sanity checks
         if (!isLiveOrder()) {return;}
         if (modified_price <= 0.0) {
-            cerr << "Invalid order price: " << modified_price << endl;
+            throw invalid_argument("Modified price must be positive");
             return;
         }
         if (modified_base_currency_size == 0.0 && modified_quote_currency_size == 0.0) {
-            cerr << "Invalid order size: 0" << security.getQuote() << endl;
+            throw invalid_argument("Order size must be non-zero");
             return;
         }
         if (modified_base_currency_size < 0.0) {
-            cerr << "Invalid order size: " << modified_base_currency_size << security.getBase() << endl;
+            throw invalid_argument("Modified base currency size must not be negative");
             return;
         }
         if (modified_quote_currency_size < 0.0) {
-            cerr << "Invalid order size: " << modified_quote_currency_size << security.getQuote() << endl;
+            throw invalid_argument("Modified quote currency size must not be negative");
             return;
         }
         if (base_currency_size != 0 && quote_currency_size != 0) {
-            cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
+            throw invalid_argument("Order size must only provided in base currency or quote currency, not both");
             return;
         }
         if (countDigitsAfterDecimal(modified_price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
-            cerr << "Invalid price of " << modified_price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+            throw invalid_argument("Modified price must obey the minimum tick size");
             return;
         }
 
-        double new_base_currency_size = modified_base_currency_size;
-        double new_quote_currency_size = modified_quote_currency_size;
-
-        if (new_base_currency_size == 0) {
+        if (modified_base_currency_size == 0) {
+            quote_currency_size = modified_quote_currency_size;
             double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
-            new_base_currency_size = int((new_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
-        } else if (new_quote_currency_size == 0) {
-            new_quote_currency_size = new_base_currency_size * price;
+            base_currency_size = int((modified_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
+        } else if (modified_quote_currency_size == 0) {
+            base_currency_size = modified_base_currency_size;
+            quote_currency_size = base_currency_size * modified_price;
         }
 
-        double new_leverage_adjusted_base_currency_size = leverage * new_base_currency_size;
-
-        if (new_leverage_adjusted_base_currency_size <= filled_size) {
-            cerr << "Modified order size of " << new_leverage_adjusted_base_currency_size << " is lesser than the already filled size of " << filled_size << security.getBase() << endl;
-            return;
-        }
-
-        base_currency_size = new_base_currency_size, quote_currency_size = new_quote_currency_size, leverage_adjusted_base_currency_size = new_leverage_adjusted_base_currency_size, price = modified_price;
+        leverage_adjusted_base_currency_size = leverage * base_currency_size;
     }
 
     /**
@@ -548,7 +557,7 @@ public:
      */
     bool checkTriggered(double current_price) {
         if (current_price <= 0.0) {
-            cerr << "Invalid current price: " << current_price << endl;
+            throw invalid_argument("Current price must be positive");
             return false;
         }
 
@@ -569,48 +578,41 @@ public:
         // Sanity checks
         if (!isLiveOrder() || triggered) {return;}
         if (modified_base_currency_size == 0.0 && modified_quote_currency_size == 0.0) {
-            cerr << "Invalid order size: 0" << security.getQuote() << endl;
+            throw invalid_argument("Order size must be non-zero");
             return;
         }
         if (modified_base_currency_size < 0.0) {
-            cerr << "Invalid order size: " << modified_base_currency_size << security.getBase() << endl;
+            throw invalid_argument("Modified base currency order size must not be negative");
             return;
         }
         if (modified_quote_currency_size < 0.0) {
-            cerr << "Invalid order size: " << modified_quote_currency_size << security.getQuote() << endl;
+            throw invalid_argument("Modified quote currency order size must not be negative");
             return;
         }
         if (base_currency_size != 0 && quote_currency_size != 0) {
-            cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
+            throw invalid_argument("Order size should only provided in base currency or quote currency, not both");
+            return;
+        }
+        if (modified_trigger_price <= 0) {
+            throw invalid_argument("Modified trigger price must be positive");
             return;
         }
         if (countDigitsAfterDecimal(modified_trigger_price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
-            cerr << "Invalid trigger price of " << modified_trigger_price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+            throw invalid_argument("Modified trigger price must obey the minimum tick size");
             return;
         }
         
-        double new_base_currency_size = modified_base_currency_size;
-
-        // if (new_base_currency_size == 0) {
-        //     double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
-        //     new_base_currency_size = int((new_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
-        // } else if (new_quote_currency_size == 0) {
-        //     new_quote_currency_size = new_base_currency_size * price;
-        // }
-
-        double new_leverage_adjusted_base_currency_size = leverage * new_base_currency_size;
-
-        if (new_leverage_adjusted_base_currency_size <= filled_size) {
-            cerr << "Modified order size of " << new_leverage_adjusted_base_currency_size << " is lesser than the already filled size of " << filled_size << security.getBase() << endl;
-            return;
-        }
-        if (modified_trigger_price <= 0.0) {
-            cerr << "Invalid order trigger price: " << modified_trigger_price << endl;
-            return;
+       if (modified_base_currency_size == 0) {
+            quote_currency_size = modified_quote_currency_size;
+            double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
+            base_currency_size = int((modified_quote_currency_size / modified_trigger_price)/base_currency_min_size) * base_currency_min_size;
+        } else if (modified_quote_currency_size == 0) {
+            base_currency_size = modified_base_currency_size;
+            quote_currency_size = base_currency_size * modified_trigger_price;
         }
 
-        base_currency_size = new_base_currency_size, leverage_adjusted_base_currency_size = new_leverage_adjusted_base_currency_size, trigger_price = modified_trigger_price;
-        // quote_currency_size = new_quote_currency_size;
+        leverage_adjusted_base_currency_size = leverage * base_currency_size;
+        trigger_price = modified_trigger_price;
     }
 
     /**
@@ -688,7 +690,7 @@ public:
      */
     bool checkTriggered(double current_price) {
         if (current_price <= 0.0) {
-            cerr << "Invalid current price: " << current_price << endl;
+            throw invalid_argument("Current price must be positive");
             return false;
         }
 
@@ -704,62 +706,59 @@ public:
      * @param modified_base_currency_size New size of the order in base currency
      * @param modified_quote_currency_size New size of the order in quote currency
      * @param modified_price New price of the order
-     * @param modified_trigger_price New trigger price of the order
+     * @param modified_trigger_price New trigger price of the order. If it has been triggered, should input the original trigger price.
      */
     void modifyOrder(double modified_base_currency_size, double modified_quote_currency_size, double modified_price, double modified_trigger_price) {
         // Sanity checks
         if (!isLiveOrder()) {return;}
         if (modified_trigger_price != trigger_price && triggered) {
-            cerr << "Cannot modify trigger price once triggered" << endl;
+            throw invalid_argument("Trigger price cannot be modified once triggered");
             return;
         }
         if (modified_trigger_price <= 0.0) {
-            cerr << "Invalid order trigger price: " << modified_trigger_price << endl;
+            throw invalid_argument("Trigger price must be positive");
             return;
         }
         if (modified_base_currency_size == 0.0 && modified_quote_currency_size == 0.0) {
-            cerr << "Invalid order size: 0" << security.getQuote() << endl;
+            throw invalid_argument("Order size must be non-zero");
             return;
         }
         if (modified_base_currency_size < 0.0) {
-            cerr << "Invalid order size: " << modified_base_currency_size << security.getBase() << endl;
+            throw invalid_argument("Modified base currency size must not be negative");
             return;
         }
         if (modified_quote_currency_size < 0.0) {
-            cerr << "Invalid order size: " << modified_quote_currency_size << security.getQuote() << endl;
+            throw invalid_argument("Modified quote currency size must not be negative");
             return;
         }
         if (base_currency_size != 0 && quote_currency_size != 0) {
-            cerr << "Order size should only provided in base currency or quote currency, not both" << endl;
+            throw invalid_argument("Order size should only provided in base currency or quote currency, not both");
             return;
         }
         if (countDigitsAfterDecimal(modified_price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
-            cerr << "Invalid price of " << modified_price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+            throw invalid_argument("Modified price must obey the minimum tick size");
             return;
         }
         if (countDigitsAfterDecimal(modified_trigger_price) > countDigitsAfterDecimal(exchange.getSpotTradeRules(security)[0])) {
-            cerr << "Invalid trigger price of " << modified_trigger_price << security.getQuote() << ". Minimum tick size is " << exchange.getSpotTradeRules(security)[0] << security.getQuote() << endl;
+            throw invalid_argument("Modified trigger price must obey the minimum tick size");
             return;
         }
+
+        if (modified_base_currency_size == 0) {
+            quote_currency_size = modified_quote_currency_size;
+            double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
+            base_currency_size = int((modified_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
+        } else if (modified_quote_currency_size == 0) {
+            base_currency_size = modified_base_currency_size;
+            quote_currency_size = base_currency_size * modified_price;
+        }
+
+        leverage_adjusted_base_currency_size = leverage * base_currency_size;
 
         double new_base_currency_size = modified_base_currency_size;
         double new_quote_currency_size = modified_quote_currency_size;
 
-        if (new_base_currency_size == 0) {
-            double base_currency_min_size = exchange.getSpotTradeRules(security)[1];
-            new_base_currency_size = int((new_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
-        } else if (new_quote_currency_size == 0) {
-            new_quote_currency_size = new_base_currency_size * price;
-        }
-
-        double new_leverage_adjusted_base_currency_size = leverage * new_base_currency_size;
-
-        if (new_leverage_adjusted_base_currency_size <= filled_size) {
-            cerr << "Modified order size of " << new_leverage_adjusted_base_currency_size << " is lesser than the already filled size of " << filled_size << security.getBase() << endl;
-            return;
-        }
-
-        base_currency_size = new_base_currency_size, quote_currency_size = new_quote_currency_size, leverage_adjusted_base_currency_size = new_leverage_adjusted_base_currency_size, price = modified_price, trigger_price = modified_trigger_price;
+        trigger_price = modified_trigger_price;
     }
 
     /**
