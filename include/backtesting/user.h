@@ -8,6 +8,10 @@
 
 using namespace std;
 
+/**
+ * @todo (Reach goal) Add restristictions per subaccount
+ * @todo (Reach goal) Manage risks/positions per subaccounts/users for a firm (tree structure)
+ */
 class User {
 public:
     /**
