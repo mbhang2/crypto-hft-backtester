@@ -3,6 +3,7 @@
 #include "../include/data/security.h"
 
 #include <iostream>
+#include <cassert>
 
 // simulate multiple stategies: different users
 // orderbook with exchange
@@ -30,6 +31,10 @@ int main() {
     orderbook.AddLevel(101);
     orderbook.AddLevel(102); 
     orderbook.AddLevel(99); 
+    orderbook.printOrderBook();
+
+    // Test case 1: Cancel an existing order
+    orderbook.CancelOrder(100, 0.5, true);
     orderbook.printOrderBook();
     return 0;
 }
