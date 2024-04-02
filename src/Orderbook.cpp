@@ -26,5 +26,10 @@ int main() {
 
     orderbook.TradeHappened(100, 3.5);
     orderbook.printOrderBook();
+
+    orderbook.AddLevel(101);
+    orderbook.AddLevel(102); 
+    orderbook.AddLevel(99); 
+    orderbook.printOrderBook();
     return 0;
 }
