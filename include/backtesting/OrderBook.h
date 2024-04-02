@@ -8,12 +8,6 @@
 
 using namespace std;
 
-/**
- * Map<double (price level, Ex: 60500.37), queue<pair<double (size), bool (is it
- * our order?)>>
- * Binance Spot BTC/USD
- * price_level:{[6,f],[1,true],[5,f]...}
- */
 class Orderbook
 {
 public:
@@ -47,45 +41,33 @@ public:
             book.erase(price_level);
         }
     }
-    /**
-     * Add order at a certain price level
-     *
-     * Cases to consider:
-     *
-     * 1. Our order does not exist at this price level --> Change the order size
-     * 2. Our order exist at this price level and is the last one (last index of
-     * queue is our order) --> We have to add new "block/pair" at the end of the
-     * queue
-     * 3. Our order exist at this price level, but is not the last one --> Only
-     * modify the order size of the last pair
-     *
-     * Useful to have a helper function that is only for modifying order size
-     * given price level and size to add/subtract
-     */
-    void AddOrder(double price_level, double order_size, bool is_our_order)
-    {
-        // Ensure the price level exists
-        // TODO Combine rest orders
-        AddLevel(price_level);
 
-        if (book[price_level].empty() || !book[price_level].back().second
-            || !is_our_order)
-        {
-            // Case 1 & 3
+    void AddOrder(double price_level, double order_size, bool is_our_order) {
+    // Ensure the price level exists in the book.
+    AddLevel(price_level);
+
+    if (!is_our_order) {
+        // Logic for adding a non-our order.
+        if (!book[price_level].empty() && !book[price_level].back().second) {
+            // If the last order in the queue is not our order, combine it.
+            book[price_level].back().first += order_size;
+        } else {
+            // Otherwise, add it as a new order.
             book[price_level].emplace(order_size, is_our_order);
         }
-        else
-        {
-            // Case 2
-            auto &last_order = book[price_level].back();
-            last_order.first += order_size; // Modify the size
+    } else {
+        // Logic for adding our order.
+        if (!book[price_level].empty() && book[price_level].back().second) {
+            // If the last order is our order, combine it.
+            book[price_level].back().first += order_size;
+        } else {
+            // Otherwise, add it as a new order.
+            book[price_level].emplace(order_size, is_our_order);
         }
     }
-    /**
-     * Subtract trade size from the front of the queue
-     * If trade size is greater than the front pair order size, since it is 0
-     * now, pop the front pair and then resume subtracting
-     */
+}
+
+    
     void TradeHappened(double price_level, double trade_size)
     {
         if (book.find(price_level) != book.end())
@@ -128,7 +110,8 @@ public:
         }
     }
     // TODO When someone cancel order, positions of order
-    // Input: series of order; Output: profits
+    // TODO Priority Queue: maxHeap, minHeap
+    // TODO PQ in a big Queue
 
     static std::string marketTypeToString(MarketType type) {
     switch (type) {
@@ -144,6 +127,5 @@ private:
     Exchange &exchange;
     MarketType market_type;
     Security &security;
-    map<double, queue<pair<double, bool>>>
-        book; // The book stores orders at each price level
+    map<double, queue<pair<double, bool>>> book; // The book stores orders at each price level
 };
