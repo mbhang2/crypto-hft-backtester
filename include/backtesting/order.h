@@ -216,8 +216,6 @@ class Order {
                         state = OrderState::Rejected;
                         return;
                     }
-
-
                 }
 
         /**
@@ -279,14 +277,16 @@ class Order {
          * Check if an exchange received the order and if so, change order status to working
          * @param current_timestamp Current timestamp in format 'yyyy-MM-dd HH:mm:ss.fffffffff'
          */
-        void checkOrderReceived(const string& current_timestamp, const string& submitted_timestamp = "") {
+        void checkOrderReceived(const string& current_timestamp, string submitted_timestamp = "") {
+            submitted_timestamp = timestamp;
+
             // Parse submitted timestamp
             tm tm_submitted;
-            istringstream ss_submitted (timestamp);
+            istringstream ss_submitted (submitted_timestamp);
             ss_submitted >> get_time (&tm_submitted, "%Y-%m-%d %H:%M:%S.%f");
             auto submitted_time_ns = chrono::time_point_cast<chrono::nanoseconds>(chrono::system_clock::from_time_t (mktime (&tm_submitted)));
             auto epoch_submitted = submitted_time_ns.time_since_epoch();
-            epoch_submitted += chrono::nanoseconds (stoll (timestamp.substr (20)));
+            epoch_submitted += chrono::nanoseconds (stoll (submitted_timestamp.substr (20)));
 
             // Parse current timestamp
             tm tm_current;
