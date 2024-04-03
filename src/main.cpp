@@ -17,12 +17,11 @@ int main(int  /*argc*/, char**  /*argv*/) {
 
     Binance.loadJson("./tests/exchange_json_test/exchange.json");
     Bybit.loadJson("./tests/exchange_json_test/exchange.json");
-
-    cout << "Max limit buy for BTC/USDT at Bybit is " << Bybit.getSpotTradeRules(BTCUSDT)[3] << endl;
     
     // cout << std::fixed << std::setprecision(7) << Binance.getSpotTradeRules(BTCUSDT)[1] << endl;
-    Limit limit(BTCUSDT, MarketType::Spot, "2024-03-22 12:30:15.123456789", 1, 2000, 0, 5, MarginType::Cross, 67650.37, Binance);
-    Market market(BTCUSDT, MarketType::Spot, "2024-03-22 12:30:15.123456789", 1, 25, 0, 5, MarginType::Cross, 67650.37, Binance);
+    Limit limit(BTCUSDT, MarketType::Spot, "2024-03-22 12:30:15.123456789", 1, 100, 0, 5, MarginType::Cross, 67650.37, Binance);
+
+    limit.fillOrder(300, 67530.37);
 
     cout << limit << setprecision(9) << endl;
 }
