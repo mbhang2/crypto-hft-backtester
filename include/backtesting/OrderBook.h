@@ -189,3 +189,9 @@ private:
     map<double, queue<pair<double, bool>>>
         book; // The book stores orders at each price level
 };
+
+// TODO: Order matching engine in a separate class?
+// eg. How to match orders in parallel?
+// Execute/Monitor order status
+// Orderbook construted from?
+// Level 2 data

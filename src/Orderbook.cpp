@@ -24,8 +24,9 @@ int main() {
 
     orderbook.TradeHappened(100, 3);
     orderbook.printOrderBook();
-
+    
     orderbook.TradeHappened(100, 3.5);
+    cout << "Trade happened at 100, 3.5" << endl;
     orderbook.printOrderBook();
 
     orderbook.AddLevel(101);
@@ -34,6 +35,7 @@ int main() {
     orderbook.printOrderBook();
 
     // Test case 1: Cancel an existing order
+    cout << "Test case 1: Cancel an existing order" << endl;
     orderbook.CancelOrder(100, 0.5, true);
     orderbook.printOrderBook();
     return 0;
