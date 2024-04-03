@@ -1,8 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include <chrono>
+#include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include "../data/exchange.h"
@@ -268,9 +270,39 @@ class Order {
          * Cancels the order if it is live.
          */
         void cancelOrder() {
-            if (!isLiveOrder()) {return;}
+            if (!isLiveOrder() && state != OrderState::SentToExchange) {return;}
 
             state = OrderState::Cancelled;
+        }
+
+        /**
+         * Check if an exchange received the order and if so, change order status to working
+         * @param current_timestamp Current timestamp in format 'yyyy-MM-dd HH:mm:ss.fffffffff'
+         */
+        void checkOrderReceived(const string& current_timestamp, const string& submitted_timestamp = "") {
+            // Parse submitted timestamp
+            tm tm_submitted;
+            istringstream ss_submitted (timestamp);
+            ss_submitted >> get_time (&tm_submitted, "%Y-%m-%d %H:%M:%S.%f");
+            auto submitted_time_ns = chrono::time_point_cast<chrono::nanoseconds>(chrono::system_clock::from_time_t (mktime (&tm_submitted)));
+            auto epoch_submitted = submitted_time_ns.time_since_epoch();
+            epoch_submitted += chrono::nanoseconds (stoll (timestamp.substr (20)));
+
+            // Parse current timestamp
+            tm tm_current;
+            istringstream ss_current (current_timestamp);
+            ss_current >> get_time (&tm_current, "%Y-%m-%d %H:%M:%S.%f");
+            auto current_time_ns = chrono::time_point_cast<chrono::nanoseconds>(chrono::system_clock::from_time_t (mktime (&tm_current)));
+            auto epoch_current = current_time_ns.time_since_epoch();
+            epoch_current += chrono::nanoseconds (stoll (current_timestamp.substr (20)));
+
+            // Compute the time difference in seconds
+            auto time_difference = epoch_current.count() - epoch_submitted.count();
+
+            // Compare the time difference with the exchange's sending latency
+            if (time_difference >= exchange.getSendingLatency()) {
+                state = OrderState::Working;
+            }
         }
 
         /**
@@ -378,7 +410,7 @@ class Order {
         double average_fill_price;      /*< Average filled price of the order */
         double price;                   /*< Price for LIMIT and STOP LIMIT orders. Current price for MARKET and STOP orders */
         const Exchange exchange;        /*< Target exchange for an order (optional) */
-        OrderState state = OrderState::Working;         /*< State of the order */
+        OrderState state = OrderState::SentToExchange;         /*< State of the order */
         vector<int> child_trade_id;     /*< Vector of trade ids executed from this order */
 
     private:
