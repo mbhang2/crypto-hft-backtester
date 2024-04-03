@@ -220,6 +220,10 @@ class Exchange {
         void setFuturesTakerFee(double fee) {futures_taker_fee = fee;}
 
 
+        bool operator==(const Exchange& other) const {
+            return name == other.name; //TODO: Check if this is the correct way to compare
+        }
+
     protected:
         const string name;           /*< Exchange name */
         int receiving_latency;      /*< Latency from an exchange in nanoseconds */

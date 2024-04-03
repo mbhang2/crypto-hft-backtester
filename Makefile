@@ -4,14 +4,15 @@ CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs -fprofile-dir=buil
 LDFLAGS = --coverage
 APP = crypto_back_testing
 APP_TESTER = crypto_tests
+APP_INCLUDE = $(wildcard include/backtesting/*.h)
 
 ##############################################
 # only need to change this part
 # add more source files here to be compiled
-APP_SOURCES = src/BackTesting.cpp src/main.cpp
+APP_SOURCES = src/main.cpp
 
 # add more test files here to be compiled
-APP_TESTS = tests/CryptoTest.cpp
+APP_TESTS = tests/unit_tests/order_unit_test.cpp
 ##############################################
 
 GTEST_DIR = googletest
@@ -28,7 +29,7 @@ else
 endif
 
 # Targets
-all: $(GTEST_DIR) $(APP) $(APP_TESTER)
+all: $(GTEST_DIR) $(APP)
 
 $(APP): $(APP_SOURCES)
 	rm -rf build
@@ -39,10 +40,10 @@ $(GTEST_DIR):
 	git clone --branch $(GTEST_TAG) $(GTEST_REPO) $@
 	cd $@ && mkdir build && cd build && cmake $(CMAKE_ARCH) .. && make
 
-$(APP_TESTER): $(APP_SOURCES) $(APP_TESTS)
-	$(CC) $(CFLAGS) -o build/$@ $^ -I$(GTEST_DIR)/googletest/include -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -pthread $(LDFLAGS)
-	mkdir -p ./build/coverage
-	mv *.gcno build/coverage
+test: $(APP_TESTS) $(APP_INCLUDE)
+	$(CC) $(CFLAGS) -o build/$@ $^ -I$(GTEST_DIR)/googletest/include -Iinclude -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -pthread $(LDFLAGS)
+	#mkdir -p ./build/coverage
+#	mv *.gcno build/coverage
 
 
 .PHONY: clean
