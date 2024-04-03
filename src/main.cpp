@@ -5,6 +5,7 @@
 #include "../include/data/exchange.h"
 #include "../include/data/security.h"
 
+int Order::next_id = 0;
 
 int main(int  /*argc*/, char**  /*argv*/) {
     Exchange Binance("Binance");

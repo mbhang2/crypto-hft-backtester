@@ -2,6 +2,8 @@
 #include "backtesting/order.h"
 #include <string>
 
+int Order::next_id=0;
+
 
 // Create securities
 Security btcusdt("BTC", "USDT");
@@ -117,16 +119,16 @@ TEST(LimitOrderTest, FillOrderTest) {
 // Create a Limit Buy Order object
 Limit limit(btcusdt, MarketType::Spot,"2023-12-31 23:59:59.999999999", 1, 100, 0, 1, MarginType::NoMargin, 10, binance);
 
-limit.fillOrder(11); // Should not fill
+limit.fillOrder(1, 11); // Should not fill
 EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getOrderState() == OrderState::Working);
 
-limit.fillOrder(4.5);
+limit.fillOrder(1, 4.5);
 EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getOrderState() == OrderState::PartiallyFilled && limit.getFilledSize() == 4.5 && limit.isLiveOrder());
 
-limit.fillOrder(6);
+limit.fillOrder(1, 6);
 EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getFilledSize() == 4.5);
 
-limit.fillOrder(5.5);
+limit.fillOrder(1, 5.5);
 EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getFilledSize() == 10 && limit.getOrderState() == OrderState::Filled && !limit.isLiveOrder());
 }
 
@@ -140,7 +142,7 @@ EXPECT_TRUE(limit.getBaseCurrencySize() == 10 && limit.getQuoteCurrencySize() ==
 limit.modifyOrder(0, 400, 20);  // Should change base currency size to 20
 EXPECT_TRUE(limit.getBaseCurrencySize() == 20 && limit.getQuoteCurrencySize() == 400 && limit.getPrice() == 20);
 
-limit.fillOrder(10);
+limit.fillOrder(1, 10);
 limit.modifyOrder(5, 0, 12);    // Should fail
 EXPECT_TRUE(limit.getBaseCurrencySize() == 20 && limit.getQuoteCurrencySize() == 400 && limit.getPrice() == 20 && limit.getFilledSize() == 10);
 limit.modifyOrder(0, 190, 12);  // Should fail
