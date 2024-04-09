@@ -122,7 +122,6 @@ public:
             cout << "}" << "\n\n";
         }
     }
-    // TODO When someone cancel order, positions of order
 
     static std::string marketTypeToString(MarketType type)
     {
@@ -191,7 +190,3 @@ private:
 };
 
 // TODO: Order matching engine in a separate class?
-// eg. How to match orders in parallel?
-// Execute/Monitor order status
-// Orderbook construted from?
-// Level 2 data
