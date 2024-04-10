@@ -101,6 +101,29 @@ public:
         }
     }
 
+    bool isEmpty() const {
+        return book.empty();
+    }
+
+    double getBestPrice(bool isBuyOrder) const
+    {
+        if (isEmpty()) return -1; // Indicates that the book is empty.
+
+        double bestPrice = isBuyOrder ? 0 : std::numeric_limits<double>::max();
+        for (const auto &level : book)
+        {
+            if (isBuyOrder)
+            {
+                if (level.first > bestPrice) bestPrice = level.first;
+            }
+            else
+            {
+                if (level.first < bestPrice) bestPrice = level.first;
+            }
+        }
+        return bestPrice;
+    }
+
     void printOrderBook() const
     {
         cout << exchange.getName() << ", " << marketTypeToString(market_type)
