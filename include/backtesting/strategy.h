@@ -46,7 +46,11 @@ class Strategy {
          * Call this function to submit an order
          * @param order_vector vector of orders to submit
          */
-        virtual void submitOrder(vector<Order> order_vector);
+        void submitOrder(vector<Order> order_vector) {
+            for (auto& it: order_vector) {
+                
+            }
+        }
 
     protected:
         const string strategy_name;
