@@ -11,13 +11,26 @@ using namespace std;
 class Orderbook
 {
 public:
-
+    /**
+     * Constructor for the Orderbook class.
+     */
     Orderbook(Exchange &exchange_, MarketType market_type_, Security &security_)
         : exchange(exchange_)
         , market_type(market_type_)
         , security(security_)
     {}
 
+    /**
+     * Destructor
+     */
+    virtual ~Orderbook() {}
+
+    /**
+     * Add a price level to the order book.
+     * @param price_level The price level to add.
+     * @param order_size The size of the order.
+     * @param is_our_trade Whether the order is ours.
+     */
     void AddLevel(double price_level)
     {
         // If the level does not exist, create it with an empty queue
@@ -33,6 +46,13 @@ public:
         book[price_level].emplace(order_size, is_our_trade);
     }
 
+    /**
+     * Remove a price level from the order book.
+     * @param price_level The price level to remove.
+     * @param order_size The size of the order.
+     * @param is_our_trade Whether the order is ours.
+     * @return True if the level was removed, false otherwise.
+     */
     void RemoveLevel(double price_level)
     {
         // If the level exists, remove it
@@ -42,6 +62,13 @@ public:
         }
     }
 
+    /**
+     * Add an order to the order book.
+     * @param price_level The price level to add the order to.
+     * @param order_size The size of the order.
+     * @param is_our_order Whether the order is ours.
+     * @return True if the order was added, false otherwise.
+     */
     void AddOrder(double price_level, double order_size, bool is_our_order)
     {
         // Ensure the price level exists in the book.
@@ -77,7 +104,16 @@ public:
         }
     }
 
-
+    
+    /**
+     * @brief Executes trades in the order book based on the given price level and trade size.
+     * 
+     * This function checks if there are orders at the specified price level in the order book.
+     * If there are, it executes trades by matching the trade size with the available orders.
+     * 
+     * @param price_level The price level at which the trades are executed.
+     * @param trade_size The size of the trades to be executed.
+     */
     void TradeHappened(double price_level, double trade_size)
     {
         if (book.find(price_level) != book.end())
@@ -103,25 +139,6 @@ public:
 
     bool isEmpty() const {
         return book.empty();
-    }
-
-    double getBestPrice(bool isBuyOrder) const
-    {
-        if (isEmpty()) return -1; // Indicates that the book is empty.
-
-        double bestPrice = isBuyOrder ? 0 : std::numeric_limits<double>::max();
-        for (const auto &level : book)
-        {
-            if (isBuyOrder)
-            {
-                if (level.first > bestPrice) bestPrice = level.first;
-            }
-            else
-            {
-                if (level.first < bestPrice) bestPrice = level.first;
-            }
-        }
-        return bestPrice;
     }
 
     void printOrderBook() const
@@ -159,11 +176,19 @@ public:
         }
     }
 
-    void CancelOrder(
-        double price_level,
-        double order_size,
-        bool is_our_order
-    )
+    /**
+     * @brief Cancels an order from the order book.
+     * 
+     * This function cancels an order from the order book based on the specified price level, order size, and whether it is our order.
+     * If the price level does not exist in the order book, a message will be printed.
+     * If the order is found and cancelled, the order will be removed from the order book.
+     * If the order is not found, a message will be printed.
+     * 
+     * @param price_level The price level of the order.
+     * @param order_size The size of the order.
+     * @param is_our_order Indicates whether the order is ours or not.
+     */
+    void CancelOrder(double price_level, double order_size, bool is_our_order)
     {
         if (book.find(price_level) == book.end())
         {
