@@ -16,6 +16,7 @@ using namespace std;
 
 /**
  * Abstract class for exchagnes.
+ * @todo: Have a method to configure latency per each day
  */
 class Exchange {
     public:
@@ -218,6 +219,10 @@ class Exchange {
          */
         void setFuturesTakerFee(double fee) {futures_taker_fee = fee;}
 
+
+        bool operator==(const Exchange& other) const {
+            return name == other.name; //TODO: Check if this is the correct way to compare
+        }
 
     protected:
         const string name;           /*< Exchange name */
