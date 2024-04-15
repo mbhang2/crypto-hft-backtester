@@ -7,9 +7,19 @@
 #include "../data/exchange.h"
 #include "../data/security.h"
 
+#include <iostream>
+#include <fstream>
 #include <string>
+#include <vector>
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
+using namespace boost;
+
 
 
 /**
