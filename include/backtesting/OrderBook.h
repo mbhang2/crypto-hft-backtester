@@ -8,8 +8,8 @@
 
 using namespace std;
 
-class Orderbook
-{
+
+class Orderbook { 
 public:
     /**
      * Constructor for the Orderbook class.
@@ -141,6 +141,10 @@ public:
         return book.empty();
     }
 
+    map<double, queue<pair<double, bool>>>& getBook() {
+        return book;
+    }
+
     void printOrderBook() const
     {
         cout << exchange.getName() << ", " << marketTypeToString(market_type)
@@ -233,8 +237,7 @@ private:
     Exchange &exchange;
     MarketType market_type;
     Security &security;
-    map<double, queue<pair<double, bool>>>
-        book; // The book stores orders at each price level
+    map<double, queue<pair<double, bool>>>book; // The book stores orders at each price level
 };
 
 // TODO: Order matching engine in a separate class?
