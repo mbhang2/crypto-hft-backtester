@@ -254,14 +254,14 @@ class Order {
 
             average_fill_price = (average_fill_price * filled_size + filled_price * qty)/(filled_size+qty);
             filled_size += qty;
-            base_currency_size -= qty;
+            base_currency_size -= qty/leverage;
             quote_currency_size = base_currency_size * price;
             leverage_adjusted_base_currency_size = base_currency_size * leverage;
 
             if (base_currency_size > 0) {
-                state = OrderState::Filled;
-            } else {
                 state = OrderState::PartiallyFilled;
+            } else {
+                state = OrderState::Filled;
             }
         }
 
