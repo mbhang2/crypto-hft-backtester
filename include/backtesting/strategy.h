@@ -30,27 +30,17 @@ class Strategy {
         /**
          * Triggers when a trade event message arrives
          */
-        virtual void onTrade(TradeEventMsg& event_msg);
+        virtual vector<Order> onTrade(TradeEventMsg& event_msg);
 
         /**
          * Triggers when a change in top quote (BBO) message arrives
          */
-        virtual void onTopQuote(QuoteEventMsg& event_msg);
+        virtual vector<Order> onTopQuote(QuoteEventMsg& event_msg);
 
         /**
          * Triggers when a change in orderbook message arrives
          */
-        virtual void onDepth(DepthEventMsg& event_msg);
-
-        /**
-         * Call this function to submit an order
-         * @param order_vector vector of orders to submit
-         */
-        void submitOrder(vector<Order> order_vector) {
-            for (auto& it: order_vector) {
-                
-            }
-        }
+        virtual vector<Order> onDepth(DepthEventMsg& event_msg);
 
     protected:
         const string strategy_name;
