@@ -102,7 +102,7 @@ class Order {
         /**
          * Constructor to create an order.
          */
-        Order(Security security_, const MarketType market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_ ,double price_, Exchange exchange_, double buying_power_): 
+        Order(Security security_, const MarketType market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_ ,double price_, Exchange exchange_): 
                 security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
                     id = ++next_id; // Assign a unique order id
                     
@@ -216,13 +216,6 @@ class Order {
                         state = OrderState::Rejected;
                         return;
                     }
-
-                    // Check if order exceeds buying power
-                    if (quote_currency_size * leverage > buying_power_) {
-                        throw invalid_argument("Order value exceeds buyihg power");
-                        state = OrderState::Rejected;
-                        return;
-                    }
                 }
 
         /**
@@ -278,6 +271,15 @@ class Order {
             if (!isLiveOrder() && state != OrderState::SentToExchange) {return;}
 
             state = OrderState::Cancelled;
+        }
+
+        /**
+         * Reject order.
+         */
+        void rejectOrder() {
+            if (state != OrderState::SentToExchange) {return;}
+
+            state = OrderState::Rejected;
         }
 
         /**
@@ -433,8 +435,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(Security security_, const MarketType market_type_ ,const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double price_, Exchange exchange_, double buying_power_): 
-            Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {}
+    Limit(Security security_, const MarketType market_type_ ,const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {}
 
     /**
      * Checks if the order could be filled.
@@ -527,8 +529,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double current_price_, Exchange exchange_, double buying_power_): 
-            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_, buying_power_) {}
+    Market(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double current_price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_) {}
 
     /**
      * Checks if the order could be filled.
@@ -572,8 +574,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_, double buying_power_): 
-            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_, buying_power_) {
+    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -702,8 +704,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_, double buying_power_): 
-            Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {
+    StopLimit(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_): 
+            Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
