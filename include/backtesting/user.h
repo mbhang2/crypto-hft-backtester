@@ -60,6 +60,27 @@ public:
         exchange_list.push_back(exchange);
     }
 
+    /**
+     * Find exchange by name, case insensitive
+     * @param name name of the exchange to find
+     * @return pointer to the exchange
+     */
+    Exchange* findExchange(const string& name) {
+    // Convert the target name to lowercase for case-insensitive comparison
+    string lowercase_name = name;
+    transform(lowercase_name.begin(), lowercase_name.end(), lowercase_name.begin(), ::tolower);
+
+    for (auto& exchange : exchange_list) {
+        string exchangeName = exchange.getName();
+        transform(exchangeName.begin(), exchangeName.end(), exchangeName.begin(), ::tolower);
+        if (exchangeName == lowercase_name) {
+            return &exchange;
+        }
+    }
+
+    return nullptr; // Exchange not found
+}
+
     private:
     int id; /*< Unique user id */
     double spot_balance; /*< Spot balance */

@@ -27,6 +27,8 @@ int main(int argc, char* argv[]) {
     user.addExchange(binance);
     user.addExchange(bybit);
 
+    cout << user.findExchange("binance")->getName() << endl;
+
     MovingAverageCross ma_cross(1, 5, 20, 1000000.0, 1000000.0);
 
     Backtester backtester(user, &ma_cross);
