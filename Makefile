@@ -1,7 +1,7 @@
 # Variables
 CC = g++
-CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs -fprofile-dir=build/coverage -I./boost_1_84_0
-LDFLAGS = --coverage
+#CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs -fprofile-dir=build/coverage -I./boost_1_84_0
+CFLAGS = -std=c++20 -I./boost_1_84_0
 APP = crypto_back_testing
 APP_TESTER = crypto_tests
 APP_INCLUDE = $(wildcard include/backtesting/*.h)
@@ -34,7 +34,7 @@ all: $(GTEST_DIR) $(APP)
 $(APP): $(APP_SOURCES)
 	rm -rf build
 	mkdir -p build
-	$(CC) $(CFLAGS) -o build/$@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o build/$@ $^
 
 $(GTEST_DIR):
 	git clone --branch $(GTEST_TAG) $(GTEST_REPO) $@
@@ -43,7 +43,7 @@ $(GTEST_DIR):
 test: $(APP_TESTS) $(APP_INCLUDE)
 	rm -rf *.gcno
 	rm -rf *.gcda
-	$(CC) $(CFLAGS) -o build/$@ $^ -I$(GTEST_DIR)/googletest/include -Iinclude -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -pthread $(LDFLAGS)
+	$(CC) $(CFLAGS) -o build/$@ $^ -I$(GTEST_DIR)/googletest/include -Iinclude -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -pthread
 	#mkdir -p ./build/coverage
 #	mv *.gcno build/coverage
 
