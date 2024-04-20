@@ -15,7 +15,8 @@ int main(int argc, char* argv[]) {
     //     cerr << "Usage: " << argv[0] << " <arg1> <arg2>\n";
     // }
 
-    Security btcusdt("BTC", "USDT");
+    Security btcusdt("btc", "usdt");
+
 
     Exchange binance("Binance");
     binance.loadJson("./configuration/exchange.json");
@@ -26,10 +27,6 @@ int main(int argc, char* argv[]) {
     User user(1000000.0, 1000000.0);
     user.addExchange(binance);
     user.addExchange(bybit);
-
-    MarketType spot = MarketType::Spot;
-
-    cout << user.findExchange("binance")->findSecurity(spot, "BTC/USDT")->getBase() << endl;
 
     MovingAverageCross ma_cross(1, 5, 20, 1000000.0, 1000000.0);
 

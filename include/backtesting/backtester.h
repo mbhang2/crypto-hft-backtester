@@ -67,8 +67,21 @@ class Backtester {
                 throw runtime_error("Exchange " + tokens[4] + " is not found");
             }
 
+            // Finding Security
+            Security* security_ptr = exchange_ptr->findSecurity(MarketType::Spot, tokens[3]);
+
+            if (security_ptr == nullptr) {
+                throw runtime_error("Security " + tokens[3] + " is not found");
+            }
+
             if (tokens[2] == "T") {
-                // TradeEventMsg msg(tokens[0])
+                TradeEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[6]), stod(tokens[7]));
+                cout << msg << endl;
+            }
+
+            if (tokens[2] == "Q") {
+                QuoteEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
+                cout << msg << endl;
             }
 
             // if (tokens.size() == 5 /*< Change this number accordingly */) {
