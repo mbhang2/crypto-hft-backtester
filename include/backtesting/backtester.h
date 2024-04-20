@@ -6,8 +6,8 @@
 #include "./user.h"
 #include "../data/exchange.h"
 #include "../data/security.h"
-#include "../boost/accumulators/accumulators.hpp"
-#include "../boost/algorithm/string.hpp"
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -28,7 +28,7 @@ class Backtester {
     /**
      * Constructor
      */
-    Backtester(User& user_, Strategy& strategy_): user(user_), strategy(strategy_) {}
+    Backtester(User& user_, Strategy* strategy_): user(user_), strategy(strategy_) {}
 
     /**
      * Destructor
@@ -55,11 +55,36 @@ class Backtester {
         }
 
         string line;
+        getline(file, line);    // Skip first line
         while (getline(file, line)) {
             vector<string> tokens;
             boost::split(tokens, line, boost::is_any_of(","));
 
-            if (tokens.size() == 5 /*< Change this number accordingly */) {
+            // Finding Exchange
+            Exchange* exchange_ptr = user.findExchange(tokens[4]);
+
+            if (exchange_ptr == nullptr) {
+                throw runtime_error("Exchange " + tokens[4] + " is not found");
+            }
+
+            // Finding Security
+            Security* security_ptr = exchange_ptr->findSecurity(MarketType::Spot, tokens[3]);
+
+            if (security_ptr == nullptr) {
+                throw runtime_error("Security " + tokens[3] + " is not found");
+            }
+
+            if (tokens[2] == "T") {
+                TradeEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[6]), stod(tokens[7]));
+                cout << msg << endl;
+            }
+
+            if (tokens[2] == "Q") {
+                QuoteEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
+                cout << msg << endl;
+            }
+
+            // if (tokens.size() == 5 /*< Change this number accordingly */) {
                 // string timestamp = tokens[0];
 
                 /*
@@ -86,12 +111,12 @@ class Backtester {
                     }
                 }    
                 */
-            }
+            // }
         }
 
     }
 
     private:
     User user;
-    Strategy strategy;
+    Strategy* strategy;
 };
