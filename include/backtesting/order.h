@@ -7,89 +7,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include "../data/enum.h"
 #include "../data/exchange.h"
 #include "../data/security.h"
 
 using namespace std;
-
-/**
- * Enumeration class for order state
- * @todo: Add a state where packet is on the way to the exchange
- */
-enum class OrderState {
-    SentToExchange,
-    Working,
-    Filled,
-    PartiallyFilled,
-    Cancelled,
-    Rejected
-};
-
-/**
- * << operator overload for OrderState class.
- */
-ostream& operator<<(ostream& os, const OrderState& state) {
-    switch (state) {
-        case OrderState::SentToExchange:
-            os << "Sent to Exchange";
-            break;
-        case OrderState::Working:
-            os << "Working";
-            break;
-        case OrderState::Filled:
-            os << "Filled";
-            break;
-        case OrderState::PartiallyFilled:
-            os << "Partially Filled";
-            break;
-        case OrderState::Cancelled:
-            os << "Cancelled";
-            break;
-        case OrderState::Rejected:
-            os << "Rejected";
-            break;
-        default:
-            os << "Unknown"; // Handle any other values gracefully
-    }
-    return os;
-}
-
-/**
- * Enumeration class for market type
- */
-enum class MarketType {
-    Spot,
-    Futures
-};
-
-/**
- * Enumeration class for market type
- */
-enum class MarginType {
-    NoMargin,
-    Cross,
-    Isolated
-};
-
-/**
- * << operator overload for OrderState class.
- */
-ostream& operator<<(ostream& os, const MarginType& margin_type) {
-    switch (margin_type) {
-        case MarginType::NoMargin:
-            os << "No Margin";
-            break;
-        case MarginType::Isolated:
-            os << "Isolated";
-            break;
-        case MarginType::Cross:
-            os << "Cross";
-            break;
-        default:
-            os << "Unknown"; // Handle any other values gracefully
-    }
-    return os;
-}
 
 /**
  * Abstract class for orders.
@@ -102,7 +24,7 @@ class Order {
         /**
          * Constructor to create an order.
          */
-        Order(Security security_, const MarketType market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_ ,double price_, Exchange exchange_): 
+        Order(Security security_, const MarketType market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_ ,double price_, Exchange exchange_, double buying_power_): 
                 security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
                     id = ++next_id; // Assign a unique order id
                     
@@ -216,6 +138,13 @@ class Order {
                         state = OrderState::Rejected;
                         return;
                     }
+
+                    // Check if order exceeds buying power
+                    if (quote_currency_size * leverage > buying_power_) {
+                        throw invalid_argument("Order value exceeds buyihg power");
+                        state = OrderState::Rejected;
+                        return;
+                    }
                 }
 
         /**
@@ -247,14 +176,14 @@ class Order {
 
             average_fill_price = (average_fill_price * filled_size + filled_price * qty)/(filled_size+qty);
             filled_size += qty;
-            base_currency_size -= qty;
+            base_currency_size -= qty/leverage;
             quote_currency_size = base_currency_size * price;
             leverage_adjusted_base_currency_size = base_currency_size * leverage;
 
             if (base_currency_size > 0) {
-                state = OrderState::Filled;
-            } else {
                 state = OrderState::PartiallyFilled;
+            } else {
+                state = OrderState::Filled;
             }
         }
 
@@ -426,8 +355,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(Security security_, const MarketType market_type_ ,const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double price_, Exchange exchange_): 
-            Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {}
+    Limit(Security security_, const MarketType market_type_ ,const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double price_, Exchange exchange_, double buying_power_): 
+            Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {}
 
     /**
      * Checks if the order could be filled.
@@ -520,8 +449,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double current_price_, Exchange exchange_): 
-            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_) {}
+    Market(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double current_price_, Exchange exchange_, double buying_power_): 
+            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_, buying_power_) {}
 
     /**
      * Checks if the order could be filled.
@@ -565,8 +494,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_): 
-            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_) {
+    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_, double buying_power_): 
+            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_, buying_power_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -695,8 +624,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_): 
-            Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {
+    StopLimit(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_, double buying_power_): 
+            Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -831,3 +760,5 @@ private:
     bool triggered;         /*< Whether the trigger price has been hit */
     double trigger_price;   /*< Trigger price for the stop order */
 };
+
+int Order::next_id = 0;
