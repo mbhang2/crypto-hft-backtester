@@ -56,21 +56,30 @@ public:
      * Add exchange to the list
      * @param exchange exchange to add
      */
-    void addExchange(const Exchange& exchange) {
+    void addExchange(Exchange& exchange) {
         exchange_list.push_back(exchange);
     }
 
     /**
-     * Remove exchange from the list
-     * @param exchange exchange to remove
+     * Find exchange by name, case insensitive
+     * @param name name of the exchange to find
+     * @return pointer to the exchange
      */
-    void removeExchange(const Exchange& exchange) {
-        // Find the exchange in the vector and remove it
-        auto it = std::find(exchange_list.begin(), exchange_list.end(), exchange);
-        if (it != exchange_list.end()) {
-            exchange_list.erase(it);
+    Exchange* findExchange(const string& name) {
+    // Convert the target name to lowercase for case-insensitive comparison
+    string lowercase_name = name;
+    transform(lowercase_name.begin(), lowercase_name.end(), lowercase_name.begin(), ::tolower);
+
+    for (auto& exchange : exchange_list) {
+        string exchangeName = exchange.getName();
+        transform(exchangeName.begin(), exchangeName.end(), exchangeName.begin(), ::tolower);
+        if (exchangeName == lowercase_name) {
+            return &exchange;
         }
     }
+
+    return nullptr; // Exchange not found
+}
 
     private:
     int id; /*< Unique user id */
@@ -80,3 +89,5 @@ public:
     vector<Exchange> exchange_list; /*< List of exchanges for the user */
     OrderLog orderlog;  /*< Order log */
 };
+
+int User::next_id = 0;

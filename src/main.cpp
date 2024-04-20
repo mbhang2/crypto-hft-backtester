@@ -1,28 +1,38 @@
 #include <iostream>
 #include <iomanip>
+
 #include "../include/backtesting/order.h"
 #include "../include/backtesting/trade.h"
+#include "../include/backtesting/backtester.h"
 #include "../include/data/exchange.h"
 #include "../include/data/security.h"
+#include "./sample_strategy.h"
 
-int Order::next_id = 0;
+using namespace std;
 
-int main(int  /*argc*/, char**  /*argv*/) {
-    Exchange Binance("Binance");
-    Exchange Okx("Okx");
-    Exchange Bybit("Bybit");
+int main(int argc, char* argv[]) {
+    // if (argc != 3) {
+    //     cerr << "Usage: " << argv[0] << " <arg1> <arg2>\n";
+    // }
 
-    Security BTCUSDT = Security("BTC", "USDT");
-    Security DOTUSDT = Security("DOT", "USDT");
-    Security DOGEUSDT = Security("DOGE", "USDT");
+    Security btcusdt("BTC", "USDT");
 
-    Binance.loadJson("./tests/exchange_json_test/exchange.json");
-    Bybit.loadJson("./tests/exchange_json_test/exchange.json");
-    
-    // cout << std::fixed << std::setprecision(7) << Binance.getSpotTradeRules(BTCUSDT)[1] << endl;
-    Limit limit(BTCUSDT, MarketType::Spot, "2024-03-22 12:30:15.123456789", 1, 100, 0, 5, MarginType::Cross, 67650.37, Binance);
+    Exchange binance("Binance");
+    binance.loadJson("./configuration/exchange.json");
 
-    limit.fillOrder(300, 67530.37);
+    Exchange bybit("Bybit");
+    bybit.loadJson("./configuration/exchange.json");
 
-    cout << limit << setprecision(9) << endl;
+    User user(1000000.0, 1000000.0);
+    user.addExchange(binance);
+    user.addExchange(bybit);
+
+    MarketType spot = MarketType::Spot;
+
+    cout << user.findExchange("binance")->findSecurity(spot, "BTC/USDT")->getBase() << endl;
+
+    MovingAverageCross ma_cross(1, 5, 20, 1000000.0, 1000000.0);
+
+    Backtester backtester(user, &ma_cross);
+    backtester.runBacktest("./sample_data/sample_input_data.csv");
 }
