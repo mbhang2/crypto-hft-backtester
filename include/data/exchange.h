@@ -3,16 +3,22 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
 #include "security.h"
+#include "enum.h"
 #include "../rapidjson/document.h"
 #include "../rapidjson/filereadstream.h"
 
+enum class MarketType;
+
 using namespace rapidjson;
 using namespace std;
+
 
 /**
  * Abstract class for exchagnes.
@@ -68,6 +74,7 @@ class Exchange {
                         string security_str = security.name.GetString();
                         size_t slash_pos = security_str.find('/');
                         Security sec(security_str.substr(0, slash_pos), security_str.substr(slash_pos + 1));
+                        listed_securities[MarketType::Spot].push_back(sec);
 
                         // Save rule values
                         const Value& rule_values = security.value;
@@ -76,6 +83,23 @@ class Exchange {
                             rule_vector.push_back(v.GetDouble());
                         }
                         spot_trading_rules[sec] = rule_vector;
+                    }
+
+                    // Futures
+                    const Value& futures_rules_rules = exchange.value["tradeingRules"]["Futures"];
+                    for (auto& security : futures_rules_rules.GetObject()) {
+                        string security_str = security.name.GetString();
+                        size_t slash_pos = security_str.find('/');
+                        Security sec(security_str.substr(0, slash_pos), security_str.substr(slash_pos + 1));
+                        listed_securities[MarketType::Futures].push_back(sec);
+
+                        // Save rule values
+                        const Value& rule_values = security.value;
+                        vector<double> rule_vector;
+                        for (auto& v : rule_values.GetArray()) {
+                            rule_vector.push_back(v.GetDouble());
+                        }
+                        futures_trading_rules[sec] = rule_vector;
                     }
 
                     /**
@@ -108,7 +132,7 @@ class Exchange {
                 }
             }
 
-            cerr << "Exchange not found in JSON data." << endl;
+            throw invalid_argument("Exchange configuration not found");
             return false;
         }
 
@@ -124,7 +148,7 @@ class Exchange {
             }
 
             // Could not find tick size
-            cerr << "Trading Rule not found for given security." << endl;
+            throw invalid_argument("Trading Rule not found for given security.");
             return vector<double>();
         }
 
@@ -162,6 +186,37 @@ class Exchange {
          * Getter for futures taker fee.
          */
         double getFuturesTakerFee() const {return futures_taker_fee;}
+
+        /**
+         * Getter for listed securities
+         * @param market_type type of the market (Futures, Spot)
+         */
+        const vector<Security>& getListedSecurities(MarketType& market_type) const {
+            auto it = listed_securities.find(market_type);
+            
+            if (it != listed_securities.end()) {
+                return it->second; // Return a const reference to the vector
+            } else {
+                static vector<Security> emptyVector;
+                return emptyVector;
+            }
+        }
+
+        /**
+         * Search for the secuity with provided name
+         */
+        Security* findSecurity(MarketType market_type, const std::string& name) const {
+            auto it = listed_securities.find(market_type);
+            if (it != listed_securities.end()) {
+                // Search within the vector for the specified security name
+                for (const Security& security : it->second) {
+                    if (security.getBase() + "/" + security.getQuote() == name) {
+                        return const_cast<Security*>(&security); // Return a pointer to the found security
+                    }
+                }
+            }
+            return nullptr; // Security not found
+        }
 
         /**
          * Setter for spot trading fee.
@@ -233,6 +288,8 @@ class Exchange {
         double futures_maker_fee;      /*< Maker fee in a futures market in percent */
         double futures_taker_fee;      /*< Taker fee in a futures market in percent */
         unordered_map<Security, vector<double>, Security::Hash> spot_trading_rules; /*< Map storing trade rules per security for spot/margin market (Hash was used to ensure the same objects to store the same tick size) */
+        unordered_map<Security, vector<double>, Security::Hash> futures_trading_rules; /*< Map storing trade rules per security for futures market (Hash was used to ensure the same objects to store the same tick size) */
         vector<pair<double, double>> spot_trading_fees;     /*< Trading fees in spot market */
         vector<pair<double, double>> futures_trading_fees;     /*< Trading fees in futurs market */
+        map<MarketType, vector<Security>> listed_securities;      /*< List of securities listed per market*/
 };
