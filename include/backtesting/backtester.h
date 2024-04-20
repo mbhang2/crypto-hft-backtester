@@ -6,8 +6,8 @@
 #include "./user.h"
 #include "../data/exchange.h"
 #include "../data/security.h"
-#include "../boost/accumulators/accumulators.hpp"
-#include "../boost/algorithm/string.hpp"
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -28,7 +28,7 @@ class Backtester {
     /**
      * Constructor
      */
-    Backtester(User& user_, Strategy& strategy_): user(user_), strategy(strategy_) {}
+    Backtester(User& user_, Strategy* strategy_): user(user_), strategy(strategy_) {}
 
     /**
      * Destructor
@@ -59,7 +59,11 @@ class Backtester {
             vector<string> tokens;
             boost::split(tokens, line, boost::is_any_of(","));
 
-            if (tokens.size() == 5 /*< Change this number accordingly */) {
+            for (auto& it : tokens) {
+                cout << it << endl;
+            }
+
+            // if (tokens.size() == 5 /*< Change this number accordingly */) {
                 // string timestamp = tokens[0];
 
                 /*
@@ -86,12 +90,12 @@ class Backtester {
                     }
                 }    
                 */
-            }
+            // }
         }
 
     }
 
     private:
     User user;
-    Strategy strategy;
+    Strategy* strategy;
 };
