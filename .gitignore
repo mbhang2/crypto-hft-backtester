@@ -135,3 +135,5 @@ Temporary Items
 
 /build/
 /googletest/
+
+./cmake/
