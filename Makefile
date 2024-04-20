@@ -41,6 +41,8 @@ $(GTEST_DIR):
 	cd $@ && mkdir build && cd build && cmake $(CMAKE_ARCH) .. && make
 
 test: $(APP_TESTS) $(APP_INCLUDE)
+	rm -rf *.gcno
+	rm -rf *.gcda
 	$(CC) $(CFLAGS) -o build/$@ $^ -I$(GTEST_DIR)/googletest/include -Iinclude -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -pthread $(LDFLAGS)
 	#mkdir -p ./build/coverage
 #	mv *.gcno build/coverage
