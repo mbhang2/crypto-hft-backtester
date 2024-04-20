@@ -1,6 +1,6 @@
 # Variables
 CC = g++
-CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs -fprofile-dir=build/coverage
+CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs -fprofile-dir=build/coverage -I./boost_1_84_0
 LDFLAGS = --coverage
 APP = crypto_back_testing
 APP_TESTER = crypto_tests

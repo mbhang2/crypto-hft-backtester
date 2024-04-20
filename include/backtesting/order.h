@@ -838,3 +838,5 @@ private:
     bool triggered;         /*< Whether the trigger price has been hit */
     double trigger_price;   /*< Trigger price for the stop order */
 };
+
+int Order::next_id = 0;

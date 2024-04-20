@@ -38,7 +38,7 @@ class MovingAverageCross: public Strategy {
          * Constructor
          */
         MovingAverageCross(int candlestick_minute_ = 1, int short_length_ = 5, int long_length_ = 20, double spot_capital_ = 1000000.0, double futures_capital_ = 1000000.0): 
-                candlestick_minute(candlestick_minute_), short_length(short_length_), long_length(long_length_) {Strategy("Moving Average Cross", spot_capital_, futures_capital_);}
+                Strategy("Moving Average Cross", spot_capital_, futures_capital_), candlestick_minute(candlestick_minute_), short_length(short_length_), long_length(long_length_) {}
 
         /**
          * Destructor
@@ -106,7 +106,7 @@ class MovingAverageCross: public Strategy {
                     long_ma /= long_length;
                     prev_long_ma /= long_length;
 
-                    double curr_pos = getPosition(MarketType::Spot, event_msg.security, event_msg.exchange);
+                    double curr_pos = 0; //getPosition(MarketType::Spot, event_msg.security, event_msg.exchange);
 
                     // Check long entry condition
                     if (prev_short_ma < prev_long_ma && short_ma > long_ma) {

@@ -56,20 +56,8 @@ public:
      * Add exchange to the list
      * @param exchange exchange to add
      */
-    void addExchange(const Exchange& exchange) {
+    void addExchange(Exchange& exchange) {
         exchange_list.push_back(exchange);
-    }
-
-    /**
-     * Remove exchange from the list
-     * @param exchange exchange to remove
-     */
-    void removeExchange(const Exchange& exchange) {
-        // Find the exchange in the vector and remove it
-        auto it = std::find(exchange_list.begin(), exchange_list.end(), exchange);
-        if (it != exchange_list.end()) {
-            exchange_list.erase(it);
-        }
     }
 
     private:
@@ -80,3 +68,5 @@ public:
     vector<Exchange> exchange_list; /*< List of exchanges for the user */
     OrderLog orderlog;  /*< Order log */
 };
+
+int User::next_id = 0;
