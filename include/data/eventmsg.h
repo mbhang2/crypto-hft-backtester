@@ -63,6 +63,23 @@ public:
     const double bid_size;   /*< best bid size in base currency */
     const double ask_price;  /*< best ask price */
     const double ask_size;   /*< best ask size in base currency */
+
+    /**
+     * Override << operator for Market class.
+     */
+    friend ostream& operator<<(ostream& os, const QuoteEventMsg& msg) {
+        os << "========== Quote Update ==========" << endl;
+        os << "Timestamp: " << msg.timestamp << endl;
+        os << "Market: " << msg.market_type << endl;
+        os << "Security: " << msg.security << endl;
+        os << "Exchange: " << msg.exchange.getName() << endl;
+        os << "Bid price: " << msg.bid_price << endl;
+        os << "Bid size: " << msg.bid_size << msg.security.getBase() << endl;
+        os << "Ask price: " << msg.ask_price << endl;
+        os << "Ask size: " << msg.ask_size << msg.security.getBase() << endl;
+        os << "=======================================" << endl;
+        return os;
+    }
 };
 
 

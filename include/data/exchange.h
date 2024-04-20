@@ -205,7 +205,7 @@ class Exchange {
         /**
          * Search for the secuity with provided name
          */
-        Security* findSecurity(MarketType& market_type, const std::string& name) const {
+        Security* findSecurity(MarketType market_type, const std::string& name) const {
             auto it = listed_securities.find(market_type);
             if (it != listed_securities.end()) {
                 // Search within the vector for the specified security name
