@@ -27,7 +27,9 @@ int main(int argc, char* argv[]) {
     user.addExchange(binance);
     user.addExchange(bybit);
 
-    cout << user.findExchange("binance")->getName() << endl;
+    MarketType spot = MarketType::Spot;
+
+    cout << user.findExchange("binance")->findSecurity(spot, "BTC/USDT")->getBase() << endl;
 
     MovingAverageCross ma_cross(1, 5, 20, 1000000.0, 1000000.0);
 

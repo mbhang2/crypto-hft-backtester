@@ -55,6 +55,7 @@ class Backtester {
         }
 
         string line;
+        getline(file, line);    // Skip first line
         while (getline(file, line)) {
             vector<string> tokens;
             boost::split(tokens, line, boost::is_any_of(","));
