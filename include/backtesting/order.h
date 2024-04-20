@@ -63,6 +63,23 @@ enum class MarketType {
 };
 
 /**
+ * << operator overload for OrderState class.
+ */
+ostream& operator<<(ostream& os, const MarketType& market_type) {
+    switch (market_type) {
+        case MarketType::Spot:
+            os << "Spot";
+            break;
+        case MarketType::Futures:
+            os << "Futures";
+            break;
+        default:
+            os << "Unknown"; // Handle any other values gracefully
+    }
+    return os;
+}
+
+/**
  * Enumeration class for market type
  */
 enum class MarginType {

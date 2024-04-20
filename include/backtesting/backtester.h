@@ -59,8 +59,15 @@ class Backtester {
             vector<string> tokens;
             boost::split(tokens, line, boost::is_any_of(","));
 
-            for (auto& it : tokens) {
-                cout << it << endl;
+            // Finding Exchange
+            Exchange* exchange_ptr = user.findExchange(tokens[4]);
+
+            if (exchange_ptr == nullptr) {
+                throw runtime_error("Exchange " + tokens[4] + " is not found");
+            }
+
+            if (tokens[2] == "T") {
+                // TradeEventMsg msg(tokens[0])
             }
 
             // if (tokens.size() == 5 /*< Change this number accordingly */) {

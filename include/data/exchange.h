@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -108,7 +109,7 @@ class Exchange {
                 }
             }
 
-            cerr << "Exchange not found in JSON data." << endl;
+            throw invalid_argument("Exchange configuration not found");
             return false;
         }
 
@@ -124,7 +125,7 @@ class Exchange {
             }
 
             // Could not find tick size
-            cerr << "Trading Rule not found for given security." << endl;
+            throw invalid_argument("Trading Rule not found for given security.");
             return vector<double>();
         }
 
@@ -162,6 +163,21 @@ class Exchange {
          * Getter for futures taker fee.
          */
         double getFuturesTakerFee() const {return futures_taker_fee;}
+
+        /**
+         * Getter for listed securities
+         * @param market_type type of the market (Futures, Spot)
+         */
+        const vector<Security>& getListedSecurities(MarketType& market_type) const {
+            auto it = listed_securities.find(market_type);
+            
+            if (it != listed_securities.end()) {
+                return it->second; // Return a const reference to the vector
+            } else {
+                static vector<Security> emptyVector;
+                return emptyVector;
+            }
+        }
 
         /**
          * Setter for spot trading fee.
@@ -235,4 +251,5 @@ class Exchange {
         unordered_map<Security, vector<double>, Security::Hash> spot_trading_rules; /*< Map storing trade rules per security for spot/margin market (Hash was used to ensure the same objects to store the same tick size) */
         vector<pair<double, double>> spot_trading_fees;     /*< Trading fees in spot market */
         vector<pair<double, double>> futures_trading_fees;     /*< Trading fees in futurs market */
+        map<MarketType, vector<Security>> listed_securities;      /*< List of securities listed per market*/
 };
