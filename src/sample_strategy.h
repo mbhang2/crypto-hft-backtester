@@ -25,7 +25,20 @@ struct Candlestick {
     Candlestick(const string& timestamp, double open, double high, double low, double close, unsigned volume): 
             timestamp_(timestamp), open_(open), high_(high), low_(low), close_(close), volume_(volume) {}
 
-    
+    /**
+     * Override << operator for Candlestick class.
+     */
+    friend ostream& operator<<(ostream& os, const Candlestick& cs) {
+        os << "========== Candlestick ==========" << endl;
+        os << "Time: " << cs.timestamp_ << endl;
+        os << "Open: " << cs.open_ << endl;
+        os << "High: " << cs.high_ << endl;
+        os << "Low: " << cs.low_<< endl;
+        os << "Close: " << cs.close_ << endl;
+        os << "Volume: " << cs.volume_ << endl;
+        os << "=======================================" << endl;
+        return os;
+    }
 };
 
 
@@ -50,8 +63,8 @@ class MovingAverageCross: public Strategy {
          * @param event_msg trade event message
          * @return vector of orders to submit. Return empty vector if no orders to submit.
          */
-        virtual vector<Order> onTrade(TradeEventMsg& event_msg) {
-            vector<Order> orders;
+        virtual vector<Order*> onTrade(TradeEventMsg& event_msg) {
+            vector<Order*> orders;
 
             string trade_timestamp = event_msg.timestamp;
             double trade_price = event_msg.price;
@@ -72,8 +85,9 @@ class MovingAverageCross: public Strategy {
                 cd.volume_ += trade_size;
             } 
             else {
-                candlestick_vector.push_back(Candlestick(next_candlestick_open, trade_price, trade_price, trade_price, trade_price, trade_size));
-                next_candlestick_open = addMinutesToTimestamp(next_candlestick_open, candlestick_minute);
+                string rounded_timestamp = roundDownTimestamp(trade_timestamp, candlestick_minute);
+                next_candlestick_open = addMinutesToTimestamp(rounded_timestamp, candlestick_minute);
+                candlestick_vector.push_back(Candlestick(rounded_timestamp, trade_price, trade_price, trade_price, trade_price, trade_size));
 
                 if (candlestick_vector.size() == long_length + 1) {
                     int index = 0;
@@ -82,7 +96,7 @@ class MovingAverageCross: public Strategy {
                     double prev_short_ma = 0.0;
                     double prev_long_ma = 0.0;
 
-                    for (unsigned i = candlestick_vector.size() - 1; i >= 0; i--) {
+                    for (int i = candlestick_vector.size() - 1; i >= 0; i--) {
                         double curr_close = candlestick_vector.at(i).close_;
 
                         if (index >= 0 && index < short_length) {
@@ -106,22 +120,31 @@ class MovingAverageCross: public Strategy {
                     long_ma /= long_length;
                     prev_long_ma /= long_length;
 
-                    double curr_pos = 0; //getPosition(MarketType::Spot, event_msg.security, event_msg.exchange);
+                    double curr_pos = getPosition(MarketType::Spot, event_msg.exchange, event_msg.security);
 
                     // Check long entry condition
                     if (prev_short_ma < prev_long_ma && short_ma > long_ma) {
                         if (curr_pos == 0) {
-                            orders.push_back(Market(event_msg.security, MarketType::Spot, trade_timestamp, 1, int(getSpotCapital() * 0.1), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital()));
+                            Market market(event_msg.security, MarketType::Spot, trade_timestamp, 1, int(getSpotCapital() * 0.1 / trade_price), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << &market << endl;
+                            orders.push_back(&market);
                         } else {
-                            orders.push_back(Market(event_msg.security, MarketType::Spot, trade_timestamp, 1, int(getSpotCapital() * 0.1) + abs(curr_pos), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital()));
+                            Market market(event_msg.security, MarketType::Spot, trade_timestamp, 1, int(getSpotCapital() * 0.1 / trade_price) + abs(curr_pos), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << &market << endl;
+                            orders.push_back(&market);
                         }
                     }
                     // Check short entry condition
                     else if (prev_short_ma > prev_long_ma && short_ma < long_ma) {
                         if (curr_pos == 0) {
-                            orders.push_back(Market(event_msg.security, MarketType::Spot, trade_timestamp, -1, int(getSpotCapital() * 0.1), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital()));
+                            Market market(event_msg.security, MarketType::Spot, trade_timestamp, -1, int(getSpotCapital() * 0.1 / trade_price), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << &market << endl;
+
+                            orders.push_back(&market);
                         } else {
-                            orders.push_back(Market(event_msg.security, MarketType::Spot, trade_timestamp, -1, int(getSpotCapital() * 0.1) + abs(curr_pos), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital()));
+                            Market market(event_msg.security, MarketType::Spot, trade_timestamp, -1, int(getSpotCapital() * 0.1 / trade_price) + abs(curr_pos), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << &market << endl;
+                            orders.push_back(&market);
                         }
                     }
 
@@ -137,14 +160,14 @@ class MovingAverageCross: public Strategy {
          * @param event_msg BBO update event message
          * @return vector of orders to submit. Return empty vector if no orders to submit.
          */
-        virtual vector<Order> onTopQuote(QuoteEventMsg& event_msg) {return vector<Order>();}
+        virtual vector<Order*> onTopQuote(QuoteEventMsg& event_msg) {return vector<Order*>();}
 
         /**
          * Triggers when a change in orderbook message arrives
          * @param event_msg order book update event message
          * @return vector of orders to submit. Return empty vector if no orders to submit.
          */
-        virtual vector<Order> onDepth(DepthEventMsg& event_msg) {return vector<Order>();}
+        virtual vector<Order*> onDepth(DepthEventMsg& event_msg) {return vector<Order*>();}
 
     protected:
         string next_candlestick_open;           /*< String timestamp for next candlestick open */

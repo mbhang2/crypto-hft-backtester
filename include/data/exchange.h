@@ -279,6 +279,16 @@ class Exchange {
             return name == other.name; //TODO: Check if this is the correct way to compare
         }
 
+        /**
+         * Hash used for unordered map in exchange class.
+         */
+        struct Hash {
+            size_t operator()(const Exchange& exchange) const {
+                // Use the hash value of the exchange name (case-insensitive)
+                return std::hash<std::string>{}(exchange.getName());
+            }
+        };
+
     protected:
         const string name;           /*< Exchange name */
         int receiving_latency;      /*< Latency from an exchange in nanoseconds */

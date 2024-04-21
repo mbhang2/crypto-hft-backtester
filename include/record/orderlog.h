@@ -25,7 +25,7 @@ public:
      * Add order to the order list
      * @param order order to add
      */
-    void addOrder(const Order& order) {
+    void addOrder(Order* order) {
         orders.push_back(order);
     }
 
@@ -35,9 +35,9 @@ public:
      * @return reference to the order
      */
     const Order& getOrderByID(int order_id) const {
-        for (const Order& order : orders) {
-            if (order.getID() == order_id) {
-                return order;
+        for (Order* order : orders) {
+            if (order->getID() == order_id) {
+                return *order;
             }
         }
         
@@ -46,5 +46,5 @@ public:
     }
 
 private:
-    std::vector<Order> orders;
+    std::vector<Order*> orders;
 };

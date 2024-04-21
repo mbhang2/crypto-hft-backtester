@@ -24,7 +24,7 @@ class Order {
         /**
          * Constructor to create an order.
          */
-        Order(Security security_, const MarketType market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_ ,double price_, Exchange exchange_, double buying_power_): 
+        Order(const Security& security_, const MarketType& market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType& margintype_ ,double price_, const Exchange& exchange_, double buying_power_): 
                 security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
                     id = ++next_id; // Assign a unique order id
                     
@@ -150,15 +150,15 @@ class Order {
         /**
          * Destructor
          */
-        virtual ~Order() {}
+        virtual ~Order() = default;
 
         /**
-         * Checks if the order could be filled.
+         * Checks if the order could be filled for limit and stop limit class
          * @param best_bid The best bid price of the given security
          * @param best_ask The best ask price of the given security
          * @return Boolean whether the order could be filled
          */
-        bool checkFillability() const {return false;}
+        virtual bool checkFillability(double best_bid, double best_ask) = 0;
 
         /**
          * Fills the order and change the order status accordingly
@@ -166,24 +166,37 @@ class Order {
         */
         void fillOrder(double qty, double filled_price) {
             // Sanity checks
-            if (qty <= 0) {
-                throw invalid_argument("Filled quantity should be positive");
+            if (qty < 0) {
+                throw invalid_argument("Filled quantity should be non-negative");
+                return;
+            }
+            if (qty == 0) {
+                throw invalid_argument("Filled quantity should be non-zero");
                 return;
             }
             if (qty > leverage_adjusted_base_currency_size) {
                 throw invalid_argument("Filled quantity should not be greater than the order size");
             }
 
-            average_fill_price = (average_fill_price * filled_size + filled_price * qty)/(filled_size+qty);
-            filled_size += qty;
-            base_currency_size -= qty/leverage;
-            quote_currency_size = base_currency_size * price;
-            leverage_adjusted_base_currency_size = base_currency_size * leverage;
-
-            if (base_currency_size > 0) {
-                state = OrderState::PartiallyFilled;
-            } else {
+            if (qty == leverage_adjusted_base_currency_size) {
+                average_fill_price = (average_fill_price * filled_size + filled_price * qty)/(filled_size+qty);
+                base_currency_size = 0;
+                quote_currency_size = 0;
+                leverage_adjusted_base_currency_size = 0;
                 state = OrderState::Filled;
+            } else {
+                average_fill_price = (average_fill_price * filled_size + filled_price * qty)/(filled_size+qty);
+                filled_size += qty;
+                base_currency_size -= qty/leverage;
+                base_currency_size = int(base_currency_size/exchange.getSpotTradeRules(security)[1])*exchange.getSpotTradeRules(security)[1];
+                quote_currency_size = base_currency_size * price;
+                leverage_adjusted_base_currency_size = base_currency_size * leverage;
+
+                if (base_currency_size > 0) {
+                    state = OrderState::PartiallyFilled;
+                } else {
+                    state = OrderState::Filled;
+                }
             }
         }
 
@@ -206,7 +219,7 @@ class Order {
          * Check if an exchange received the order and if so, change order status to working
          * @param current_timestamp Current timestamp in format 'yyyy-MM-dd HH:mm:ss.fffffffff'
          */
-        void checkOrderReceived(const string& current_timestamp, string submitted_timestamp = "") {
+        bool checkOrderReceived(const string& current_timestamp, string submitted_timestamp = "") const {
             submitted_timestamp = timestamp;
 
             // Parse submitted timestamp
@@ -230,9 +243,15 @@ class Order {
 
             // Compare the time difference with the exchange's sending latency
             if (time_difference >= exchange.getSendingLatency()) {
-                state = OrderState::Working;
+                return true;
             }
+            return false;
         }
+
+        /**
+         * Order arrived at the exchange.
+         */
+        void orderArrived() {state = OrderState::Working;}
 
         /**
          * Getter for unique id.
@@ -325,20 +344,20 @@ class Order {
 
     protected:
         int id;                         /*< Unique ID */
-        const MarketType market_type;   /*< Market type */
-        const Security security;        /*< Security */
-        const string timestamp;         /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
+        const MarketType& market_type;   /*< Market type */
+        const Security& security;        /*< Security */
+        const string& timestamp;         /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
         const string type;              /*< Order type */
         const int side;                 /*< -1 for SELL, 1 for BUY */
         double base_currency_size;      /*< Quantity of the order in base currency before leverage (For BTC/USDT, order size in BTC) */
         double quote_currency_size;     /*< Quantity of the order in quote currency before leverage (For BTC/USDT, order size in USDT) */
         unsigned leverage;              /*< Leverage of the order */
-        const MarginType margin_type;   /*< Margin type of the order */
+        const MarginType& margin_type;   /*< Margin type of the order */
         double leverage_adjusted_base_currency_size;    /*< Leverage adjusted base currency size */
         double filled_size = 0.0;       /*< Quantify filled of the order */
-        double average_fill_price;      /*< Average filled price of the order */
+        double average_fill_price = 0.0;      /*< Average filled price of the order */
         double price;                   /*< Price for LIMIT and STOP LIMIT orders. Current price for MARKET and STOP orders */
-        const Exchange exchange;        /*< Target exchange for an order (optional) */
+        const Exchange& exchange;        /*< Target exchange for an order (optional) */
         OrderState state = OrderState::SentToExchange;         /*< State of the order */
         vector<int> child_trade_id;     /*< Vector of trade ids executed from this order */
 
@@ -359,18 +378,19 @@ public:
             Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {}
 
     /**
-     * Checks if the order could be filled.
+     * Checks if the order could be filled for limit and stop limit class
      * @param best_bid The best bid price of the given security
      * @param best_ask The best ask price of the given security
      * @return Boolean whether the order could be filled
      */
-    bool checkFillability(double best_bid, double best_ask) const {
+    bool checkFillability(double best_bid, double best_ask) override {
         if (!isLiveOrder()) {return false;}
         if (side == 1 && price >= best_ask) {return true;}
         if (side == -1 && price <= best_bid) {return true;}
 
         return false;
     }
+
 
     /**
      * Modifies the order. 
@@ -449,19 +469,18 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double current_price_, Exchange exchange_, double buying_power_): 
+    Market(const Security& security_, const MarketType& market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType& margintype_, double current_price_, const Exchange& exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_, buying_power_) {}
 
     /**
-     * Checks if the order could be filled.
+     * Checks if the order could be filled for limit and stop limit class
      * @param best_bid The best bid price of the given security
      * @param best_ask The best ask price of the given security
      * @return Boolean whether the order could be filled
      */
-    bool checkFillability() const {
-        if (!isLiveOrder()) {return false;}
-
-        return true;
+    bool checkFillability(double best_bid, double best_ask) override {
+        cout << "Market fillabilitiy called" << endl;
+        return isLiveOrder();
     }
 
     /**
@@ -500,12 +519,12 @@ public:
             }
 
     /**
-     * Checks if the order could be filled.
+     * Checks if the order could be filled for limit and stop limit class
      * @param best_bid The best bid price of the given security
      * @param best_ask The best ask price of the given security
      * @return Boolean whether the order could be filled
      */
-    bool checkFillability() const {
+    bool checkFillability(double best_bid, double best_ask) override {
         if (!isLiveOrder() || !triggered) {return false;}
 
         return true;
@@ -630,12 +649,12 @@ public:
             }
 
     /**
-     * Checks if the order could be filled.
+     * Checks if the order could be filled for limit and stop limit class
      * @param best_bid The best bid price of the given security
      * @param best_ask The best ask price of the given security
      * @return Boolean whether the order could be filled
      */
-    bool checkFillability(double best_bid, double best_ask) const {
+    bool checkFillability(double best_bid, double best_ask) override {
         if (!isLiveOrder() || !triggered) {return false;}
 
         if (side == 1 && price >= best_ask) {return true;}

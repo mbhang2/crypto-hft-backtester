@@ -34,6 +34,8 @@ all: $(GTEST_DIR) $(APP)
 $(APP): $(APP_SOURCES)
 	rm -rf build
 	mkdir -p build
+	rm -rf *.gcno
+	rm -rf *.gcda
 	$(CC) $(CFLAGS) -o build/$@ $^ $(LDFLAGS)
 
 $(GTEST_DIR):

@@ -9,6 +9,7 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -47,6 +48,7 @@ class Backtester {
      * @param data_path file path for market data input
      */
     void runBacktest(const string& data_path) {
+        vector<Order*> current_orders;
         ifstream file(data_path);
 
         if (!file.is_open()) {
@@ -54,6 +56,7 @@ class Backtester {
             return;
         }
 
+        int n = 2;
         string line;
         getline(file, line);    // Skip first line
         while (getline(file, line)) {
@@ -74,46 +77,90 @@ class Backtester {
                 throw runtime_error("Security " + tokens[3] + " is not found");
             }
 
+            // Calling strategy functions
+            vector<Order*> order_vector;
+
             if (tokens[2] == "T") {
-                TradeEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[6]), stod(tokens[7]));
-                cout << msg << endl;
+                // TradeEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[6]), stod(tokens[7]));
+                TradeEventMsg msg(tokens[0], *exchange_ptr, MarketType::Spot, *security_ptr, stod(tokens[6])*180, stod(tokens[7]));
+                order_vector = strategy->onTrade(msg);
             }
 
-            if (tokens[2] == "Q") {
+            else if (tokens[2] == "Q") {
                 QuoteEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
-                cout << msg << endl;
+                order_vector = strategy->onTopQuote(msg);
+                // @todo: update orderbook
+                cout << order_vector.size() << endl;
             }
 
-            // if (tokens.size() == 5 /*< Change this number accordingly */) {
-                // string timestamp = tokens[0];
+            else if (tokens[2] == "D") {
 
-                /*
-                trade_event_message;
-                vector<Order> order_vector;
+            }
 
-                if (trade_event) {
-                    order_vector = strategy.onTrade(trade_event_message);
-                } else if (quote_event) {
-                    order_vector = strategy.onQuote(trade_event_message);
-                } else if (depth_event) {
-                    order_vector = strategy.onDepth(trade_event_message);
-                } else {
-                    continue;
+            // Append order to the back of the current order
+            if (!order_vector.empty()) {
+                for (Order* it : order_vector) {
+                    Security s = it->getSecurity();
+                    cout << "Address while going over for loop: " << it << endl;
+                    current_orders.push_back(it);
                 }
-                
-                if (order_vector.size() == 0) {
-                    continue;
-                } else {
-                    for (auto& it: order_vector) {
-                        // Check if order exceeds buying power
-                        
-                        // push back to orders waiting to be filled
-                    }
-                }    
-                */
+            }
+
+            // // Work with orders
+            // for (auto& it : current_orders) {
+            //     if (it->isLiveOrder()) {
+            //         double size_to_fill = it->getLeverageAdjustedBaseCurrencySize();
+            //         cout << size_to_fill << ", " << it->getOrderState() << endl;
+            //         it->fillOrder(size_to_fill, stod(tokens[6])*180);
+            //         cout << it->getOrderState() << endl;
+            //         cout << it->getLeverageAdjustedBaseCurrencySize() << endl;
+                    
+            //         if (it->getSide() == 1) {
+            //             strategy->updatePosition(it->getMarketType(), *exchange_ptr, *security_ptr, size_to_fill);
+            //         } else {
+            //             strategy->updatePosition(it->getMarketType(), *exchange_ptr, *security_ptr, -size_to_fill);
+            //         }
+                    
+            //         // Todo: update order log
+            //     }
+            //     else if (it->getOrderState() == OrderState::SentToExchange) {
+            //         it->checkOrderReceived(tokens[0], it->getTimestamp());
+            //         if (it->getOrderState() != OrderState::Working) {
+            //             break;
+            //         }
+            //     }
             // }
+
+            // // Remove not-live orders
+            // cout << "Remove not live orders" << endl;
+            // for (auto it = current_orders.begin(); it != current_orders.end();) {
+            //     if (!(*it)->isLiveOrder()) {
+            //         delete *it; // Clean up memory if necessary
+            //         it = current_orders.erase(it);
+            //     } else {
+            //         ++it;
+            //     }
+            // }
+
+            // cout << "Done" << endl;
+
         }
 
+        // for (Order* it : current_orders) {
+        //     string s = (it->getSide() == 1) ? "Buy" : "Sell";
+        //     cout << "========== Order Information ==========" << endl;
+        //     cout << "Security: " << it->getSecurity() << endl;
+        //     // cout << "Exchange: " << it->getExchange().getName() << endl;
+        //     // cout << "Timestamp: " << it->getTimestamp() << endl;
+        //     // cout << "Order Type: " << it->getOrderType() << endl;
+        //     // cout << "Side: " << s << endl;
+        //     // cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity().getBase() << endl;
+        //     // cout << "Margin Type: " << it->getMarginType() << endl;
+        //     // cout << "Leverage: " << it->getLeverage() << "x" << endl;
+        //     // cout << "Leverage Adjusted Size: " << it->getLeverageAdjustedBaseCurrencySize() << it->getSecurity().getBase() << endl;
+        //     // cout << "Order State: " << it->getOrderState() << endl;
+        //     // cout << "=======================================" << endl;
+        // }
     }
 
     private:

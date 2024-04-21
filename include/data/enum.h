@@ -56,7 +56,7 @@ enum class MarketType {
 };
 
 /**
- * << operator overload for OrderState class.
+ * << operator overload for MarketType class.
  */
 ostream& operator<<(ostream& os, const MarketType& market_type) {
     switch (market_type) {
@@ -70,6 +70,24 @@ ostream& operator<<(ostream& os, const MarketType& market_type) {
             os << "Unknown"; // Handle any other values gracefully
     }
     return os;
+}
+
+/**
+ * Hash overload for MarketType
+ */
+namespace std {
+    template <>
+    struct hash<MarketType> {
+        size_t operator()(const MarketType& type) const {
+            // Return a constant hash value for each enum value
+            switch (type) {
+                case MarketType::Spot:
+                    return 42; // Replace with your desired hash value
+                case MarketType::Futures:
+                    return 24; // Replace with another desired hash value
+            }
+        }
+    };
 }
 
 /**
