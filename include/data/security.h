@@ -56,7 +56,7 @@ class Security {
         }
 
         /**
-         * Hash used for unordered map in exchange class.
+         * Hash used for unordered map
          */
         struct Hash {
             size_t operator()(const Security& sec) const {
