@@ -22,23 +22,23 @@ enum class OrderState {
  * << operator overload for OrderState class.
  */
 ostream& operator<<(ostream& os, const OrderState& state) {
-    switch (state) {
-        case OrderState::SentToExchange:
+    switch (static_cast<int>(state)) {
+        case static_cast<int>(OrderState::SentToExchange):
             os << "Sent to Exchange";
             break;
-        case OrderState::Working:
+        case static_cast<int>(OrderState::Working):
             os << "Working";
             break;
-        case OrderState::Filled:
+        case static_cast<int>(OrderState::Filled):
             os << "Filled";
             break;
-        case OrderState::PartiallyFilled:
+        case static_cast<int>(OrderState::PartiallyFilled):
             os << "Partially Filled";
             break;
-        case OrderState::Cancelled:
+        case static_cast<int>(OrderState::Cancelled):
             os << "Cancelled";
             break;
-        case OrderState::Rejected:
+        case static_cast<int>(OrderState::Rejected):
             os << "Rejected";
             break;
         default:
@@ -59,11 +59,11 @@ enum class MarketType {
  * << operator overload for MarketType class.
  */
 ostream& operator<<(ostream& os, const MarketType& market_type) {
-    switch (market_type) {
-        case MarketType::Spot:
+    switch (static_cast<int>(market_type)) {
+        case static_cast<int>(MarketType::Spot):
             os << "Spot";
             break;
-        case MarketType::Futures:
+        case static_cast<int>(MarketType::Futures):
             os << "Futures";
             break;
         default:
@@ -80,12 +80,13 @@ namespace std {
     struct hash<MarketType> {
         size_t operator()(const MarketType& type) const {
             // Return a constant hash value for each enum value
-            switch (type) {
-                case MarketType::Spot:
+            switch (static_cast<int>(type)) {
+                case static_cast<int>(MarketType::Spot):
                     return 42; // Replace with your desired hash value
-                case MarketType::Futures:
+                case static_cast<int>(MarketType::Futures):
                     return 24; // Replace with another desired hash value
             }
+            return -1; // return -1 for unknown values
         }
     };
 }
@@ -103,14 +104,14 @@ enum class MarginType {
  * << operator overload for OrderState class.
  */
 ostream& operator<<(ostream& os, const MarginType& margin_type) {
-    switch (margin_type) {
-        case MarginType::NoMargin:
+    switch (static_cast<int>(margin_type)) {
+        case static_cast<int>(MarginType::NoMargin):
             os << "No Margin";
             break;
-        case MarginType::Isolated:
+        case static_cast<int>(MarginType::Isolated):
             os << "Isolated";
             break;
-        case MarginType::Cross:
+        case static_cast<int>(MarginType::Cross):
             os << "Cross";
             break;
         default:
