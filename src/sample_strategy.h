@@ -125,13 +125,13 @@ class MovingAverageCross: public Strategy {
                     // Check long entry condition
                     if (prev_short_ma < prev_long_ma && short_ma > long_ma) {
                         if (curr_pos == 0) {
-                            Market market(event_msg.security, MarketType::Spot, trade_timestamp, 1, int(getSpotCapital() * 0.1 / trade_price), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital());
-                            cout << &market << endl;
-                            orders.push_back(&market);
+                            Market* market = new Market(event_msg.security, MarketType::Spot, trade_timestamp, 1, int(getSpotCapital() * 0.1 / trade_price), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << market << endl;
+                            orders.push_back(market);
                         } else {
-                            Market market(event_msg.security, MarketType::Spot, trade_timestamp, 1, int(getSpotCapital() * 0.1 / trade_price) + abs(curr_pos), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital());
-                            cout << &market << endl;
-                            orders.push_back(&market);
+                            Market* market = new Market(event_msg.security, MarketType::Spot, trade_timestamp, 1, int(getSpotCapital() * 0.1 / trade_price) + abs(curr_pos), 0, 1, MarginType::NoMargin, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << market << endl;
+                            orders.push_back(market);
                         }
                     }
                     // Check short entry condition
