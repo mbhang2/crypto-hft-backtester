@@ -101,7 +101,7 @@ class Backtester {
             if (!order_vector.empty()) {
                 for (Order* it : order_vector) {
                     Security s = it->getSecurity();
-                    cout << "Address while going over for loop: " << it << endl;
+                    cout << "Address while going over for loop: " << &s << endl;
                     current_orders.push_back(it);
                 }
             }
