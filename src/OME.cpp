@@ -1,4 +1,3 @@
-
 #include "../include/data/security.h"
 #include "../include/backtesting/OME.h"
 #include <iostream>
@@ -8,43 +7,43 @@ int main() {
     Exchange exchange("Binance");
     Security security("BTC", "USDT");
     MarketType marketType = MarketType::Spot;
-    
+
     Orderbook orderbook(exchange, marketType, security);
     OME ome(orderbook);
 
     // Populate the order book with initial orders
-    orderbook.AddOrder(100, 10, false);  // Order from another trader
-    orderbook.AddOrder(100, 5, true);    // Our order
-    orderbook.AddOrder(100, 6, false);    // Not Our order
-    orderbook.AddOrder(101, 6, false);    // Not Our order
+    // Adding sell orders
+    orderbook.AddOrder(99, 10, false, OrderSide::Sell);  // Sell order from another trader
+    orderbook.AddOrder(98, 6, false, OrderSide::Sell);   // Sell order from another trader
+
+    // Adding buy orders
+    orderbook.AddOrder(97, 5, true, OrderSide::Buy);     // Our buy order
+    orderbook.AddOrder(96, 6, false, OrderSide::Buy);    // Buy order from another trader
 
     cout << "Initial Order Book: " << endl;
-    orderbook.printOrderBook();// Price Level 100: {[10, 0][5, 1][6, 0]}
+    orderbook.printOrderBook(); // Expected: Sell orders at 98 and 99, buy orders at 96 and 97
 
-    ome.matchOrder(100, 3, false);
-    cout << "After matching 3 units of order at price level 100 (not our order): " << endl;
-    orderbook.printOrderBook();// Price Level 100: {[7, 0][5, 1][6, 0]}
+    // Incoming sell order matching with existing buy orders
+    ome.matchOrder(97, 3, false, OrderSide::Sell);
+    cout << "After matching 3 units of sell order at price level 97 (not our order): " << endl;
+    orderbook.printOrderBook(); // Expected: Our buy order at 97 reduced by 3
 
-    ome.matchOrder(100, 5, true);
-    cout << "After matching 5 units of order at price level 100 (our order): " << endl;
-    orderbook.printOrderBook();// Price Level 100: {[2, 0][5, 1][6, 0]}
+    // Incoming buy order matching with existing sell orders
+    ome.matchOrder(98, 4, true, OrderSide::Buy);
+    cout << "After matching 4 units of buy order at price level 98 (our order): " << endl;
+    orderbook.printOrderBook(); // Expected: Sell order at 98 reduced by 4
 
-    ome.matchOrder(100, 5, false);
-    cout << "After matching 5 units of order at price level 100 (not our order): " << endl;
-    orderbook.printOrderBook(); // Price Level 100: {[2, 1][6, 0]}
+    // Matching another buy order
+    ome.matchOrder(99, 2, false, OrderSide::Buy);
+    cout << "After matching 2 units of buy order at price level 99 (not our order): " << endl;
+    orderbook.printOrderBook(); // Expected: Sell order at 99 reduced by 2
 
-    ome.matchOrder(100, 2, true);
-    cout << "After matching 2 units of order at price level 100 (our order): " << endl;
-    orderbook.printOrderBook(); // Price Level 100: {[2, 1][4, 0]}
+    // Incoming buy order that is larger than any single sell order
+    ome.matchOrder(96, 10, false, OrderSide::Buy);
+    cout << "After matching 10 units of buy order at price level 96 (not our order): " << endl;
+    orderbook.printOrderBook(); // Expected: Buy order at 96 reduced completely and part of 97 if possible
 
-    ome.matchOrder(100, 4, false);
-    cout << "After matching 4 units of order at price level 100 (not our order): " << endl;
-    orderbook.printOrderBook(); 
-
-    ome.matchOrder(100, 5, false);
-    cout << "After matching 5 units of order at price level 100 (not our order) but move to next price level: " << endl;
-    orderbook.printOrderBook(); // Price Level 100: {}
-
+    // Continue with additional test cases as needed...
 
     return 0;
 }
