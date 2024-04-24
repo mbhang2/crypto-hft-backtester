@@ -24,7 +24,7 @@ class Order {
         /**
          * Constructor to create an order.
          */
-        Order(const Security& security_, const MarketType& market_type_, const string& timestamp_, const string& type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType& margintype_ ,double price_, const Exchange& exchange_, double buying_power_): 
+        Order(Security& security_, MarketType& market_type_, string& timestamp_, string type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType& margintype_ ,double price_, Exchange& exchange_, double buying_power_): 
                 security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
                     id = ++next_id; // Assign a unique order id
                     
@@ -150,7 +150,7 @@ class Order {
         /**
          * Destructor
          */
-        virtual ~Order() = default;
+        ~Order() = default;
 
         /**
          * Checks if the order could be filled for limit and stop limit class
@@ -219,16 +219,14 @@ class Order {
          * Check if an exchange received the order and if so, change order status to working
          * @param current_timestamp Current timestamp in format 'yyyy-MM-dd HH:mm:ss.fffffffff'
          */
-        bool checkOrderReceived(const string& current_timestamp, string submitted_timestamp = "") const {
-            submitted_timestamp = timestamp;
-
+        void checkOrderReceived(const string& current_timestamp) {
             // Parse submitted timestamp
             tm tm_submitted;
-            istringstream ss_submitted (submitted_timestamp);
+            istringstream ss_submitted (timestamp);
             ss_submitted >> get_time (&tm_submitted, "%Y-%m-%d %H:%M:%S.%f");
             auto submitted_time_ns = chrono::time_point_cast<chrono::nanoseconds>(chrono::system_clock::from_time_t (mktime (&tm_submitted)));
             auto epoch_submitted = submitted_time_ns.time_since_epoch();
-            epoch_submitted += chrono::nanoseconds (stoll (submitted_timestamp.substr (20)));
+            epoch_submitted += chrono::nanoseconds (stoll (timestamp.substr (20)));
 
             // Parse current timestamp
             tm tm_current;
@@ -241,11 +239,10 @@ class Order {
             // Compute the time difference in seconds
             auto time_difference = epoch_current.count() - epoch_submitted.count();
 
-            // Compare the time difference with the exchange's sending latency
+            cout << "Timestamp after the function is " << timestamp << endl;
             if (time_difference >= exchange.getSendingLatency()) {
-                return true;
-            }
-            return false;
+                state = OrderState::Working;
+            }   
         }
 
         /**
@@ -261,17 +258,17 @@ class Order {
         /**
          * Getter for security.
          */
-        Security getSecurity() const {return security;}
+        Security& getSecurity() {return security;}
 
         /**
          * Getter for market type.
          */
-        MarketType getMarketType() const {return market_type;}
+        MarketType& getMarketType() {return market_type;}
 
         /**
          * Getter for timestamp.
          */
-        string getTimestamp() const {return timestamp;}
+        string& getTimestamp() const {return timestamp;}
 
         /**
          * Getter for order type.
@@ -321,12 +318,12 @@ class Order {
         /**
          * Getter for exchange.
          */
-        Exchange getExchange() const {return exchange;}
+        Exchange& getExchange() {return exchange;}
 
         /**
          * Getter for margin type.
          */
-        MarginType getMarginType() const {return margin_type;}
+        MarginType& getMarginType() {return margin_type;}
 
         /**
          * Finds the number of digits after the decimal point
@@ -344,20 +341,20 @@ class Order {
 
     protected:
         int id;                         /*< Unique ID */
-        const MarketType& market_type;   /*< Market type */
-        const Security& security;        /*< Security */
-        const string& timestamp;         /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
-        const string type;              /*< Order type */
+        MarketType& market_type;   /*< Market type */
+        Security& security;        /*< Security */
+        string& timestamp;         /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
+        string type;              /*< Order type */
         const int side;                 /*< -1 for SELL, 1 for BUY */
         double base_currency_size;      /*< Quantity of the order in base currency before leverage (For BTC/USDT, order size in BTC) */
         double quote_currency_size;     /*< Quantity of the order in quote currency before leverage (For BTC/USDT, order size in USDT) */
         unsigned leverage;              /*< Leverage of the order */
-        const MarginType& margin_type;   /*< Margin type of the order */
+        MarginType margin_type;   /*< Margin type of the order */
         double leverage_adjusted_base_currency_size;    /*< Leverage adjusted base currency size */
         double filled_size = 0.0;       /*< Quantify filled of the order */
         double average_fill_price = 0.0;      /*< Average filled price of the order */
         double price;                   /*< Price for LIMIT and STOP LIMIT orders. Current price for MARKET and STOP orders */
-        const Exchange& exchange;        /*< Target exchange for an order (optional) */
+        Exchange& exchange;        /*< Target exchange for an order */
         OrderState state = OrderState::SentToExchange;         /*< State of the order */
         vector<int> child_trade_id;     /*< Vector of trade ids executed from this order */
 
@@ -374,7 +371,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(Security security_, const MarketType market_type_ ,const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double price_, Exchange exchange_, double buying_power_): 
+    Limit(Security& security_, MarketType& market_type_ , string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType& margintype_, double price_, Exchange& exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {}
 
     /**
@@ -441,23 +438,23 @@ public:
     /**
      * Override << operator for Limit class.
      */
-    friend ostream& operator<<(ostream& os, const Limit& limit) {
-        string s = (limit.getSide() == 1) ? "Buy" : "Sell";
-        os << "========== Order Information ==========" << endl;
-        os << "Security: " << limit.getSecurity() << endl;
-        os << "Exchange: " << limit.getExchange().getName() << endl;
-        os << "Timestamp: " << limit.getTimestamp() << endl;
-        os << "Order Type: " << limit.getOrderType() << endl;
-        os << "Side: " << s << endl;
-        os << "Size: " << limit.getBaseCurrencySize() << limit.getSecurity().getBase() << endl;
-        os << "Margin Type: " << limit.getMarginType() << endl;
-        os << "Leverage: " << limit.getLeverage() << "x" << endl;
-        os << "Leverage Adjusted Size: " << limit.getLeverageAdjustedBaseCurrencySize() << limit.getSecurity().getBase() << endl;
-        os << "Price: " << limit.getPrice() << limit.getSecurity().getQuote() << endl;
-        os << "Order State: " << limit.getOrderState() << endl;
-        os << "=======================================" << endl;
-        return os;
-    }
+    // friend ostream& operator<<(ostream& os, const Limit& limit) {
+    //     string s = (limit.getSide() == 1) ? "Buy" : "Sell";
+    //     os << "========== Order Information ==========" << endl;
+    //     os << "Security: " << limit.getSecurity() << endl;
+    //     os << "Exchange: " << limit.getExchange().getName() << endl;
+    //     os << "Timestamp: " << limit.getTimestamp() << endl;
+    //     os << "Order Type: " << limit.getOrderType() << endl;
+    //     os << "Side: " << s << endl;
+    //     os << "Size: " << limit.getBaseCurrencySize() << limit.getSecurity().getBase() << endl;
+    //     os << "Margin Type: " << limit.getMarginType() << endl;
+    //     os << "Leverage: " << limit.getLeverage() << "x" << endl;
+    //     os << "Leverage Adjusted Size: " << limit.getLeverageAdjustedBaseCurrencySize() << limit.getSecurity().getBase() << endl;
+    //     os << "Price: " << limit.getPrice() << limit.getSecurity().getQuote() << endl;
+    //     os << "Order State: " << limit.getOrderState() << endl;
+    //     os << "=======================================" << endl;
+    //     return os;
+    // }
 };
 
 
@@ -469,7 +466,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(const Security& security_, const MarketType& market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType& margintype_, double current_price_, const Exchange& exchange_, double buying_power_): 
+    Market(Security& security_, MarketType& market_type_, string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType& margintype_, double current_price_, Exchange& exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_, buying_power_) {}
 
     /**
@@ -486,22 +483,22 @@ public:
     /**
      * Override << operator for Market class.
      */
-    friend ostream& operator<<(ostream& os, const Market& market) {
-        string s = (market.getSide() == 1) ? "Buy" : "Sell";
-        os << "========== Order Information ==========" << endl;
-        os << "Security: " << market.getSecurity() << endl;
-        os << "Exchange: " << market.getExchange().getName() << endl;
-        os << "Timestamp: " << market.getTimestamp() << endl;
-        os << "Order Type: " << market.getOrderType() << endl;
-        os << "Side: " << s << endl;
-        os << "Size: " << market.getBaseCurrencySize() << market.getSecurity().getBase() << endl;
-        os << "Margin Type: " << market.getMarginType() << endl;
-        os << "Leverage: " << market.getLeverage() << "x" << endl;
-        os << "Leverage Adjusted Size: " << market.getLeverageAdjustedBaseCurrencySize() << market.getSecurity().getBase() << endl;
-        os << "Order State: " << market.getOrderState() << endl;
-        os << "=======================================" << endl;
-        return os;
-    }
+    // friend ostream& operator<<(ostream& os, const Market& market) {
+    //     string s = (market.getSide() == 1) ? "Buy" : "Sell";
+    //     os << "========== Order Information ==========" << endl;
+    //     os << "Security: " << market.getSecurity() << endl;
+    //     os << "Exchange: " << market.getExchange().getName() << endl;
+    //     os << "Timestamp: " << market.getTimestamp() << endl;
+    //     os << "Order Type: " << market.getOrderType() << endl;
+    //     os << "Side: " << s << endl;
+    //     os << "Size: " << market.getBaseCurrencySize() << market.getSecurity().getBase() << endl;
+    //     os << "Margin Type: " << market.getMarginType() << endl;
+    //     os << "Leverage: " << market.getLeverage() << "x" << endl;
+    //     os << "Leverage Adjusted Size: " << market.getLeverageAdjustedBaseCurrencySize() << market.getSecurity().getBase() << endl;
+    //     os << "Order State: " << market.getOrderState() << endl;
+    //     os << "=======================================" << endl;
+    //     return os;
+    // }
 };
 
 
@@ -513,7 +510,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_, double buying_power_): 
+    Stop(Security security_, MarketType market_type_, string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double trigger_price_, Exchange exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_, buying_power_) {
                 triggered = false, trigger_price = trigger_price_;
             }
@@ -608,25 +605,25 @@ public:
     /**
      * Override << operator for Limit class.
      */
-    friend ostream& operator<<(ostream& os, const Stop& stop) {
-        string s = (stop.getSide() == 1) ? "Buy" : "Sell";
-        string trigger_status = (stop.isTriggered() == 1) ? "Triggered" : "Not Triggered";
-        os << "========== Order Information ==========" << endl;
-        os << "Security: " << stop.getSecurity() << endl;
-        os << "Exchange: " << stop.getExchange().getName() << endl;
-        os << "Timestamp: " << stop.getTimestamp() << endl;
-        os << "Order Type: " << stop.getOrderType() << endl;
-        os << "Side: " << s << endl;
-        os << "Size: " << stop.getBaseCurrencySize() << stop.getSecurity().getBase() << endl;
-        os << "Margin Type: " << stop.getMarginType() << endl;
-        os << "Leverage: " << stop.getLeverage() << "x" << endl;
-        os << "Leverage Adjusted Size: " << stop.getLeverageAdjustedBaseCurrencySize() << stop.getSecurity().getBase() << endl;
-        os << "Trigger Price: " << stop.getTriggerPrice() << stop.getSecurity().getQuote() << endl;
-        os << "Trigger Status: " << trigger_status << endl;
-        os << "Order State: " << stop.getOrderState() << endl;
-        os << "=======================================" << endl;
-        return os;
-    }
+    // friend ostream& operator<<(ostream& os, const Stop& stop) {
+    //     string s = (stop.getSide() == 1) ? "Buy" : "Sell";
+    //     string trigger_status = (stop.isTriggered() == 1) ? "Triggered" : "Not Triggered";
+    //     os << "========== Order Information ==========" << endl;
+    //     os << "Security: " << stop.getSecurity() << endl;
+    //     os << "Exchange: " << stop.getExchange().getName() << endl;
+    //     os << "Timestamp: " << stop.getTimestamp() << endl;
+    //     os << "Order Type: " << stop.getOrderType() << endl;
+    //     os << "Side: " << s << endl;
+    //     os << "Size: " << stop.getBaseCurrencySize() << stop.getSecurity().getBase() << endl;
+    //     os << "Margin Type: " << stop.getMarginType() << endl;
+    //     os << "Leverage: " << stop.getLeverage() << "x" << endl;
+    //     os << "Leverage Adjusted Size: " << stop.getLeverageAdjustedBaseCurrencySize() << stop.getSecurity().getBase() << endl;
+    //     os << "Trigger Price: " << stop.getTriggerPrice() << stop.getSecurity().getQuote() << endl;
+    //     os << "Trigger Status: " << trigger_status << endl;
+    //     os << "Order State: " << stop.getOrderState() << endl;
+    //     os << "=======================================" << endl;
+    //     return os;
+    // }
 
 private:
     bool triggered;         /*< Whether the trigger price has been hit */
@@ -643,7 +640,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(Security security_, const MarketType market_type_, const string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, const MarginType margintype_, double trigger_price_, Exchange exchange_, double buying_power_): 
+    StopLimit(Security security_, MarketType market_type_, string& timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, MarginType margintype_, double trigger_price_, Exchange exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {
                 triggered = false, trigger_price = trigger_price_;
             }
@@ -754,26 +751,26 @@ public:
     /**
      * Override << operator for Limit class.
      */
-    friend ostream& operator<<(ostream& os, const StopLimit& stoplimit) {
-        string s = (stoplimit.getSide() == 1) ? "Buy" : "Sell";
-        string trigger_status = (stoplimit.isTriggered() == 1) ? "Triggered" : "Not Triggered";
-        os << "========== Order Information ==========" << endl;
-        os << "Security: " << stoplimit.getSecurity() << endl;
-        os << "Exchange: " << stoplimit.getExchange().getName() << endl;
-        os << "Timestamp: " << stoplimit.getTimestamp() << endl;
-        os << "Order Type: " << stoplimit.getOrderType() << endl;
-        os << "Side: " << s << endl;
-        os << "Size: " << stoplimit.getBaseCurrencySize() << stoplimit.getSecurity().getBase() << endl;
-        os << "Margin Type: " << stoplimit.getMarginType() << endl;
-        os << "Leverage: " << stoplimit.getLeverage() << "x" << endl;
-        os << "Leverage Adjusted Size: " << stoplimit.getLeverageAdjustedBaseCurrencySize() << stoplimit.getSecurity().getBase() << endl;
-        os << "Price: " << stoplimit.getPrice() << endl;
-        os << "Trigger Price: " << stoplimit.getTriggerPrice() << endl;
-        os << "Trigger Status: " << trigger_status << endl;
-        os << "Order State: " << stoplimit.getOrderState() << endl;
-        os << "=======================================" << endl;
-        return os;
-    }
+    // friend ostream& operator<<(ostream& os, const StopLimit& stoplimit) {
+    //     string s = (stoplimit.getSide() == 1) ? "Buy" : "Sell";
+    //     string trigger_status = (stoplimit.isTriggered() == 1) ? "Triggered" : "Not Triggered";
+    //     os << "========== Order Information ==========" << endl;
+    //     os << "Security: " << stoplimit.getSecurity() << endl;
+    //     os << "Exchange: " << stoplimit.getExchange().getName() << endl;
+    //     os << "Timestamp: " << stoplimit.getTimestamp() << endl;
+    //     os << "Order Type: " << stoplimit.getOrderType() << endl;
+    //     os << "Side: " << s << endl;
+    //     os << "Size: " << stoplimit.getBaseCurrencySize() << stoplimit.getSecurity().getBase() << endl;
+    //     os << "Margin Type: " << stoplimit.getMarginType() << endl;
+    //     os << "Leverage: " << stoplimit.getLeverage() << "x" << endl;
+    //     os << "Leverage Adjusted Size: " << stoplimit.getLeverageAdjustedBaseCurrencySize() << stoplimit.getSecurity().getBase() << endl;
+    //     os << "Price: " << stoplimit.getPrice() << endl;
+    //     os << "Trigger Price: " << stoplimit.getTriggerPrice() << endl;
+    //     os << "Trigger Status: " << trigger_status << endl;
+    //     os << "Order State: " << stoplimit.getOrderState() << endl;
+    //     os << "=======================================" << endl;
+    //     return os;
+    // }
 
 private:
     bool triggered;         /*< Whether the trigger price has been hit */
