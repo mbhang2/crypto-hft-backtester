@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./order.h"
+#include "./OrderBook.h"
 #include "./strategy.h"
 #include "./trade.h"
 #include "./user.h"
@@ -21,15 +22,29 @@ using namespace std;
 using namespace boost;
 
 
+
 /**
  * Class for backtesting
  */
 class Backtester {
     public:
+        using MarketKey = tuple<MarketType, Exchange, Security>;
+        using MarketMap = unordered_map<MarketKey, std::shared_ptr<Orderbook>, MarketKeyHash>;
+
     /**
      * Constructor
      */
-    Backtester(User& user_, Strategy* strategy_): user(user_), strategy(strategy_) {}
+    Backtester(User& user_, Strategy* strategy_): user(user_), strategy(strategy_) {
+        // Setup Orderbooks
+        for (auto&& exchanges : user.getExchanges()) {
+            for (auto&& securities : exchanges->getListedSecurities(MarketType::Spot)) {
+                orderbooks[make_tuple(MarketType::Spot, *exchanges, *securities)] = make_shared<Orderbook>(*exchanges, MarketType::Spot, *securities);
+            }
+            for (auto&& securities : exchanges->getListedSecurities(MarketType::Futures)) {
+                orderbooks[make_tuple(MarketType::Futures, *exchanges, *securities)] = make_shared<Orderbook>(*exchanges, MarketType::Futures, *securities);
+            }
+        }
+    }
 
     /**
      * Destructor
@@ -90,12 +105,11 @@ class Backtester {
                 order_vector = strategy->onTrade(msg);
             }
 
-            else if (tokens[2] == "Q") {
+            else if (tokens[2] == "BID_") {
                 // QuoteEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
                 QuoteEventMsg msg(tt, exchange_ptr, s, security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
                 // order_vector = strategy->onTopQuote(msg);
                 // @todo: update orderbook
-                cout << order_vector.size() << endl;
             }
 
             else if (tokens[2] == "D") {
@@ -115,7 +129,7 @@ class Backtester {
 
             // Work with orders
             for (auto&& it : current_orders) {
-                if (it->isLiveOrder()) {
+                if (it->checkFillability(1,2)) {
                     double size_to_fill = it->getLeverageAdjustedBaseCurrencySize();
                     it->fillOrder(size_to_fill, stod(tokens[6])*180);
                     
@@ -138,8 +152,6 @@ class Backtester {
             for (auto it = current_orders.begin(); it != current_orders.end();) {
                 if (!(*it)->isLiveOrder() && !((*it)->getOrderState() == OrderState::SentToExchange)) {
                     it = current_orders.erase(it);
-                    cout << "Remove not live orders" << endl;
-                    cout << "Length of current orders after removing not live orders is " << current_orders.size() << endl;
                 } else {
                     ++it;
                 }
@@ -147,25 +159,26 @@ class Backtester {
 
             // cout << "Done" << endl;
 
-            // for (auto&& it : current_orders) {
-            //     string s = (it->getSide() == 1) ? "Buy" : "Sell";
-            //     cout << "========== Order Information ==========" << endl;
-            //     cout << "Security: " << *(it->getSecurity()) << endl;
-            //     cout << "Exchange: " << it->getExchange()->getName() << endl;
-            //     cout << "Timestamp: " << it->getTimestamp().toString() << endl;
-            //     cout << "Order Type: " << it->getOrderType() << endl;
-            //     cout << "Side: " << s << endl;
-            //     cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity()->getBase() << endl;
-            //     cout << "Margin Type: " << it->getMarginType() << endl;
-            //     cout << "Leverage: " << it->getLeverage() << "x" << endl;
-            //     cout << "Leverage Adjusted Size: " << it->getLeverageAdjustedBaseCurrencySize() << it->getSecurity()->getBase() << endl;
-            //     cout << "Order State: " << it->getOrderState() << endl;
-            //     cout << "=======================================" << endl;
-            // }
+            for (auto&& it : current_orders) {
+                string s = (it->getSide() == 1) ? "Buy" : "Sell";
+                cout << "========== Order Information ==========" << endl;
+                cout << "Security: " << *(it->getSecurity()) << endl;
+                cout << "Exchange: " << it->getExchange()->getName() << endl;
+                cout << "Timestamp: " << it->getTimestamp().toString() << endl;
+                cout << "Order Type: " << it->getOrderType() << endl;
+                cout << "Side: " << s << endl;
+                cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity()->getBase() << endl;
+                cout << "Margin Type: " << it->getMarginType() << endl;
+                cout << "Leverage: " << it->getLeverage() << "x" << endl;
+                cout << "Leverage Adjusted Size: " << it->getLeverageAdjustedBaseCurrencySize() << it->getSecurity()->getBase() << endl;
+                cout << "Order State: " << it->getOrderState() << endl;
+                cout << "=======================================" << endl;
+            }
         }
     }
 
     private:
     User user;
     Strategy* strategy;
+    MarketMap orderbooks;
 };
