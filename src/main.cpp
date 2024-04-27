@@ -15,18 +15,8 @@ int main(int argc, char* argv[]) {
     //     cerr << "Usage: " << argv[0] << " <arg1> <arg2>\n";
     // }
 
-    Security btcusdt("BTC", "USDT");
-
-
-    Exchange* binance = new Exchange("Binance");
-    binance->loadJson("./configuration/exchange.json");
-
-    Exchange bybit("Bybit");
-    bybit.loadJson("./configuration/exchange.json");
-
-    User user(1000000.0, 1000000.0);
-    user.addExchange(*binance);
-    user.addExchange(bybit);
+    User user(1000000.0, 1000000.0, "./configuration/exchange.json");
+    Exchange* binance = user.findExchange("Binance").get();
 
     MovingAverageCross ma_cross(1, 5, 20, 1000000.0, 1000000.0);
 

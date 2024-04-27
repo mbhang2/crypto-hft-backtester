@@ -59,21 +59,21 @@ class Strategy {
          * @param event_msg trade event message
          * @return vector of orders to submit. Return empty vector if no orders to submit.
          */
-        virtual vector<Order*> onTrade(TradeEventMsg& event_msg) = 0;
+        virtual vector<std::shared_ptr<Order>> onTrade(TradeEventMsg& event_msg) = 0;
 
         /**
          * Triggers when a change in top quote (BBO) message arrives
          * @param event_msg BBO update event message
          * @return vector of orders to submit. Return empty vector if no orders to submit.
          */
-        virtual vector<Order*> onTopQuote(QuoteEventMsg& event_msg) = 0;
+        virtual vector<std::shared_ptr<Order>> onTopQuote(QuoteEventMsg& event_msg) = 0;
 
         /**
          * Triggers when a change in orderbook message arrives
          * @param event_msg order book update event message
          * @return vector of orders to submit. Return empty vector if no orders to submit.
          */
-        virtual vector<Order*> onDepth(DepthEventMsg& event_msg) = 0;
+        virtual vector<std::shared_ptr<Order>> onDepth(DepthEventMsg& event_msg) = 0;
 
         /**
          * Getter for spot capital

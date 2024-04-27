@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -73,8 +74,8 @@ class Exchange {
                     for (auto& security : spot_margin_rules.GetObject()) {
                         string security_str = security.name.GetString();
                         size_t slash_pos = security_str.find('/');
-                        Security sec(security_str.substr(0, slash_pos), security_str.substr(slash_pos + 1));
-                        listed_securities[MarketType::Spot].push_back(sec);
+                        Security* sec = new Security(security_str.substr(0, slash_pos), security_str.substr(slash_pos + 1));
+                        listed_securities[MarketType::Spot].push_back(std::shared_ptr<Security>(sec));
 
                         // Save rule values
                         const Value& rule_values = security.value;
@@ -82,7 +83,7 @@ class Exchange {
                         for (auto& v : rule_values.GetArray()) {
                             rule_vector.push_back(v.GetDouble());
                         }
-                        spot_trading_rules[sec] = rule_vector;
+                        spot_trading_rules[*sec] = rule_vector;
                     }
 
                     // Futures
@@ -90,8 +91,8 @@ class Exchange {
                     for (auto& security : futures_rules_rules.GetObject()) {
                         string security_str = security.name.GetString();
                         size_t slash_pos = security_str.find('/');
-                        Security sec(security_str.substr(0, slash_pos), security_str.substr(slash_pos + 1));
-                        listed_securities[MarketType::Futures].push_back(sec);
+                        Security* sec = new Security(security_str.substr(0, slash_pos), security_str.substr(slash_pos + 1));
+                        listed_securities[MarketType::Futures].push_back(std::shared_ptr<Security>(sec));
 
                         // Save rule values
                         const Value& rule_values = security.value;
@@ -99,7 +100,7 @@ class Exchange {
                         for (auto& v : rule_values.GetArray()) {
                             rule_vector.push_back(v.GetDouble());
                         }
-                        futures_trading_rules[sec] = rule_vector;
+                        futures_trading_rules[*sec] = rule_vector;
                     }
 
                     /**
@@ -191,13 +192,13 @@ class Exchange {
          * Getter for listed securities
          * @param market_type type of the market (Futures, Spot)
          */
-        const vector<Security>& getListedSecurities(MarketType& market_type) const {
+        const vector<std::shared_ptr<Security>>& getListedSecurities(MarketType market_type) const {
             auto it = listed_securities.find(market_type);
             
             if (it != listed_securities.end()) {
                 return it->second; // Return a const reference to the vector
             } else {
-                static vector<Security> emptyVector;
+                static vector<std::shared_ptr<Security>> emptyVector;
                 return emptyVector;
             }
         }
@@ -205,13 +206,13 @@ class Exchange {
         /**
          * Search for the secuity with provided name
          */
-        Security* findSecurity(MarketType market_type, const std::string& name) const {
+        std::shared_ptr<Security> findSecurity(MarketType market_type, const std::string& name) const {
             auto it = listed_securities.find(market_type);
             if (it != listed_securities.end()) {
                 // Search within the vector for the specified security name
-                for (const Security& security : it->second) {
-                    if (security.getBase() + "/" + security.getQuote() == name) {
-                        return const_cast<Security*>(&security); // Return a pointer to the found security
+                for (auto&& security : it->second) {
+                    if (security->getBase() + "/" + security->getQuote() == name) {
+                        return security; // Return a pointer to the found security
                     }
                 }
             }
@@ -301,5 +302,5 @@ class Exchange {
         unordered_map<Security, vector<double>, Security::Hash> futures_trading_rules; /*< Map storing trade rules per security for futures market (Hash was used to ensure the same objects to store the same tick size) */
         vector<pair<double, double>> spot_trading_fees;     /*< Trading fees in spot market */
         vector<pair<double, double>> futures_trading_fees;     /*< Trading fees in futurs market */
-        map<MarketType, vector<Security>> listed_securities;      /*< List of securities listed per market*/
+        map<MarketType, vector<std::shared_ptr<Security>>> listed_securities;      /*< List of securities listed per market*/
 };
