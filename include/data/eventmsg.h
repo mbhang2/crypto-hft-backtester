@@ -14,13 +14,13 @@ using namespace std;
  */
 class EventMsg {
 public:
-    EventMsg(string& timestamp_, Exchange& exchange_, MarketType& market_type_, Security& security_)
+    EventMsg(TimeType* timestamp_, Exchange* exchange_, MarketType market_type_, Security* security_)
         : timestamp(timestamp_), exchange(exchange_), market_type(market_type_), security(security_) {}
 
-    string& timestamp;         /*< timestamp of an event */
-    Exchange& exchange;        /*< exchange an event occurred */
-    MarketType& market_type;  /*< Market type (Futures or spot) */
-    Security& security;        /*< instrument an event occurred */
+    TimeType* timestamp;         /*< timestamp of an event */
+    Exchange* exchange;        /*< exchange an event occurred */
+    MarketType market_type;  /*< Market type (Futures or spot) */
+    Security* security;        /*< instrument an event occurred */
 };
 
 /**
@@ -28,7 +28,7 @@ public:
  */
 class TradeEventMsg : public EventMsg {
 public:
-    TradeEventMsg(string& timestamp_, Exchange& exchange_, MarketType& market_type_, Security& security_, double price_, double size_): 
+    TradeEventMsg(TimeType* timestamp_, Exchange* exchange_, MarketType market_type_, Security* security_, double price_, double size_): 
             EventMsg(timestamp_, exchange_, market_type_, security_), price(price_), size(size_) {}
 
     double price;  /*< price at which the trade occurred */
@@ -39,12 +39,12 @@ public:
      */
     friend ostream& operator<<(ostream& os, TradeEventMsg& msg) {
         os << "========== Trade Event ==========" << endl;
-        os << "Timestamp: " << msg.timestamp << endl;
+        os << "Timestamp: " << msg.timestamp->toString() << endl;
         os << "Market: " << msg.market_type << endl;
         os << "Security: " << msg.security << endl;
-        os << "Exchange: " << msg.exchange.getName() << endl;
+        os << "Exchange: " << msg.exchange->getName() << endl;
         os << "Price: " << msg.price << endl;
-        os << "Size: " << msg.size << msg.security.getBase() << endl;
+        os << "Size: " << msg.size << msg.security->getBase() << endl;
         os << "=======================================" << endl;
         return os;
     }
@@ -56,7 +56,7 @@ public:
  */ 
 class QuoteEventMsg : public EventMsg {
 public:
-    QuoteEventMsg(string& timestamp_, Exchange& exchange_, MarketType& market_type_, Security& security_, double bid_price_, double bid_size_, double ask_price_, double ask_size_): 
+    QuoteEventMsg(TimeType* timestamp_, Exchange* exchange_, MarketType market_type_, Security* security_, double bid_price_, double bid_size_, double ask_price_, double ask_size_): 
         EventMsg(timestamp_, exchange_, market_type_, security_), bid_price(bid_price_), bid_size(bid_size_), ask_price(ask_price_), ask_size(ask_size_) {}
 
     double bid_price;  /*< best bid price */
@@ -69,14 +69,14 @@ public:
      */
     friend ostream& operator<<(ostream& os, QuoteEventMsg& msg) {
         os << "========== Quote Update ==========" << endl;
-        os << "Timestamp: " << msg.timestamp << endl;
+        os << "Timestamp: " << msg.timestamp->toString() << endl;
         os << "Market: " << msg.market_type << endl;
         os << "Security: " << msg.security << endl;
-        os << "Exchange: " << msg.exchange.getName() << endl;
+        os << "Exchange: " << msg.exchange->getName() << endl;
         os << "Bid price: " << msg.bid_price << endl;
-        os << "Bid size: " << msg.bid_size << msg.security.getBase() << endl;
+        os << "Bid size: " << msg.bid_size << msg.security->getBase() << endl;
         os << "Ask price: " << msg.ask_price << endl;
-        os << "Ask size: " << msg.ask_size << msg.security.getBase() << endl;
+        os << "Ask size: " << msg.ask_size << msg.security->getBase() << endl;
         os << "=======================================" << endl;
         return os;
     }
@@ -88,7 +88,7 @@ public:
  */ 
 class DepthEventMsg : public EventMsg {
 public:
-    DepthEventMsg(string& timestamp_, Exchange& exchange_, MarketType& market_type_, Security& security_, int side_, double price_, double size_): 
+    DepthEventMsg(TimeType* timestamp_, Exchange* exchange_, MarketType market_type_, Security* security_, int side_, double price_, double size_): 
         EventMsg(timestamp_, exchange_, market_type_, security_), side(side_), price(price_), size(size_) {}
 
     int side;      /*< indicates bid (1) or ask (-1) side of the order book */

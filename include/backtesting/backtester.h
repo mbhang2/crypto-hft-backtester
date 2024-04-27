@@ -49,6 +49,7 @@ class Backtester {
      */
     void runBacktest(const string& data_path) {
         vector<Order*> current_orders;
+        vector<TimeType*> timetype_vector;
         ifstream file(data_path);
 
         if (!file.is_open()) {
@@ -80,16 +81,18 @@ class Backtester {
             // Calling strategy functions
             vector<Order*> order_vector;
             MarketType s = MarketType::Spot;
+            TimeType* tt = new TimeType(tokens[0]);
+            timetype_vector.push_back(tt);
 
             if (tokens[2] == "T") {
                 // TradeEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[6]), stod(tokens[7]));
-                TradeEventMsg msg(tokens[0], *exchange_ptr, s, *security_ptr, stod(tokens[6])*180, stod(tokens[7]));
+                TradeEventMsg msg(tt, exchange_ptr, s, security_ptr, stod(tokens[6])*180, stod(tokens[7]));
                 order_vector = strategy->onTrade(msg);
             }
 
             else if (tokens[2] == "Q") {
                 // QuoteEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
-                QuoteEventMsg msg(tokens[0], *exchange_ptr, s, *security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
+                QuoteEventMsg msg(tt, exchange_ptr, s, security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
                 order_vector = strategy->onTopQuote(msg);
                 // @todo: update orderbook
                 cout << order_vector.size() << endl;
@@ -102,15 +105,17 @@ class Backtester {
             // Append order to the back of the current order
             if (!order_vector.empty()) {
                 cout << "Strategy submitted new orders" << endl;
+                for (auto& it : timetype_vector) {
+                    cout << it->toString() << endl;
+                }
+
                 for (Order* it : order_vector) {
                     // Security s = it->getSecurity();
                     // cout << "Address while going over for loop: " << &s << endl;
                     // string s = it->getTimestamp();
-                    // cout << "Timestamp of the order is " << s << endl;
-                    Market m(it->getSecurity(), it->getMarketType(), it->getTimestamp(), it->getSide(), it->getBaseCurrencySize(), 0, 
-                            it->getLeverage(), it->getMarginType(), it->getPrice(), it->getExchange(), 1000000);
-                    current_orders.push_back(&m);
+                    current_orders.push_back(it);
                 }
+                cout << "Done" << endl;
             }
 
             // Work with orders
@@ -120,7 +125,7 @@ class Backtester {
                 cout << "========== Order Information ==========" << endl;
                 cout << "Security: " << it->getSecurity() << endl;
                 cout << "Exchange: " << it->getExchange().getName() << endl;
-                cout << "Timestamp: " << it->getTimestamp() << endl;
+                cout << "Timestamp: " << it->getTimestamp().toString() << endl;
                 cout << "Order Type: " << it->getOrderType() << endl;
                 cout << "Side: " << s << endl;
                 cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity().getBase() << endl;
@@ -147,13 +152,13 @@ class Backtester {
                     // Todo: update order log
                 //}
                  if (it->getOrderState() == OrderState::SentToExchange) {
-                    cout << "This order's timestamp before checking if it arrived at the exchange is " << it->getTimestamp() << endl;
-                    it->checkOrderReceived(tokens[0]);
+                    cout << "This order's timestamp before checking if it arrived at the exchange is " << it->getTimestamp().toString() << endl;
+                    it->checkOrderReceived(*tt);
                     if (it->getOrderState() != OrderState::Working) {
                         cout << "Order hasn't arrived at the exchange yet" << endl;
                         break;
                     }
-                    cout << "Order with timestamp " << it->getTimestamp() << " has arrived at the exchange" << endl;
+                    cout << "Order with timestamp " << it->getTimestamp().toString() << " has arrived at the exchange" << endl;
                 }
             }
 
@@ -175,7 +180,7 @@ class Backtester {
                 cout << "========== Order Information ==========" << endl;
                 cout << "Security: " << it->getSecurity() << endl;
                 cout << "Exchange: " << it->getExchange().getName() << endl;
-                cout << "Timestamp: " << it->getTimestamp() << endl;
+                cout << "Timestamp: " << it->getTimestamp().toString() << endl;
                 cout << "Order Type: " << it->getOrderType() << endl;
                 cout << "Side: " << s << endl;
                 cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity().getBase() << endl;
