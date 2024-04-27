@@ -18,14 +18,14 @@ int main(int argc, char* argv[]) {
     Security btcusdt("BTC", "USDT");
 
 
-    Exchange binance("Binance");
-    binance.loadJson("./configuration/exchange.json");
+    Exchange* binance = new Exchange("Binance");
+    binance->loadJson("./configuration/exchange.json");
 
     Exchange bybit("Bybit");
     bybit.loadJson("./configuration/exchange.json");
 
     User user(1000000.0, 1000000.0);
-    user.addExchange(binance);
+    user.addExchange(*binance);
     user.addExchange(bybit);
 
     MovingAverageCross ma_cross(1, 5, 20, 1000000.0, 1000000.0);

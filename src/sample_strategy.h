@@ -66,7 +66,7 @@ class MovingAverageCross: public Strategy {
         virtual vector<Order*> onTrade(TradeEventMsg& event_msg) {
             vector<Order*> orders;
 
-            string& trade_timestamp = event_msg.timestamp;
+            string trade_timestamp = event_msg.timestamp->toString();
             double trade_price = event_msg.price;
             double trade_size = event_msg.size;
 
@@ -120,30 +120,30 @@ class MovingAverageCross: public Strategy {
                     long_ma /= long_length;
                     prev_long_ma /= long_length;
 
-                    double curr_pos = getPosition(MarketType::Spot, event_msg.exchange, event_msg.security);
+                    double curr_pos = getPosition(MarketType::Spot, *event_msg.exchange, *event_msg.security);
 
                     MarginType mt = MarginType::NoMargin;
                     // Check long entry condition
                     if (prev_short_ma < prev_long_ma && short_ma > long_ma) {
                         if (curr_pos == 0) {
-                            Market market = Market(event_msg.security, event_msg.market_type, trade_timestamp, 1, int(getSpotCapital() * 0.1 / trade_price), 0, 1, mt, trade_price, event_msg.exchange, getSpotCapital());
-                            // cout << market.getTimestamp() << endl;
+                            Market market = Market(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, int(getSpotCapital() * 0.1 / trade_price), 0, 1, mt, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << market.getTimestamp().toString() << endl;
                             orders.push_back(&market);
                         } else {
-                            Market market = Market(event_msg.security, event_msg.market_type, trade_timestamp, 1, int(getSpotCapital() * 0.1 / trade_price) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange, getSpotCapital());
-                            // cout << market.getTimestamp() << endl;
+                            Market market = Market(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, int(getSpotCapital() * 0.1 / trade_price) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << market.getTimestamp().toString() << endl;
                             orders.push_back(&market);
                         }
                     }
                     // Check short entry condition
                     else if (prev_short_ma > prev_long_ma && short_ma < long_ma) {
                         if (curr_pos == 0) {
-                            Market market = Market(event_msg.security, event_msg.market_type, trade_timestamp, -1, int(getSpotCapital() * 0.1 / trade_price), 0, 1, mt, trade_price, event_msg.exchange, getSpotCapital());
-                            // cout << market.getTimestamp() << endl;
+                            Market market = Market(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, int(getSpotCapital() * 0.1 / trade_price), 0, 1, mt, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << market.getTimestamp().toString() << endl;
                             orders.push_back(&market);
                         } else {
-                            Market market = Market(event_msg.security, event_msg.market_type, trade_timestamp, -1, int(getSpotCapital() * 0.1 / trade_price) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange, getSpotCapital());
-                            // cout << market.getTimestamp() << endl;
+                            Market market = Market(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, int(getSpotCapital() * 0.1 / trade_price) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange, getSpotCapital());
+                            cout << market.getTimestamp().toString() << endl;
                             orders.push_back(&market);
                         }
                     }
