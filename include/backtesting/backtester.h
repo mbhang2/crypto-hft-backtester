@@ -131,22 +131,22 @@ class Backtester {
                 cout << "=======================================" << endl;
 
 
-                if (it->isLiveOrder()) {
-                    double size_to_fill = it->getLeverageAdjustedBaseCurrencySize();
-                    cout << size_to_fill << ", " << it->getOrderState() << endl;
-                    it->fillOrder(size_to_fill, stod(tokens[6])*180);
-                    cout << it->getOrderState() << endl;
-                    cout << it->getLeverageAdjustedBaseCurrencySize() << endl;
+                // if (it->isLiveOrder()) {
+                //     double size_to_fill = it->getLeverageAdjustedBaseCurrencySize();
+                //     cout << size_to_fill << ", " << it->getOrderState() << endl;
+                //     it->fillOrder(size_to_fill, stod(tokens[6])*180);
+                //     cout << it->getOrderState() << endl;
+                //     cout << it->getLeverageAdjustedBaseCurrencySize() << endl;
                     
-                    if (it->getSide() == 1) {
-                        strategy->updatePosition(it->getMarketType(), *exchange_ptr, *security_ptr, size_to_fill);
-                    } else {
-                        strategy->updatePosition(it->getMarketType(), *exchange_ptr, *security_ptr, -size_to_fill);
-                    }
+                //     if (it->getSide() == 1) {
+                //         strategy->updatePosition(it->getMarketType(), *exchange_ptr, *security_ptr, size_to_fill);
+                //     } else {
+                //         strategy->updatePosition(it->getMarketType(), *exchange_ptr, *security_ptr, -size_to_fill);
+                //     }
                     
                     // Todo: update order log
-                }
-                else if (it->getOrderState() == OrderState::SentToExchange) {
+                //}
+                 if (it->getOrderState() == OrderState::SentToExchange) {
                     cout << "This order's timestamp before checking if it arrived at the exchange is " << it->getTimestamp() << endl;
                     it->checkOrderReceived(tokens[0]);
                     if (it->getOrderState() != OrderState::Working) {
