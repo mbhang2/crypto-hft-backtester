@@ -25,7 +25,7 @@ class Order {
         /**
          * Constructor to create an order.
          */
-        Order(Security* security_, MarketType market_type_, TimeType* timestamp_, string type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_ ,double price_, Exchange* exchange_, double buying_power_): 
+        Order(std::shared_ptr<Security> security_, MarketType market_type_, TimeType* timestamp_, string type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_ ,double price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
                 security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
                     id = ++next_id; // Assign a unique order id
                     
@@ -221,30 +221,8 @@ class Order {
          * @param current_timestamp Current timestamp in format 'yyyy-MM-dd HH:mm:ss.fffffffff'
          */
         void checkOrderReceived(TimeType& current_timestamp) {
-            string ts = timestamp->toString();
-            string ct = current_timestamp.toString();
-            cout << "Current timestamp: " << ct << ", submitted timestamp: " << ts << endl;
+            long long time_difference = current_timestamp.toNanosecondsSinceEpoch() - timestamp->toNanosecondsSinceEpoch();
 
-            // Parse submitted timestamp
-            tm tm_submitted;
-            istringstream ss_submitted (ts);
-            ss_submitted >> get_time (&tm_submitted, "%Y-%m-%d %H:%M:%S.%f");
-            auto submitted_time_ns = chrono::time_point_cast<chrono::nanoseconds>(chrono::system_clock::from_time_t (mktime (&tm_submitted)));
-            auto epoch_submitted = submitted_time_ns.time_since_epoch();
-            epoch_submitted += chrono::nanoseconds (stoll (ts.substr (20)));
-
-            // Parse current timestamp
-            tm tm_current;
-            istringstream ss_current (ct);
-            ss_current >> get_time (&tm_current, "%Y-%m-%d %H:%M:%S.%f");
-            auto current_time_ns = chrono::time_point_cast<chrono::nanoseconds>(chrono::system_clock::from_time_t (mktime (&tm_current)));
-            auto epoch_current = current_time_ns.time_since_epoch();
-            epoch_current += chrono::nanoseconds (stoll (ct.substr (20)));
-
-            // Compute the time difference in seconds
-            auto time_difference = epoch_current.count() - epoch_submitted.count();
-
-            cout << "Timestamp after the function is " << ts << endl;
             if (time_difference >= exchange->getSendingLatency()) {
                 state = OrderState::Working;
             }   
@@ -263,7 +241,7 @@ class Order {
         /**
          * Getter for security.
          */
-        Security& getSecurity() {return *security;}
+        std::shared_ptr<Security> getSecurity() {return security;}
 
         /**
          * Getter for market type.
@@ -323,7 +301,7 @@ class Order {
         /**
          * Getter for exchange.
          */
-        Exchange& getExchange() {return *exchange;}
+        std::shared_ptr<Exchange> getExchange() {return exchange;}
 
         /**
          * Getter for margin type.
@@ -347,7 +325,7 @@ class Order {
     protected:
         int id;                         /*< Unique ID */
         MarketType market_type;   /*< Market type */
-        Security* security;        /*< Security */
+        std::shared_ptr<Security> security;        /*< Security */
         TimeType* timestamp;         /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
         string type;              /*< Order type */
         const int side;                 /*< -1 for SELL, 1 for BUY */
@@ -359,7 +337,7 @@ class Order {
         double filled_size = 0.0;       /*< Quantify filled of the order */
         double average_fill_price = 0.0;      /*< Average filled price of the order */
         double price;                   /*< Price for LIMIT and STOP LIMIT orders. Current price for MARKET and STOP orders */
-        Exchange* exchange;        /*< Target exchange for an order */
+        std::shared_ptr<Exchange> exchange;        /*< Target exchange for an order */
         OrderState state = OrderState::SentToExchange;         /*< State of the order */
         vector<int> child_trade_id;     /*< Vector of trade ids executed from this order */
 
@@ -376,7 +354,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(Security* security_, MarketType market_type_ , TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double price_, Exchange* exchange_, double buying_power_): 
+    Limit(std::shared_ptr<Security> security_, MarketType market_type_ , TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {}
 
     /**
@@ -471,7 +449,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(Security* security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double current_price_, Exchange* exchange_, double buying_power_): 
+    Market(std::shared_ptr<Security> security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double current_price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_, buying_power_) {}
 
     /**
@@ -515,7 +493,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(Security* security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double trigger_price_, Exchange* exchange_, double buying_power_): 
+    Stop(std::shared_ptr<Security> security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double trigger_price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_, buying_power_) {
                 triggered = false, trigger_price = trigger_price_;
             }
@@ -645,7 +623,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(Security* security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, MarginType margintype_, double trigger_price_, Exchange* exchange_, double buying_power_): 
+    StopLimit(std::shared_ptr<Security> security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, MarginType margintype_, double trigger_price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
             Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {
                 triggered = false, trigger_price = trigger_price_;
             }
