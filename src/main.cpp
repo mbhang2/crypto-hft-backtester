@@ -16,7 +16,6 @@ int main(int argc, char* argv[]) {
     // }
 
     User user(1000000.0, 1000000.0, "./configuration/exchange.json");
-    Exchange* binance = user.findExchange("Binance").get();
 
     MovingAverageCross ma_cross(1, 5, 20, 1000000.0, 1000000.0);
 

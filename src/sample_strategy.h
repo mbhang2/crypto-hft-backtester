@@ -121,7 +121,6 @@ class MovingAverageCross: public Strategy {
                     prev_long_ma /= long_length;
 
                     double curr_pos = getPosition(MarketType::Spot, *event_msg.exchange, *event_msg.security);
-                    cout << "Current position is " << curr_pos << endl;
 
                     MarginType mt = MarginType::NoMargin;
                     // Check long entry condition
