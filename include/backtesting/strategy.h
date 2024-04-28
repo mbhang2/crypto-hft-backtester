@@ -94,6 +94,11 @@ class Strategy {
         }
 
         /**
+         * Getter for the map itself.
+         */
+        MarketMap getPositionMap() const {return position;}
+
+        /**
          * Update position
          * @param marketType market type (spot or futures)
          * @param exchange exchange

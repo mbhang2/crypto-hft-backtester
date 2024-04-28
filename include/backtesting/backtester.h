@@ -67,7 +67,6 @@ class Backtester {
         vector<std::shared_ptr<Order>> current_orders;
         vector<TimeType*> timetype_vector;
         ifstream file(data_path);
-        double last_traded_price = 0;
 
         if (!file.is_open()) {
             cerr << "Error opening the file." << endl;
@@ -102,8 +101,8 @@ class Backtester {
             std::shared_ptr<OrderBook> ob = getOrderbook(mt, *exchange_ptr, *security_ptr);
 
             if (tokens[2] == "T") {
-                last_traded_price = stod(tokens[6]);
-                vector<tuple<std::shared_ptr<Order>, double, double>> filled_orders = ob->tradeOccurred(last_traded_price, stod(tokens[7]));
+                last_traded_price[make_pair(mt, security_ptr)] = stod(tokens[6]);
+                vector<tuple<std::shared_ptr<Order>, double, double>> filled_orders = ob->tradeOccurred(last_traded_price[make_pair(mt, security_ptr)], stod(tokens[7]));
 
                 // @Todo: update buying power and positions
                 for (auto it : filled_orders) {
@@ -175,7 +174,7 @@ class Backtester {
             // Work with orders
             for (auto&& it : current_orders) {
                 if (it->isLiveOrder() && (it->getOrderType() == "STOP" || it->getOrderType() == "STOPLIMIT")) {
-                    it->checkTriggered(last_traded_price);
+                    it->checkTriggered(last_traded_price[make_pair(mt, security_ptr)]);
                 }
                 if (it->checkFillability(ob->getBestBid(),ob->getBestAsk())) {
                     pair<std::shared_ptr<Order>, vector<pair<double, double>>> fills;
@@ -221,6 +220,28 @@ class Backtester {
                     ++it;
                 }
             }
+
+            // Record balance history
+            if (tradelog.getTrades().empty()) {
+                tradelog.addBalanceHistory(tt, user.getCapital(MarketType::Spot), user.getCapital(MarketType::Futures));
+            } else {
+                double spot_cap = user.getCapital(MarketType::Spot);
+                double futures_cap = user.getCapital(MarketType::Futures);
+
+                for (const auto& pair : strategy->getPositionMap()) {
+                    if (pair.second != 0) {
+                        if (std::get<0>(pair.first) == MarketType::Spot) {
+                            double pos = strategy->getPosition(MarketType::Spot, *exchange_ptr, *security_ptr);
+                            spot_cap += pos * (tradelog.computeWeightedAverageFillPrice(abs(pos)) - last_traded_price[{MarketType::Spot, security_ptr}]);
+                        } else {
+                            double pos = strategy->getPosition(MarketType::Futures, *exchange_ptr, *security_ptr);
+                            spot_cap += pos * (tradelog.computeWeightedAverageFillPrice(abs(pos)) - last_traded_price[{MarketType::Futures, security_ptr}]);
+                        }
+                    }
+                }
+
+                tradelog.addBalanceHistory(tt, spot_cap, futures_cap);
+            }
         }
     }
 
@@ -235,6 +256,7 @@ class Backtester {
     MarketMap orderbooks;
     OrderLog orderlog;
     TradeLog tradelog;
+    map<pair<MarketType, std::shared_ptr<Security>>, double> last_traded_price;
 
     std::shared_ptr<OrderBook> getOrderbook(MarketType market_type, const Exchange& exchange, const Security& security) {
         MarketKey key = make_tuple(market_type, exchange, security);
