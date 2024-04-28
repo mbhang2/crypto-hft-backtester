@@ -99,7 +99,7 @@ public:
     /**
      * Export balance history to CSV format
      */
-    void exportToCSV(const string& filename) {
+    void exportBalanceHistoryToCSV(const string& filename) {
         std::ofstream outfile(filename);
         outfile << std::fixed << std::setprecision(2);
 
@@ -107,6 +107,27 @@ public:
             outfile << "TIMESTAMP,SPOT_BALANCE,FUTURES_BALANCE" << "\n";
             for (const auto& it : balance_history) {
                 outfile << it.first->toString() << "," << it.second.first << "," << it.second.second << "\n";
+            }
+            outfile.close();
+            std::cout << "Data exported to " << filename << std::endl;
+        } else {
+            std::cerr << "Error opening file for writing." << std::endl;
+        }
+    }
+
+    /**
+     * Export tradelog to CSV format
+     */
+    void exportTradeLogToCSV(const string& filename) {
+        std::ofstream outfile(filename);
+        outfile << std::fixed << std::setprecision(2);
+
+        if (outfile) {
+            outfile << "TIMESTAMP,SECURITY,MARKET_TYPE,EXCHANGE,SIDE,SIZE,FEE" << "\n";
+            for (const auto& it : trades) {
+                string s = (it->getSide() == 1) ? "Buy" : "sell";
+                outfile << it->getTimestamp()->toString() << "," << *(it->getSecurity()) << "," << it->getParentOrder()->getMarketType() << "," << it->getExchange()->getName() 
+                        << "," << s << "," << it->getBaseCurrencySize() << "," << it->getFee() << "\n";
             }
             outfile.close();
             std::cout << "Data exported to " << filename << std::endl;
