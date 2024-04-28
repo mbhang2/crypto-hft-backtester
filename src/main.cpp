@@ -17,10 +17,10 @@ int main(int argc, char* argv[]) {
 
     User user(1000000.0, 1000000.0, "./configuration/exchange.json");
 
-    MovingAverageCross ma_cross(1, 5, 20, 1000000.0, 1000000.0);
+    MovingAverageCross ma_cross(user, 1, 5, 20);
 
     Backtester backtester(user, &ma_cross);
-    backtester.runBacktest("./sample_data/20230103_trades.csv");
+    backtester.runBacktest("./sample_data/sample_input.csv");
 
     // Market market(btcusdt, MarketType::Spot, "2024-04-19 20:30:23.123456789", -1, 2, 0, 5, MarginType::Isolated, 69321.23, binance, 1000000);
     // cout << market.getSide() << endl;

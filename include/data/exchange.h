@@ -83,7 +83,7 @@ class Exchange {
                         for (auto& v : rule_values.GetArray()) {
                             rule_vector.push_back(v.GetDouble());
                         }
-                        spot_trading_rules[*sec] = rule_vector;
+                        trading_rules[MarketType::Spot][*sec] = rule_vector;
                     }
 
                     // Futures
@@ -100,7 +100,7 @@ class Exchange {
                         for (auto& v : rule_values.GetArray()) {
                             rule_vector.push_back(v.GetDouble());
                         }
-                        futures_trading_rules[*sec] = rule_vector;
+                        trading_rules[MarketType::Futures][*sec] = rule_vector;
                     }
 
                     /**
@@ -112,22 +112,22 @@ class Exchange {
                     const Value& spotTakerFees = exchange.value["feeStructure"]["Spot/Margin"]["Taker"];
 
                     for (SizeType i = 0; i < spotTakerFees.Size(); ++i) {
-                        spot_trading_fees.emplace_back(spotMakerFees[i].GetDouble(), spotTakerFees[i].GetDouble());
+                        trading_fee_schedule[MarketType::Spot].emplace_back(spotMakerFees[i].GetDouble(), spotTakerFees[i].GetDouble());
                     }
 
-                    spot_maker_fee = spot_trading_fees[0].first; // Set maker fee by default
-                    spot_taker_fee = spot_trading_fees[0].second; // Set taker fee by default
+                    maker_fee[MarketType::Spot] = trading_fee_schedule[MarketType::Spot][0].first; // Set maker fee by default
+                    taker_fee[MarketType::Spot] = trading_fee_schedule[MarketType::Spot][0].second; // Set taker fee by default
 
                     // Futures
                     const Value& futuresMakerFees = exchange.value["feeStructure"]["Futures"]["Maker"];
                     const Value& futuresTakerFees = exchange.value["feeStructure"]["Futures"]["Taker"];
 
                     for (SizeType i = 0; i < futuresTakerFees.Size(); ++i) {
-                        futures_trading_fees.emplace_back(futuresMakerFees[i].GetDouble(), futuresTakerFees[i].GetDouble());
+                        trading_fee_schedule[MarketType::Futures].emplace_back(futuresMakerFees[i].GetDouble(), futuresTakerFees[i].GetDouble());
                     }
 
-                    futures_maker_fee = futures_trading_fees[0].first; // Set maker fee by default
-                    futures_taker_fee = futures_trading_fees[0].second; // Set taker fee by default
+                    maker_fee[MarketType::Futures] = trading_fee_schedule[MarketType::Futures][0].first; // Set maker fee by default
+                    taker_fee[MarketType::Futures] = trading_fee_schedule[MarketType::Futures][0].second; // Set taker fee by default
 
                     return true; // Found the exchange
                 }
@@ -142,9 +142,9 @@ class Exchange {
          * Getter for the trade rules of the security within the exchange.
          * @param sec Security that we would like the trade rules.
         */
-        vector<double> getSpotTradeRules(const Security& sec) const {
-            auto it = spot_trading_rules.find(sec);
-            if (it != spot_trading_rules.end()) {
+        vector<double> getTradingRules(MarketType market_type, const Security& sec) const {
+            auto it = trading_rules.at(market_type).find(sec);
+            if (it != trading_rules.at(market_type).end()) {
                 return it->second;
             }
 
@@ -169,24 +169,14 @@ class Exchange {
         int getSendingLatency()const {return sending_latency;}
 
         /**
-         * Getter for spot maker fee.
+         * Getter for maker fee.
          */
-        double getSpotMakerFee() const {return spot_maker_fee;}
+        double getMakerFee(MarketType market_type) const {return maker_fee.at(market_type);}
 
         /**
-         * Getter for spot taker fee.
+         * Getter for taker fee.
          */
-        double getSpotTakerFee() const {return spot_taker_fee;}
-
-        /**
-         * Getter for futures maker fee.
-         */
-        double getFuturesMakerFee() const {return futures_maker_fee;}
-
-        /**
-         * Getter for futures taker fee.
-         */
-        double getFuturesTakerFee() const {return futures_taker_fee;}
+        double getTakerFee(MarketType market_type) const {return taker_fee.at(market_type);}
 
         /**
          * Getter for listed securities
@@ -220,64 +210,37 @@ class Exchange {
         }
 
         /**
-         * Setter for spot trading fee.
-         * @param level customer (VIP) level fee structure to use
-         */
-        void setSpotTradingFee(int level) {
-            if (level >= spot_trading_fees.size()) {
-                cerr << "Invalid customer level of " << level << ". Highest customer level is " << spot_trading_fees.size() - 1 << endl;
+         * Setter for trading fee from fee schedule.
+        */
+        void setTradingFeeFromSchedule(MarketType market_type, int level) {
+            if (level >= trading_fee_schedule[market_type].size()) {
+                throw invalid_argument("Invalid customer level of " + to_string(level));
                 return;
             }
 
-            spot_maker_fee = spot_trading_fees[level].first;
-            spot_taker_fee = spot_trading_fees[level].second;
+            maker_fee[market_type] = trading_fee_schedule[market_type][level].first;
+            taker_fee[market_type] = trading_fee_schedule[market_type][level].second;
         }
 
         /**
-         * Setter for spot maker fee.
+         * Setter for maker fee.
          * Manually set the fee outside the provided fee structure.
-         * @param fee spot maker fee in percent.
+         * @param fee maker fee in percent.
          */
-        void setSpotMakerFee(double fee) {spot_maker_fee = fee;}
+        void setMakerFee(MarketType market_type, double fee) {maker_fee[market_type] = fee;}
 
         /**
-         * Setter for spot taker fee.
+         * Setter for taker fee.
          * Manually set the fee outside the provided fee structure.
-         * @param fee spot taker fee in percent.
+         * @param fee taker fee in percent.
          */
-        void setSpotTakerFee(double fee) {spot_taker_fee = fee;}
+        void setTakerFee(MarketType market_type, double fee) {taker_fee[market_type] = fee;}
 
         /**
-         * Setter for futures trading fee.
-         * @param level customer (VIP) level fee structure to use
+         * Equal operator.
          */
-        void setFuturesTradingFee(int level) {
-            if (level >= futures_trading_fees.size()) {
-                cerr << "Invalid customer level of " << level << ". Highest customer level is " << futures_trading_fees.size() - 1 << endl;
-                return;
-            }
-
-            futures_maker_fee = futures_trading_fees[level].first;
-            futures_taker_fee = futures_trading_fees[level].second;
-        }
-
-        /**
-         * Setter for futures maker fee.
-         * Manually set the fee outside the provided fee structure.
-         * @param fee futures maker fee in percent.
-         */
-        void setFuturesMakerFee(double fee) {futures_maker_fee = fee;}
-
-        /**
-         * Setter for futures taker fee.
-         * Manually set the fee outside the provided fee structure.
-         * @param fee futures taker fee in percent.
-         */
-        void setFuturesTakerFee(double fee) {futures_taker_fee = fee;}
-
-
         bool operator==(const Exchange& other) const {
-            return name == other.name; //TODO: Check if this is the correct way to compare
+            return name == other.name;
         }
 
         /**
@@ -292,15 +255,11 @@ class Exchange {
 
     protected:
         const string name;           /*< Exchange name */
-        int receiving_latency;      /*< Latency from an exchange in nanoseconds */
-        int sending_latency;        /*< Laency to an exchange in nanoseconds */ 
-        double spot_maker_fee;      /*< Maker fee in a spot market in percent */
-        double spot_taker_fee;      /*< Taker fee in a spot market in percent */
-        double futures_maker_fee;      /*< Maker fee in a futures market in percent */
-        double futures_taker_fee;      /*< Taker fee in a futures market in percent */
-        unordered_map<Security, vector<double>, Security::Hash> spot_trading_rules; /*< Map storing trade rules per security for spot/margin market (Hash was used to ensure the same objects to store the same tick size) */
-        unordered_map<Security, vector<double>, Security::Hash> futures_trading_rules; /*< Map storing trade rules per security for futures market (Hash was used to ensure the same objects to store the same tick size) */
-        vector<pair<double, double>> spot_trading_fees;     /*< Trading fees in spot market */
-        vector<pair<double, double>> futures_trading_fees;     /*< Trading fees in futurs market */
+        int receiving_latency;       /*< Latency from an exchange in nanoseconds */
+        int sending_latency;         /*< Laency to an exchange in nanoseconds */
+        map<MarketType, double> maker_fee;  /*< Maker fee in percent */
+        map<MarketType, double> taker_fee;  /*< Taker fee in percent */
+        map<MarketType, unordered_map<Security, vector<double>, Security::Hash>> trading_rules;  /*< Map storing trade rules*/
+        map<MarketType,  vector<pair<double, double>>> trading_fee_schedule;    /*< Trading fee schedule */
         map<MarketType, vector<std::shared_ptr<Security>>> listed_securities;      /*< List of securities listed per market*/
 };

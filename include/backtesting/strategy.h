@@ -1,9 +1,9 @@
 #pragma once
 
-
+#include "order.h"
+#include "user.h"
 #include "../data/eventmsg.h"
 #include "../data/exchange.h"
-#include "order.h"
 #include "../data/security.h"
 
 #include <functional>
@@ -47,7 +47,7 @@ class Strategy {
         /**
          * Constructor
          */
-        Strategy(const string& strategy_name_, double spot_capital_, double futures_capital_): strategy_name(strategy_name_), spot_capital(spot_capital_), futures_capital(futures_capital_) {}
+        Strategy(const string& strategy_name_, User& user_): strategy_name(strategy_name_), user(user_) {}
 
         /**
          * Destructor
@@ -76,16 +76,6 @@ class Strategy {
         virtual vector<std::shared_ptr<Order>> onDepth(DepthEventMsg& event_msg) = 0;
 
         /**
-         * Getter for spot capital
-         */
-        double getSpotCapital() const {return spot_capital;}
-
-        /**
-         * Getter for futures capital
-         */
-        double getFuturesCapital() const {return futures_capital;}
-
-        /**
          * Getter for position
          * @param marketType market type (spot or futures)
          * @param exchange exchange
@@ -104,20 +94,6 @@ class Strategy {
         }
 
         /**
-         * update spot capital
-         */
-        void updateSpotCapital(double capital_change) {
-            spot_capital += capital_change;
-        } 
-
-        /**
-         * update futures capital
-         */
-        void updateFuturesCapital(double capital_change) {
-            futures_capital += capital_change;
-        } 
-
-        /**
          * Update position
          * @param marketType market type (spot or futures)
          * @param exchange exchange
@@ -132,7 +108,6 @@ class Strategy {
 
     protected:
         const string strategy_name;
-        double spot_capital;
-        double futures_capital; 
+        User user;
         MarketMap position; 
 };

@@ -25,7 +25,7 @@ public:
      * Add order to the order list
      * @param order order to add
      */
-    void addOrder(Order* order) {
+    void addOrder(std::shared_ptr<Order> order) {
         orders.push_back(order);
     }
 
@@ -34,17 +34,17 @@ public:
      * @param order_id unique order id of an order to retrieve
      * @return reference to the order
      */
-    const Order& getOrderByID(int order_id) const {
-        for (Order* order : orders) {
-            if (order->getID() == order_id) {
-                return *order;
-            }
-        }
+    // const Order& getOrderByID(int order_id) const {
+    //     for (Order* order : orders) {
+    //         if (order->getID() == order_id) {
+    //             return *order;
+    //         }
+    //     }
         
-        // Throw an exception when order not found
-        throw runtime_error("Order with ID " + to_string(order_id) + " not found.");
-    }
+    //     // Throw an exception when order not found
+    //     throw runtime_error("Order with ID " + to_string(order_id) + " not found.");
+    // }
 
 private:
-    std::vector<Order*> orders;
+    std::vector<std::shared_ptr<Order>> orders;
 };
