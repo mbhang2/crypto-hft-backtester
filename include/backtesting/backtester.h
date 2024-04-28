@@ -160,8 +160,10 @@ class Backtester {
             // Append order to the back of the current order
             if (!order_vector.empty()) {
                 for (auto&& it : order_vector) {
-                    if (user.getCapital(it->getMarketType()) < it->getLeverageAdjustedBaseCurrencySize() * it->getPrice()) {
-                        throw std::runtime_error("Submitted order exceeds the available buying power of " + to_string(user.getCapital(it->getMarketType())));
+                    map<MarketType, double> avail_buying_pwr = {{MarketType::Spot, user.getCapital(MarketType::Spot)},{MarketType::Futures, user.getCapital(MarketType::Futures)}};
+                    avail_buying_pwr[it->getMarketType()] -= it->getBaseCurrencySize() * it->getPrice();
+                    if (avail_buying_pwr[it->getMarketType()] < 0) {
+                        throw std::runtime_error("Submitted order exceeds the available buying power of " + to_string(avail_buying_pwr[it->getMarketType()]));
                         it->rejectOrder();
                     } else {
                         current_orders.push_back(it);

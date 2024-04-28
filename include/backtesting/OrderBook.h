@@ -54,7 +54,7 @@ class OrderBook {
                 level_queue.front().first -= subtracting;
                 quantity_to_fill -= subtracting;
 
-                if (level_queue.front().second != nullptr) {
+                if (level_queue.front().second != nullptr && level_queue.front().second->isLiveOrder()) {
                     fills.emplace_back(make_tuple(level_queue.front().second, price, subtracting));
                 }
 
@@ -82,7 +82,7 @@ class OrderBook {
             addLevel(price_level, order_side);  // Handling case where price level does not exist
 
             if (book[price_level].first != order_side) {
-                if(order_ptr != nullptr) {
+                if(order_ptr != nullptr && order_ptr->isLiveOrder()) {
                     return fillMarketOrder(order_ptr);
                 }
             } else {
@@ -104,6 +104,10 @@ class OrderBook {
          * @param qty quantity that could get filled instantly
         */
         pair<std::shared_ptr<Order>, vector<pair<double, double>>> instantFillLimit(std::shared_ptr<Order> order_ptr, double qty) {
+            if (!order_ptr->isLiveOrder()) {
+                return pair<std::shared_ptr<Order>, vector<pair<double, double>>>();
+            }
+
             double quantity_to_fill = qty;
             int side = order_ptr->getSide();
 
@@ -149,6 +153,10 @@ class OrderBook {
          * @param order_ptr pointer to order.
         */
         pair<std::shared_ptr<Order>, vector<pair<double, double>>> fillMarketOrder(std::shared_ptr<Order> order_ptr) {
+            if (!order_ptr->isLiveOrder()) {
+                return pair<std::shared_ptr<Order>, vector<pair<double, double>>>();
+            }
+
             double quantity_to_fill = order_ptr->getLeverageAdjustedBaseCurrencySize();
             int side = order_ptr->getSide();
 
@@ -217,7 +225,9 @@ class OrderBook {
                 if (getLevelOurOrderTotalSize(price_level) != 0) {
                     // Fill our orders
                     for (std::shared_ptr<Order> it : getOurOrderPtr(price_level)) {
-                        filled_orders.push_back(make_tuple(it, price_level, it->getLeverageAdjustedBaseCurrencySize()));
+                        if (it->isLiveOrder()) {
+                            filled_orders.push_back(make_tuple(it, price_level, it->getLeverageAdjustedBaseCurrencySize()));
+                        }
                     }
                 }
 
@@ -233,7 +243,9 @@ class OrderBook {
                 if (key < price_level && value_first == -1) {
                     if (getLevelOurOrderTotalSize(key) != 0) {
                         for (std::shared_ptr<Order> it : getOurOrderPtr(key)) {
-                            filled_orders.push_back(make_tuple(it, key, it->getLeverageAdjustedBaseCurrencySize()));
+                            if (it->isLiveOrder()) {
+                                filled_orders.push_back(make_tuple(it, key, it->getLeverageAdjustedBaseCurrencySize()));
+                            }
                         }
                     }
                     
@@ -273,7 +285,9 @@ class OrderBook {
                 if (getLevelOurOrderTotalSize(price_level) != 0) {
                     // Fill our orders
                     for (std::shared_ptr<Order> it : getOurOrderPtr(price_level)) {
-                        filled_orders.push_back(make_tuple(it, price_level, it->getLeverageAdjustedBaseCurrencySize()));
+                        if (it->isLiveOrder()) {
+                            filled_orders.push_back(make_tuple(it, price_level, it->getLeverageAdjustedBaseCurrencySize()));
+                        }
                     }
                 }
 
@@ -289,7 +303,9 @@ class OrderBook {
                 if (key > price_level && value_first == 1) {
                     if (getLevelOurOrderTotalSize(key) != 0) {
                         for (std::shared_ptr<Order> it : getOurOrderPtr(key)) {
-                            filled_orders.push_back(make_tuple(it, key, it->getLeverageAdjustedBaseCurrencySize()));
+                            if (it->isLiveOrder()) {
+                                filled_orders.push_back(make_tuple(it, key, it->getLeverageAdjustedBaseCurrencySize()));
+                            }
                         }
                     }
                     
