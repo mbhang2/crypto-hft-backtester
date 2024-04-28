@@ -11,14 +11,16 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    // if (argc != 3) {
-    //     cerr << "Usage: " << argv[0] << " <arg1> <arg2>\n";
-    // }
+    if (argc != 5) {
+        cerr << "Usage: " << argv[0] << "<Initial Spot Balance> <Initial Futures Balance> <Configuration Path> <Market Data Path>\n";
+    }
 
-    User user(1000000.0, 1000000.0, "./configuration/exchange.json");
+    User user(stod(argv[1]), stod(argv[2]), argv[3]);
 
     MovingAverageCross ma_cross(user, 1, 5, 20);
 
     Backtester backtester(user, &ma_cross);
-    backtester.runBacktest("./sample_data/sample_input.csv");
+    backtester.runBacktest(argv[4]);
+
+    cout << "Strategy P&L: " << backtester.getTradeLog().computePNL() << endl;
 }
