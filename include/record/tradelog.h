@@ -30,9 +30,9 @@ public:
     }
 
     /**
-     * Getter for number of trades
+     * Getter for trades
      */
-    size_t getNumTrades() const {return trades.size();}
+    vector<std::shared_ptr<Trade>> getTrades() const {return trades;}
 
     /**
      * Retrieve an trade by ID
@@ -51,5 +51,5 @@ public:
     // }
 
 private:
-    std::vector<std::shared_ptr<Trade>> trades;
+    vector<std::shared_ptr<Trade>> trades;
 };

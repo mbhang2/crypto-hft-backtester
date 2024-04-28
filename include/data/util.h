@@ -1,9 +1,15 @@
 #pragma once
 
+#include <cmath>
 #include <iostream>
 #include <string>
 
 using namespace std;
+
+double round(double num, int digits) {
+    double multiplier = std::pow(10.0, digits);
+    return std::round(num * multiplier) / multiplier;
+}
 
 /**
  * Enumeration class for order state

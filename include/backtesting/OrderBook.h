@@ -25,8 +25,128 @@ class OrderBook {
         ~OrderBook() {}
 
         /**
+         * Handles when data parser reads trade update.
+         * @param price price the trade occurred. 
+         * @param qty quantity of trade.
+         * @return vector of pointer to our order, price, and size if any of our order got filled.
+         */
+        vector<tuple<std::shared_ptr<Order>, double, double>> tradeOccurred(double price, double qty) {
+            if (price <= 0) {
+                throw invalid_argument("Price should be positive");
+                return vector<tuple<std::shared_ptr<Order>, double, double>>();
+            }
+            if (qty <= 0) {
+                throw invalid_argument("Quantity should be positive");
+                return vector<tuple<std::shared_ptr<Order>, double, double>>();
+            }
+
+            vector<tuple<std::shared_ptr<Order>, double, double>> fills;
+
+            if (book[price].second.empty()) {
+                return fills;
+            }
+
+            queue<pair<double, std::shared_ptr<Order>>>& level_queue = book[price].second;
+
+            double quantity_to_fill = qty;
+            while (quantity_to_fill != 0 && !level_queue.empty()) {
+                double subtracting = min(quantity_to_fill, level_queue.front().first);
+                level_queue.front().first -= subtracting;
+                quantity_to_fill -= subtracting;
+
+                if (level_queue.front().second != nullptr) {
+                    fills.emplace_back(make_tuple(level_queue.front().second, price, subtracting));
+                }
+
+                if (level_queue.front().first == 0.0) {
+                    level_queue.pop();
+                }
+            }
+
+            return fills;
+        }
+
+        /**
+         * Add order to the book.
+         * @param price level price level of the new order
+         * @param order_side order side of the new order
+         * @param my_order boolean whether the new order is my order
+         * @todo Consider a case where placing order will instantly fill, but not all
+         */
+        pair<std::shared_ptr<Order>, vector<pair<double, double>>> addOrder(double price_level, int order_side, double order_size, std::shared_ptr<Order> order_ptr) {
+            if (price_level <= 0) {
+                throw invalid_argument("Price level should be positive");
+                return  pair<std::shared_ptr<Order>, vector<pair<double, double>>>();
+            }
+
+            addLevel(price_level, order_side);  // Handling case where price level does not exist
+
+            if (book[price_level].first != order_side) {
+                if(order_ptr != nullptr) {
+                    return fillMarketOrder(order_ptr);
+                }
+            } else {
+                if (book[price_level].second.empty()) {
+                    book[price_level].second.push(make_pair(order_size, order_ptr));
+                } else if (book[price_level].second.back().second == order_ptr) {
+                    book[price_level].second.back().first += order_size;
+                } else {
+                    book[price_level].second.push(make_pair(order_size, order_ptr));
+                }
+            }
+
+            return  pair<std::shared_ptr<Order>, vector<pair<double, double>>>();
+        }
+
+        /**
+         * Fills limit/stop limit order instantly.
+         * @param order_ptr pointer to order.
+         * @param qty quantity that could get filled instantly
+        */
+        pair<std::shared_ptr<Order>, vector<pair<double, double>>> instantFillLimit(std::shared_ptr<Order> order_ptr, double qty) {
+            double quantity_to_fill = qty;
+            int side = order_ptr->getSide();
+
+            double best_price = (side == 1) ? getBestAsk() : getBestBid();
+            double not_our_order_total_size = getLevelNotOurOrderTotalSize(best_price);
+
+            std::vector<std::pair<double, double>> fills;
+
+            if (quantity_to_fill <= not_our_order_total_size) {
+                // Can fill entirely at the best price level
+                reduceOrder(best_price, quantity_to_fill);
+                fills.emplace_back(best_price, quantity_to_fill);
+            } else {
+                // Partial fill at the best price level
+                reduceOrder(best_price, not_our_order_total_size);
+                if (not_our_order_total_size != 0) {
+                    fills.emplace_back(best_price, not_our_order_total_size);
+                }
+                quantity_to_fill -= not_our_order_total_size;
+
+                double next_level = side == 1 ? getNextSellSideLevel(best_price) : getNextBuySideLevel(best_price);
+
+                while (next_level != -1 && quantity_to_fill > 0) {
+                    not_our_order_total_size = getLevelNotOurOrderTotalSize(next_level);
+                    double subtracting = min(quantity_to_fill, not_our_order_total_size);
+                    reduceOrder(next_level, subtracting);
+                    if (not_our_order_total_size != 0) {
+                        fills.emplace_back(next_level, subtracting);
+                    }
+                    quantity_to_fill -= subtracting;
+
+                    next_level = side == 1 ? getNextSellSideLevel(next_level) : getNextBuySideLevel(next_level);
+                }
+
+                fills.back().second += quantity_to_fill;
+            }
+
+            return {order_ptr, fills};
+        }
+
+        /**
          * Fills market/stop order.
-         * @param OrderSide
+         * @param order_ptr pointer to order.
         */
         pair<std::shared_ptr<Order>, vector<pair<double, double>>> fillMarketOrder(std::shared_ptr<Order> order_ptr) {
             double quantity_to_fill = order_ptr->getLeverageAdjustedBaseCurrencySize();
@@ -44,16 +164,20 @@ class OrderBook {
             } else {
                 // Partial fill at the best price level
                 reduceOrder(best_price, not_our_order_total_size);
-                fills.emplace_back(best_price, not_our_order_total_size);
+                if (not_our_order_total_size != 0) {
+                    fills.emplace_back(best_price, not_our_order_total_size);
+                }
                 quantity_to_fill -= not_our_order_total_size;
-
                 double next_level = side == 1 ? getNextSellSideLevel(best_price) : getNextBuySideLevel(best_price);
 
-                while (next_level != -1) {
+                while (next_level != -1 && quantity_to_fill > 0) {
                     not_our_order_total_size = getLevelNotOurOrderTotalSize(next_level);
-                    reduceOrder(next_level, min(quantity_to_fill, not_our_order_total_size));
-                    fills.emplace_back(next_level, min(quantity_to_fill, not_our_order_total_size));
-                    quantity_to_fill -= min(quantity_to_fill, not_our_order_total_size);
+                    double subtracting = min(quantity_to_fill, not_our_order_total_size);
+                    reduceOrder(next_level, subtracting);
+                    if (not_our_order_total_size != 0) {
+                        fills.emplace_back(next_level, subtracting);
+                    }
+                    quantity_to_fill -= subtracting;
 
                     next_level = side == 1 ? getNextSellSideLevel(next_level) : getNextBuySideLevel(next_level);
                 }
@@ -84,10 +208,10 @@ class OrderBook {
 
                 if (order_size > not_our_order_size + our_order_size) {
                     // Add order if updated order size is greater than original
-                    addOrder(price_level, 1, order_size - not_our_order_size - our_order_size, nullptr);
+                    addOrder(price_level, 1, order_size - getLevelTotalSize(price_level), nullptr);
                 } else if (order_size < not_our_order_size + our_order_size) {
                     // Reduce order if updated order size is lesser than original
-                    reduceOrder(price_level, min(not_our_order_size, order_size - not_our_order_size - our_order_size));
+                    reduceOrder(price_level, min(not_our_order_size, not_our_order_size + our_order_size - order_size));
                 }
             } else {
                 if (getLevelOurOrderTotalSize(price_level) != 0) {
@@ -113,7 +237,7 @@ class OrderBook {
                         }
                     }
                     
-                    book[price_level] = std::make_pair(1, std::queue<pair<double, std::shared_ptr<Order>>>());
+                    book[key] = std::make_pair(1, std::queue<pair<double, std::shared_ptr<Order>>>());
                 }
             }
 
@@ -143,7 +267,7 @@ class OrderBook {
                     addOrder(price_level, -1, order_size - not_our_order_size - our_order_size, nullptr);
                 } else if (order_size < not_our_order_size + our_order_size) {
                     // Reduce order if updated order size is lesser than original
-                    reduceOrder(price_level, min(not_our_order_size, order_size - not_our_order_size - our_order_size));
+                    reduceOrder(price_level, min(not_our_order_size, not_our_order_size + our_order_size - order_size));
                 }
             } else {
                 if (getLevelOurOrderTotalSize(price_level) != 0) {
@@ -169,7 +293,7 @@ class OrderBook {
                         }
                     }
                     
-                    book[price_level] = std::make_pair(-1, std::queue<pair<double, std::shared_ptr<Order>>>());
+                    book[key] = std::make_pair(-1, std::queue<pair<double, std::shared_ptr<Order>>>());
                 }
             }
 
@@ -266,6 +390,30 @@ class OrderBook {
             return total_size;
         }
 
+        double getLimitInstantFillQuantity(double price, int order_side) {
+            if (order_side != 1 && order_side != -1) {
+                throw invalid_argument("Order side should be 1 or -1");
+                return -1.0;
+            }
+
+            double best_price = order_side == 1 ? getBestAsk() : getBestBid();
+            double instant_fill_quantity = 0;
+
+            if (order_side == 1) {
+                while (best_price <= price && best_price != -1) {
+                    instant_fill_quantity += getLevelNotOurOrderTotalSize(best_price);
+                    best_price = getNextBuySideLevel(best_price);
+                }
+            } else {
+                while (best_price >= price && best_price != -1) {
+                    instant_fill_quantity += getLevelNotOurOrderTotalSize(best_price);
+                    best_price = getNextSellSideLevel(best_price);
+                }
+            }
+
+            return instant_fill_quantity;
+        }
+
         /**
          * Getter for pointer to exchange.
          */
@@ -292,33 +440,6 @@ class OrderBook {
             }
 
             book[price_level] = std::make_pair(order_side, std::queue<pair<double, std::shared_ptr<Order>>>());
-        }
-
-        /**
-         * Add order to the book.
-         * @param price level price level of the new order
-         * @param order_side order side of the new order
-         * @paran my_order boolean whether the new order is my order
-         */
-        void addOrder(double price_level, int order_side, double order_size, std::shared_ptr<Order> order_ptr) {
-            if (price_level <= 0) {
-                throw invalid_argument("Price level should be positive");
-                return;
-            }
-
-            addLevel(price_level, order_side);  // Handling case where price level does not exist
-
-            if (book[price_level].first != order_side) {
-                // @todo Instant order fill
-            } else {
-                if (book[price_level].second.empty()) {
-                    book[price_level].second.push(make_pair(order_size, order_ptr));
-                } else if (book[price_level].second.back().second == order_ptr) {
-                    book[price_level].second.back().first += order_size;
-                } else {
-                    book[price_level].second.push(make_pair(order_size, order_ptr));
-                }
-            }
         }
 
         /**
@@ -455,7 +576,7 @@ class OrderBook {
 
                 while (!temp_queue.empty()) {
                     const auto& order_pair = temp_queue.front();
-                    if (!order_pair.second) {
+                    if (order_pair.second == nullptr) {
                         // If the second element (shared_ptr<Order>) is nullptr
                         num_not_our_order++;
                     }

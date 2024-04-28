@@ -34,6 +34,11 @@ class Trade {
         int getID() const { return id; }
 
         /**
+         * Getter for parent order.
+         */
+        std::shared_ptr<Order> getParentOrder() const {return parent_order;}
+
+        /**
          * Getter for security.
          */
         std::shared_ptr<Security> getSecurity() const {return parent_order->getSecurity();}

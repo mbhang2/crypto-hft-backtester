@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "security.h"
-#include "enum.h"
+#include "util.h"
 #include "../rapidjson/document.h"
 #include "../rapidjson/filereadstream.h"
 
