@@ -19,10 +19,18 @@ using namespace std;
 class User {
 public:
     /**
+     * Default constructor.
+     */
+    User() {}
+
+    /**
      * Constructor for user
      */
-    User(double spot_balance_, double futures_balance_, const string& json_file_path): spot_balance(spot_balance_), futures_balance(futures_balance_) {
+    User(double spot_balance_, double futures_balance_, const string& json_file_path) {
         id = ++next_id; // Assign a unique ID
+
+        buying_power[MarketType::Spot] = spot_balance_;
+        buying_power[MarketType::Futures] = futures_balance_;
 
         FILE* json_file = fopen(json_file_path.c_str(), "r");
         if (!json_file) {
@@ -54,14 +62,16 @@ public:
     int getId() const { return id; }
 
     /**
-     * Getter for user's spot balance
+     * Getter for buying power.
      */
-    double getSpotBalance() const { return spot_balance; }
+    double getCapital(MarketType market_type) const { return buying_power.at(market_type);}
 
     /**
-     * Getter for user's futures balance
+     * Update buying power.
      */
-    double getFuturesBalance() const { return futures_balance; }
+    void updateBalance(MarketType market_type, double change) {
+        buying_power[market_type] += change;
+    }
 
     /**
      * Getter for user's list of exchanges
@@ -72,14 +82,6 @@ public:
      * Getter for user's order log
      */
     OrderLog getOrderLog() const { return orderlog; }
-
-    /**
-     * Add exchange to the list
-     * @param exchange exchange to add
-     */
-    void addExchange(Exchange& exchange) {
-        exchange_list.push_back(std::shared_ptr<Exchange>(&exchange));
-    }
 
     /**
      * Find exchange by name, case insensitive
@@ -104,8 +106,7 @@ public:
 
     private:
     int id; /*< Unique user id */
-    double spot_balance; /*< Spot balance */
-    double futures_balance; /*< Futures balance */
+    map<MarketType, double> buying_power; /*< Buying power*/
     static int next_id; /*< Static member to track the next available ID */ 
     vector<std::shared_ptr<Exchange>> exchange_list; /*< List of exchanges for the user */
     OrderLog orderlog;  /*< Order log */

@@ -25,7 +25,7 @@ class Order {
         /**
          * Constructor to create an order.
          */
-        Order(std::shared_ptr<Security> security_, MarketType market_type_, TimeType* timestamp_, string type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_ ,double price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
+        Order(std::shared_ptr<Security> security_, MarketType market_type_, std::shared_ptr<TimeType> timestamp_, string type_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_ ,double price_, std::shared_ptr<Exchange> exchange_): 
                 security(security_), market_type(market_type_), timestamp(timestamp_), type(type_), side(side_), base_currency_size(base_currency_size_), quote_currency_size(quote_currency_size_), leverage(leverage_), margin_type(margintype_), price(price_), exchange(exchange_) {
                     id = ++next_id; // Assign a unique order id
                     
@@ -62,7 +62,7 @@ class Order {
                     }
 
                     // Sanity checking price
-                    if (countDigitsAfterDecimal(price) > countDigitsAfterDecimal(exchange->getSpotTradeRules(*security)[0])) {
+                    if (countDigitsAfterDecimal(price) > countDigitsAfterDecimal(exchange->getTradingRules(market_type, *security)[0])) {
                         throw invalid_argument("Price must obey the minimum tick size");
                         state = OrderState::Rejected;
                         return;
@@ -85,20 +85,20 @@ class Order {
                         state = OrderState::Rejected;
                         return;
                     }
-                    if (market_type == MarketType::Spot && margin_type == MarginType::Isolated && leverage_ > exchange->getSpotTradeRules(*security)[10]) {
-                        throw invalid_argument("Leverage must not exceed the maximum spot isolated leverage limit");
+                    if (margin_type == MarginType::Isolated && leverage_ > exchange->getTradingRules(market_type, *security)[10]) {
+                        throw invalid_argument("Leverage must not exceed the maximum isolated leverage limit");
                         state = OrderState::Rejected;
                         return;
                     }
-                    if (market_type == MarketType::Spot && margin_type == MarginType::Cross && leverage_ > exchange->getSpotTradeRules(*security)[11]) {
-                        throw invalid_argument("Leverage must not exceed the maximum spot cross leverage limit");
+                    if (margin_type == MarginType::Cross && leverage_ > exchange->getTradingRules(market_type, *security)[11]) {
+                        throw invalid_argument("Leverage must not exceed the maximum cross leverage limit");
                         state = OrderState::Rejected;
                         return;
                     }
 
                     // Sanity checking minimum order size
                     if (base_currency_size == 0) {
-                        double base_currency_min_size = exchange->getSpotTradeRules(*security)[1];
+                        double base_currency_min_size = exchange->getTradingRules(market_type, *security)[1];
                         base_currency_size = int((quote_currency_size / price)/base_currency_min_size) * base_currency_min_size;
                     } else if (quote_currency_size == 0) {
                         quote_currency_size = base_currency_size * price;
@@ -107,42 +107,35 @@ class Order {
                     leverage_adjusted_base_currency_size = leverage * base_currency_size;
 
 
-                    if (market_type == MarketType::Spot && leverage_adjusted_base_currency_size < exchange->getSpotTradeRules(*security)[1]) {
+                    if (leverage_adjusted_base_currency_size < exchange->getTradingRules(market_type, *security)[1]) {
                         throw invalid_argument("Order value must be greater than the minimum order value");
                         state = OrderState::Rejected;
                         return;
                     }
-                    if (market_type == MarketType::Spot && quote_currency_size * leverage < exchange->getSpotTradeRules(*security)[2]) {
+                    if (quote_currency_size * leverage < exchange->getTradingRules(market_type, *security)[2]) {
                         throw invalid_argument("Order value must be greater than the minimum order value");
                         state = OrderState::Rejected;
                         return;
                     }
 
                     // Sanity checking maximum trade size
-                    if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange->getSpotTradeRules(*security)[3] != -1 && leverage_adjusted_base_currency_size > exchange->getSpotTradeRules(*security)[3])) {
+                    if ((type == "LIMIT" || type == "STOPLIMIT") && (exchange->getTradingRules(market_type, *security)[3] != -1 && leverage_adjusted_base_currency_size > exchange->getTradingRules(market_type, *security)[3])) {
                         throw invalid_argument("Order value must not exceed the maximum limit order value");
                         state = OrderState::Rejected;
                         return;
                     }
-                    if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange->getSpotTradeRules(*security)[4] != -1 && leverage * quote_currency_size > exchange->getSpotTradeRules(*security)[4])) {
+                    if ((type == "LIMIT" || type == "STOPLIMIT") && (exchange->getTradingRules(market_type, *security)[4] != -1 && leverage * quote_currency_size > exchange->getTradingRules(market_type, *security)[4])) {
                         throw invalid_argument("Order value must not exceed the maximum limit order value");
                         state = OrderState::Rejected;
                         return;
                     }
-                    if (market_type == MarketType::Spot && (type == "MARKET" || type == "STOP") && (exchange->getSpotTradeRules(*security)[5] != -1 && leverage_adjusted_base_currency_size > exchange->getSpotTradeRules(*security)[5])) {
+                    if ((type == "MARKET" || type == "STOP") && (exchange->getTradingRules(market_type, *security)[5] != -1 && leverage_adjusted_base_currency_size > exchange->getTradingRules(market_type, *security)[5])) {
                         throw invalid_argument("Order value must not exceed the maximum market order value");
                         state = OrderState::Rejected;
                         return;
                     }
-                    if (market_type == MarketType::Spot && (type == "LIMIT" || type == "STOPLIMIT") && (exchange->getSpotTradeRules(*security)[6] != -1 && leverage * quote_currency_size > exchange->getSpotTradeRules(*security)[6])) {
+                    if ((type == "LIMIT" || type == "STOPLIMIT") && (exchange->getTradingRules(market_type, *security)[6] != -1 && leverage * quote_currency_size > exchange->getTradingRules(market_type, *security)[6])) {
                         throw invalid_argument("Order value must not exceed the maximum market order value");
-                        state = OrderState::Rejected;
-                        return;
-                    }
-
-                    // Check if order exceeds buying power
-                    if (quote_currency_size * leverage > buying_power_) {
-                        throw invalid_argument("Order value exceeds buyihg power");
                         state = OrderState::Rejected;
                         return;
                     }
@@ -189,7 +182,7 @@ class Order {
                 average_fill_price = (average_fill_price * filled_size + filled_price * qty)/(filled_size+qty);
                 filled_size += qty;
                 base_currency_size -= qty/leverage;
-                base_currency_size = int(base_currency_size/exchange->getSpotTradeRules(*security)[1]) * exchange->getSpotTradeRules(*security)[1];
+                base_currency_size = int(base_currency_size/exchange->getTradingRules(market_type, *security)[1]) * exchange->getTradingRules(market_type, *security)[1];
                 quote_currency_size = base_currency_size * price;
                 leverage_adjusted_base_currency_size = base_currency_size * leverage;
 
@@ -229,9 +222,9 @@ class Order {
         }
 
         /**
-         * Order arrived at the exchange.
+         * Reject order.
          */
-        void orderArrived() {state = OrderState::Working;}
+        void rejectOrder() {state = OrderState::Rejected;}
 
         /**
          * Getter for unique id.
@@ -323,10 +316,10 @@ class Order {
         }
 
     protected:
-        int id;                         /*< Unique ID */
+        int id;     /*< Unique ID */
         MarketType market_type;   /*< Market type */
         std::shared_ptr<Security> security;        /*< Security */
-        TimeType* timestamp;         /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
+        std::shared_ptr<TimeType> timestamp;       /*< UTC timestamp */
         string type;              /*< Order type */
         const int side;                 /*< -1 for SELL, 1 for BUY */
         double base_currency_size;      /*< Quantity of the order in base currency before leverage (For BTC/USDT, order size in BTC) */
@@ -354,8 +347,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Limit(std::shared_ptr<Security> security_, MarketType market_type_ , TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
-            Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {}
+    Limit(std::shared_ptr<Security> security_, MarketType market_type_ , std::shared_ptr<TimeType> timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double price_, std::shared_ptr<Exchange> exchange_): 
+            Order(security_, market_type_, timestamp_, "LIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {}
 
     /**
      * Checks if the order could be filled for limit and stop limit class
@@ -401,14 +394,14 @@ public:
             throw invalid_argument("Order size must only provided in base currency or quote currency, not both");
             return;
         }
-        if (countDigitsAfterDecimal(modified_price) > countDigitsAfterDecimal(exchange->getSpotTradeRules(*security)[0])) {
+        if (countDigitsAfterDecimal(modified_price) > countDigitsAfterDecimal(exchange->getTradingRules(market_type, *security)[0])) {
             throw invalid_argument("Modified price must obey the minimum tick size");
             return;
         }
 
         if (modified_base_currency_size == 0) {
             quote_currency_size = modified_quote_currency_size;
-            double base_currency_min_size = exchange->getSpotTradeRules(*security)[1];
+            double base_currency_min_size = exchange->getTradingRules(market_type, *security)[1];
             base_currency_size = int((modified_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
         } else if (modified_quote_currency_size == 0) {
             base_currency_size = modified_base_currency_size;
@@ -449,8 +442,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Market(std::shared_ptr<Security> security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double current_price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
-            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_, buying_power_) {}
+    Market(std::shared_ptr<Security> security_, MarketType market_type_, std::shared_ptr<TimeType> timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double current_price_, std::shared_ptr<Exchange> exchange_): 
+            Order(security_, market_type_, timestamp_, "MARKET", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, current_price_, exchange_) {}
 
     /**
      * Checks if the order could be filled for limit and stop limit class
@@ -466,18 +459,18 @@ public:
     /**
      * Override << operator for Market class.
      */
-    // friend ostream& operator<<(ostream& os, const Market& market) {
+    // friend ostream& operator<<(ostream& os, Market& market) {
     //     string s = (market.getSide() == 1) ? "Buy" : "Sell";
     //     os << "========== Order Information ==========" << endl;
     //     os << "Security: " << market.getSecurity() << endl;
-    //     os << "Exchange: " << market.getExchange().getName() << endl;
-    //     os << "Timestamp: " << market.getTimestamp() << endl;
+    //     os << "Exchange: " << market.getExchange()->getName() << endl;
+    //     os << "Timestamp: " << market.getTimestamp().toString() << endl;
     //     os << "Order Type: " << market.getOrderType() << endl;
     //     os << "Side: " << s << endl;
-    //     os << "Size: " << market.getBaseCurrencySize() << market.getSecurity().getBase() << endl;
+    //     os << "Size: " << market.getBaseCurrencySize() << market.getSecurity()->getBase() << endl;
     //     os << "Margin Type: " << market.getMarginType() << endl;
     //     os << "Leverage: " << market.getLeverage() << "x" << endl;
-    //     os << "Leverage Adjusted Size: " << market.getLeverageAdjustedBaseCurrencySize() << market.getSecurity().getBase() << endl;
+    //     os << "Leverage Adjusted Size: " << market.getLeverageAdjustedBaseCurrencySize() << market.getSecurity()->getBase() << endl;
     //     os << "Order State: " << market.getOrderState() << endl;
     //     os << "=======================================" << endl;
     //     return os;
@@ -493,8 +486,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    Stop(std::shared_ptr<Security> security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double trigger_price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
-            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_, buying_power_) {
+    Stop(std::shared_ptr<Security> security_, MarketType market_type_, std::shared_ptr<TimeType> timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double trigger_price_, std::shared_ptr<Exchange> exchange_): 
+            Order(security_, market_type_, timestamp_, "STOP", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, trigger_price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -557,14 +550,14 @@ public:
             throw invalid_argument("Modified trigger price must be positive");
             return;
         }
-        if (countDigitsAfterDecimal(modified_trigger_price) > countDigitsAfterDecimal(exchange->getSpotTradeRules(*security)[0])) {
+        if (countDigitsAfterDecimal(modified_trigger_price) > countDigitsAfterDecimal(exchange->getTradingRules(market_type, *security)[0])) {
             throw invalid_argument("Modified trigger price must obey the minimum tick size");
             return;
         }
         
        if (modified_base_currency_size == 0) {
             quote_currency_size = modified_quote_currency_size;
-            double base_currency_min_size = exchange->getSpotTradeRules(*security)[1];
+            double base_currency_min_size = exchange->getTradingRules(market_type, *security)[1];
             base_currency_size = int((modified_quote_currency_size / modified_trigger_price)/base_currency_min_size) * base_currency_min_size;
         } else if (modified_quote_currency_size == 0) {
             base_currency_size = modified_base_currency_size;
@@ -623,8 +616,8 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(std::shared_ptr<Security> security_, MarketType market_type_, TimeType* timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, MarginType margintype_, double trigger_price_, std::shared_ptr<Exchange> exchange_, double buying_power_): 
-            Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_, buying_power_) {
+    StopLimit(std::shared_ptr<Security> security_, MarketType market_type_, std::shared_ptr<TimeType> timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, MarginType margintype_, double trigger_price_, std::shared_ptr<Exchange> exchange_): 
+            Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
 
@@ -695,18 +688,18 @@ public:
             throw invalid_argument("Order size should only provided in base currency or quote currency, not both");
             return;
         }
-        if (countDigitsAfterDecimal(modified_price) > countDigitsAfterDecimal(exchange->getSpotTradeRules(*security)[0])) {
+        if (countDigitsAfterDecimal(modified_price) > countDigitsAfterDecimal(exchange->getTradingRules(market_type, *security)[0])) {
             throw invalid_argument("Modified price must obey the minimum tick size");
             return;
         }
-        if (countDigitsAfterDecimal(modified_trigger_price) > countDigitsAfterDecimal(exchange->getSpotTradeRules(*security)[0])) {
+        if (countDigitsAfterDecimal(modified_trigger_price) > countDigitsAfterDecimal(exchange->getTradingRules(market_type, *security)[0])) {
             throw invalid_argument("Modified trigger price must obey the minimum tick size");
             return;
         }
 
         if (modified_base_currency_size == 0) {
             quote_currency_size = modified_quote_currency_size;
-            double base_currency_min_size = exchange->getSpotTradeRules(*security)[1];
+            double base_currency_min_size = exchange->getTradingRules(market_type, *security)[1];
             base_currency_size = int((modified_quote_currency_size / modified_price)/base_currency_min_size) * base_currency_min_size;
         } else if (modified_quote_currency_size == 0) {
             base_currency_size = modified_base_currency_size;

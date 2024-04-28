@@ -1,12 +1,14 @@
 #pragma once
 
 #include "./order.h"
-#include "./OrderBook.h"
+#include "./OME.h"
+#include "./orderbook.h"
 #include "./strategy.h"
 #include "./trade.h"
 #include "./user.h"
 #include "../data/exchange.h"
 #include "../data/security.h"
+#include "../record/tradelog.h"
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -29,7 +31,7 @@ using namespace boost;
 class Backtester {
     public:
         using MarketKey = tuple<MarketType, Exchange, Security>;
-        using MarketMap = unordered_map<MarketKey, std::shared_ptr<Orderbook>, MarketKeyHash>;
+        using MarketMap = unordered_map<MarketKey, std::shared_ptr<OrderBook>, MarketKeyHash>;
 
     /**
      * Constructor
@@ -38,10 +40,10 @@ class Backtester {
         // Setup Orderbooks
         for (auto&& exchanges : user.getExchanges()) {
             for (auto&& securities : exchanges->getListedSecurities(MarketType::Spot)) {
-                orderbooks[make_tuple(MarketType::Spot, *exchanges, *securities)] = make_shared<Orderbook>(*exchanges, MarketType::Spot, *securities);
+                orderbooks[make_tuple(MarketType::Spot, *exchanges, *securities)] = make_shared<OrderBook>(exchanges, MarketType::Spot, securities);
             }
             for (auto&& securities : exchanges->getListedSecurities(MarketType::Futures)) {
-                orderbooks[make_tuple(MarketType::Futures, *exchanges, *securities)] = make_shared<Orderbook>(*exchanges, MarketType::Futures, *securities);
+                orderbooks[make_tuple(MarketType::Futures, *exchanges, *securities)] = make_shared<OrderBook>(exchanges, MarketType::Futures, securities);
             }
         }
     }
@@ -66,6 +68,7 @@ class Backtester {
         vector<std::shared_ptr<Order>> current_orders;
         vector<TimeType*> timetype_vector;
         ifstream file(data_path);
+        double last_traded_price = 0;
 
         if (!file.is_open()) {
             cerr << "Error opening the file." << endl;
@@ -95,43 +98,66 @@ class Backtester {
 
             // Calling strategy functions
             vector<std::shared_ptr<Order>> order_vector;
-            MarketType s = MarketType::Spot;
-            TimeType* tt = new TimeType(tokens[0]);
-            timetype_vector.push_back(tt);
+            MarketType mt = tokens[5] == "S" ? MarketType::Spot : MarketType::Futures;
+            std::shared_ptr<TimeType> tt = std::make_shared<TimeType>(tokens[0]);
+            std::shared_ptr<OrderBook> ob = getOrderbook(mt, *exchange_ptr, *security_ptr);
 
             if (tokens[2] == "T") {
-                // TradeEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[6]), stod(tokens[7]));
-                TradeEventMsg msg(tt, exchange_ptr, s, security_ptr, stod(tokens[6])*180, stod(tokens[7]));
+                // cout << "Trade Update" << endl;
+                // @todo: update orderbook
+                last_traded_price = stod(tokens[6]);
+                // OME ome(*ob.get());
+
+                // ome.matchOrder(last_traded_price, stod(tokens[7]), false, OrderSide::Buy);
+                // ome.matchOrder(last_traded_price, stod(tokens[7]), false, OrderSide::Sell);
+
+                TradeEventMsg msg(tt, exchange_ptr, mt, security_ptr, ob, stod(tokens[6]), stod(tokens[7]));
                 order_vector = strategy->onTrade(msg);
             }
 
-            else if (tokens[2] == "BID_") {
-                // QuoteEventMsg msg(tokens[0], *exchange_ptr, tokens[5] == "S" ? MarketType::Spot : MarketType::Futures, *security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
-                QuoteEventMsg msg(tt, exchange_ptr, s, security_ptr, stod(tokens[8]), stod(tokens[9]), stod(tokens[10]), stod(tokens[11]));
-                // order_vector = strategy->onTopQuote(msg);
-                // @todo: update orderbook
+            else if (tokens[2] == "BID_UPDATE" || tokens[2] == "ASK_UPDATE") {
+                // Update order book
+                vector<tuple<std::shared_ptr<Order>, double, double>> filled_orders = tokens[2] == "BID_UPDATE" ? ob->buySideUpdated(stod(tokens[8]), stod(tokens[9])) 
+                        : ob->sellSideUpdated(stod(tokens[14]), stod(tokens[15]));
+
+                // @Todo: update buying power
+                for (auto it : filled_orders) {
+                    tradelog.addTrade(std::make_shared<Trade>(std::get<0>(it), tt, std::get<0>(it)->getSide(), std::get<2>(it), std::get<1>(it), true));
+                }
+
+                QuoteEventMsg msg(tt, exchange_ptr, mt, security_ptr, ob, stod(tokens[8]), stod(tokens[9]), stod(tokens[14]), stod(tokens[15]));
+                order_vector = strategy->onTopQuote(msg);
             }
 
-            else if (tokens[2] == "D") {
-    
+            else if (tokens[2] == "BUY_SIDE_UPDATE" || tokens[2] == "SELL_SIDE_UPDATE") {
+                // Update buying power
+                vector<tuple<std::shared_ptr<Order>, double, double>> filled_orders = tokens[2] == "BUY_SIDE_UPDATE" ? ob->buySideUpdated(stod(tokens[6]), stod(tokens[7])) 
+                        : ob->sellSideUpdated(stod(tokens[6]), stod(tokens[7]));
+
+                // @Todo: Record in trade log
+                for (auto it : filled_orders) {
+                    tradelog.addTrade(std::make_shared<Trade>(std::get<0>(it), tt, std::get<0>(it)->getSide(), std::get<2>(it), std::get<1>(it), true));
+                }
+
+                DepthEventMsg msg(tt, exchange_ptr, mt, security_ptr, ob, tokens[2] == "BUY_SIDE_UPDATE" ? 1 : -1, stod(tokens[6]), stod(tokens[7]));
+                order_vector = strategy->onDepth(msg);
             }
 
             // Append order to the back of the current order
             if (!order_vector.empty()) {
-
                 for (auto&& it : order_vector) {
-                    // Security s = it->getSecurity();
-                    // cout << "Address while going over for loop: " << &s << endl;
-                    // string s = it->getTimestamp();
                     current_orders.push_back(it);
+                    // todo update capital
+                    orderlog.addOrder(it);
                 }
             }
 
             // Work with orders
             for (auto&& it : current_orders) {
                 if (it->checkFillability(1,2)) {
+                    // Consider cases
                     double size_to_fill = it->getLeverageAdjustedBaseCurrencySize();
-                    it->fillOrder(size_to_fill, stod(tokens[6])*180);
+                    it->fillOrder(size_to_fill, last_traded_price);
                     
                     if (it->getSide() == 1) {
                         strategy->updatePosition(it->getMarketType(), *exchange_ptr, *security_ptr, size_to_fill);
@@ -148,6 +174,22 @@ class Backtester {
                 }
             }
 
+            // for (auto&& it : current_orders) {
+            //     string s = (it->getSide() == 1) ? "Buy" : "Sell";
+            //     cout << "========== Order Information ==========" << endl;
+            //     cout << "Security: " << *(it->getSecurity()) << endl;
+            //     cout << "Exchange: " << it->getExchange()->getName() << endl;
+            //     cout << "Timestamp: " << it->getTimestamp().toString() << endl;
+            //     cout << "Order Type: " << it->getOrderType() << endl;
+            //     cout << "Side: " << s << endl;
+            //     cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity()->getBase() << endl;
+            //     cout << "Margin Type: " << it->getMarginType() << endl;
+            //     cout << "Leverage: " << it->getLeverage() << "x" << endl;
+            //     cout << "Leverage Adjusted Size: " << it->getLeverageAdjustedBaseCurrencySize() << it->getSecurity()->getBase() << endl;
+            //     cout << "Order State: " << it->getOrderState() << endl;
+            //     cout << "=======================================" << endl;
+            // }
+
             // Remove not-live orders
             for (auto it = current_orders.begin(); it != current_orders.end();) {
                 if (!(*it)->isLiveOrder() && !((*it)->getOrderState() == OrderState::SentToExchange)) {
@@ -158,27 +200,27 @@ class Backtester {
             }
 
             // cout << "Done" << endl;
-
-            for (auto&& it : current_orders) {
-                string s = (it->getSide() == 1) ? "Buy" : "Sell";
-                cout << "========== Order Information ==========" << endl;
-                cout << "Security: " << *(it->getSecurity()) << endl;
-                cout << "Exchange: " << it->getExchange()->getName() << endl;
-                cout << "Timestamp: " << it->getTimestamp().toString() << endl;
-                cout << "Order Type: " << it->getOrderType() << endl;
-                cout << "Side: " << s << endl;
-                cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity()->getBase() << endl;
-                cout << "Margin Type: " << it->getMarginType() << endl;
-                cout << "Leverage: " << it->getLeverage() << "x" << endl;
-                cout << "Leverage Adjusted Size: " << it->getLeverageAdjustedBaseCurrencySize() << it->getSecurity()->getBase() << endl;
-                cout << "Order State: " << it->getOrderState() << endl;
-                cout << "=======================================" << endl;
-            }
         }
+
+        cout << tradelog.getNumTrades() << endl;
     }
 
     private:
     User user;
     Strategy* strategy;
     MarketMap orderbooks;
+    OrderLog orderlog;
+    TradeLog tradelog;
+
+    std::shared_ptr<OrderBook> getOrderbook(MarketType market_type, const Exchange& exchange, const Security& security) {
+        MarketKey key = make_tuple(market_type, exchange, security);
+            auto it = orderbooks.find(key);
+
+            if (it != orderbooks.end()) {
+                return it->second;
+            }
+
+            throw invalid_argument("Orderbook not found");
+            return nullptr;
+    }
 };

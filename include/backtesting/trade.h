@@ -16,9 +16,11 @@ class Trade {
         /**
          * Constructor to create a trade.
          */
-        Trade(int parent_order_id_, Security security_, const string& timestamp_, int side_, double base_currency_size_, double price_): 
-                parent_order_id(parent_order_id_), security(security_), timestamp(timestamp_), side(side_), base_currency_size(base_currency_size_), price(price_) {
+        Trade(std::shared_ptr<Order> parent_order_, std::shared_ptr<TimeType> timestamp_, int side_, double base_currency_size_, double price_, bool is_maker_): 
+                parent_order(parent_order_), timestamp(timestamp_), side(side_), base_currency_size(base_currency_size_), price(price_), is_maker(is_maker_) {
                     id = ++next_id; // Assign a unique order id
+
+                    fee = is_maker ? base_currency_size * price * parent_order->getExchange()->getMakerFee(parent_order->getMarketType()) / 100 : base_currency_size * price * parent_order->getExchange()->getTakerFee(parent_order->getMarketType()) / 100;
                 }
 
         /**
@@ -34,12 +36,12 @@ class Trade {
         /**
          * Getter for security.
          */
-        Security getSecurity() const {return security;}
+        std::shared_ptr<Security> getSecurity() const {return parent_order->getSecurity();}
 
         /**
          * Getter for timestamp.
          */
-        string getTimestamp() const {return timestamp;}
+        std::shared_ptr<TimeType> getTimestamp() const {return timestamp;}
 
         /**
          * Getter for side.
@@ -59,7 +61,7 @@ class Trade {
         /**
          * Getter for exchange.
          */
-        Exchange getExchange() const {return exchange;}
+        std::shared_ptr<Exchange> getExchange() const {return parent_order->getExchange();}
 
         /**
          * Getter for boolean if the trade was making or taking
@@ -73,14 +75,14 @@ class Trade {
 
     private:
         int id;                     /*< Unique id */
-        int parent_order_id;        /*< Parent order's unique id */
         static int next_id;         /*< Static member to track the next available ID */ 
-        Security security;          /*< Name of the security */
-        const string timestamp;     /*< UTC date time, specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff' */
+        std::shared_ptr<Order> parent_order;    /*< Parent order */
+        std::shared_ptr<TimeType> timestamp;    /*< UTC timestamp */
         int side;                   /*< -1 for SELL, 1 for BUY */
         double base_currency_size;  /*< Quantity of the order in base currency */
         double price;               /*< Price at which trade occurred */
-        Exchange exchange;          /*< Exchange the trade occurred */
         bool is_maker;              /*< Whether the trade was making or taking */
         double fee;                 /*< Execution fee associated with the order */
 };
+
+int Trade::next_id = 0;
