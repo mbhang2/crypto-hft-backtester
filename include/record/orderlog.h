@@ -30,26 +30,10 @@ public:
     }
 
     /**
-     * Getter for number of Orders
+     * Getter for  Orders
      */
-    size_t getNumOrders() const {return orders.size();}
-
-    /**
-     * Retrieve an order by ID
-     * @param order_id unique order id of an order to retrieve
-     * @return reference to the order
-     */
-    // const Order& getOrderByID(int order_id) const {
-    //     for (Order* order : orders) {
-    //         if (order->getID() == order_id) {
-    //             return *order;
-    //         }
-    //     }
-        
-    //     // Throw an exception when order not found
-    //     throw runtime_error("Order with ID " + to_string(order_id) + " not found.");
-    // }
+    vector<std::shared_ptr<Order>> getOrders() const {return orders;}
 
 private:
-    std::vector<std::shared_ptr<Order>> orders;
+    vector<std::shared_ptr<Order>> orders;
 };

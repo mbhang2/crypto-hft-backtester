@@ -1,7 +1,6 @@
 #pragma once
 
 #include "./order.h"
-#include "./OME.h"
 #include "./orderbook.h"
 #include "./strategy.h"
 #include "./trade.h"
@@ -109,8 +108,12 @@ class Backtester {
                 // @Todo: update buying power and positions
                 for (auto it : filled_orders) {
                     std::get<0>(it)->fillOrder(std::get<2>(it), std::get<1>(it));
+
                     Trade* trade = new Trade(std::get<0>(it), tt, std::get<0>(it)->getSide(), std::get<2>(it), std::get<1>(it), true);
                     tradelog.addTrade(std::shared_ptr<Trade>(trade));
+
+                    user.updateBalance(std::get<0>(it)->getMarketType(), -trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee());
+                    strategy->updatePosition(std::get<0>(it)->getMarketType(), *std::get<0>(it)->getExchange(), *std::get<0>(it)->getSecurity(), std::get<0>(it)->getSide()*std::get<2>(it));
                 }
 
 
@@ -119,15 +122,17 @@ class Backtester {
             }
 
             else if (tokens[2] == "BID_UPDATE" || tokens[2] == "ASK_UPDATE") {
-                // Update order book
                 vector<tuple<std::shared_ptr<Order>, double, double>> filled_orders = tokens[2] == "BID_UPDATE" ? ob->buySideUpdated(stod(tokens[8]), stod(tokens[9])) 
                         : ob->sellSideUpdated(stod(tokens[14]), stod(tokens[15]));
 
-                // @Todo: update buying power and positions
                 for (auto it : filled_orders) {
                     std::get<0>(it)->fillOrder(std::get<2>(it), std::get<1>(it));
+
                     Trade* trade = new Trade(std::get<0>(it), tt, std::get<0>(it)->getSide(), std::get<2>(it), std::get<1>(it), true);
                     tradelog.addTrade(std::shared_ptr<Trade>(trade));
+
+                    user.updateBalance(std::get<0>(it)->getMarketType(), -trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee());
+                    strategy->updatePosition(std::get<0>(it)->getMarketType(), *std::get<0>(it)->getExchange(), *std::get<0>(it)->getSecurity(), std::get<0>(it)->getSide()*std::get<2>(it));
                 }
 
                 QuoteEventMsg msg(tt, exchange_ptr, mt, security_ptr, ob, stod(tokens[8]), stod(tokens[9]), stod(tokens[14]), stod(tokens[15]));
@@ -135,15 +140,17 @@ class Backtester {
             }
 
             else if (tokens[2] == "BUY_SIDE_UPDATE" || tokens[2] == "SELL_SIDE_UPDATE") {
-                // Update buying power
                 vector<tuple<std::shared_ptr<Order>, double, double>> filled_orders = tokens[2] == "BUY_SIDE_UPDATE" ? ob->buySideUpdated(stod(tokens[6]), stod(tokens[7])) 
                         : ob->sellSideUpdated(stod(tokens[6]), stod(tokens[7]));
 
-                // @Todo: update buying power and positions
                 for (auto it : filled_orders) {
                     std::get<0>(it)->fillOrder(std::get<2>(it), std::get<1>(it));
+
                     Trade* trade = new Trade(std::get<0>(it), tt, std::get<0>(it)->getSide(), std::get<2>(it), std::get<1>(it), true);
                     tradelog.addTrade(std::shared_ptr<Trade>(trade));
+
+                    user.updateBalance(std::get<0>(it)->getMarketType(), -trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee());
+                    strategy->updatePosition(std::get<0>(it)->getMarketType(), *std::get<0>(it)->getExchange(), *std::get<0>(it)->getSecurity(), std::get<0>(it)->getSide()*std::get<2>(it));
                 }
 
                 DepthEventMsg msg(tt, exchange_ptr, mt, security_ptr, ob, tokens[2] == "BUY_SIDE_UPDATE" ? 1 : -1, stod(tokens[6]), stod(tokens[7]));
@@ -153,16 +160,18 @@ class Backtester {
             // Append order to the back of the current order
             if (!order_vector.empty()) {
                 for (auto&& it : order_vector) {
-                    // todo update capital
-
-                    current_orders.push_back(it);
-                    orderlog.addOrder(it);
+                    if (user.getCapital(it->getMarketType()) < it->getLeverageAdjustedBaseCurrencySize() * it->getPrice()) {
+                        throw std::runtime_error("Submitted order exceeds the available buying power of " + to_string(user.getCapital(it->getMarketType())));
+                        it->rejectOrder();
+                    } else {
+                        current_orders.push_back(it);
+                        orderlog.addOrder(it);
+                    }
                 }
             }
 
             // Work with orders
             for (auto&& it : current_orders) {
-                // @todo check stop and stop limit trigger
                 if (it->isLiveOrder() && (it->getOrderType() == "STOP" || it->getOrderType() == "STOPLIMIT")) {
                     it->checkTriggered(last_traded_price);
                 }
@@ -172,10 +181,11 @@ class Backtester {
                     if (it->getOrderType() == "MARKET" || it->getOrderType() == "STOP") {
                         fills = ob->fillMarketOrder(it);
                     } else if (it->getOrderType() == "LIMIT" || it->getOrderType() == "STOPLIMIT") {
-                        double qty_fillable = ob->getLimitInstantFillQuantity(it->getPrice(), it->getSide());
-                        fills = ob->instantFillLimit(it, qty_fillable);
-
-                        ob->addOrder(it->getPrice(), it->getSide(), it->getLeverageAdjustedBaseCurrencySize(), it);
+                        double qty_fillable = min(ob->getLimitInstantFillQuantity(it->getPrice(), it->getSide()), it->getLeverageAdjustedBaseCurrencySize());
+                        if (qty_fillable != 0) { fills = ob->instantFillLimit(it, qty_fillable); }
+                        if (qty_fillable < it->getLeverageAdjustedBaseCurrencySize()) {
+                            ob->addOrder(it->getPrice(), it->getSide(), it->getLeverageAdjustedBaseCurrencySize() - qty_fillable, it);
+                        }
                     }
 
                     for (auto& fill_pair : fills.second) {
@@ -190,8 +200,8 @@ class Backtester {
                         Trade* trade = new Trade(it, tt, it->getSide(), fill_pair.second, fill_pair.first, false);
                         tradelog.addTrade(std::shared_ptr<Trade>(trade));
 
-                        // Update buying power
-                    }
+                        user.updateBalance(it->getMarketType(), -trade->getSide() * fill_pair.first * fill_pair.second - trade->getFee());
+                        }
                 }
                 if (it->getOrderState() == OrderState::SentToExchange) {
                     it->checkOrderReceived(*tt);
@@ -201,22 +211,6 @@ class Backtester {
                 }
             }
 
-            // for (auto&& it : current_orders) {
-            //     string s = (it->getSide() == 1) ? "Buy" : "Sell";
-            //     cout << "========== Order Information ==========" << endl;
-            //     cout << "Security: " << *(it->getSecurity()) << endl;
-            //     cout << "Exchange: " << it->getExchange()->getName() << endl;
-            //     cout << "Timestamp: " << it->getTimestamp().toString() << endl;
-            //     cout << "Order Type: " << it->getOrderType() << endl;
-            //     cout << "Side: " << s << endl;
-            //     cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity()->getBase() << endl;
-            //     cout << "Margin Type: " << it->getMarginType() << endl;
-            //     cout << "Leverage: " << it->getLeverage() << "x" << endl;
-            //     cout << "Leverage Adjusted Size: " << it->getLeverageAdjustedBaseCurrencySize() << it->getSecurity()->getBase() << endl;
-            //     cout << "Order State: " << it->getOrderState() << endl;
-            //     cout << "=======================================" << endl;
-            // }
-
             // Remove not-live orders
             for (auto it = current_orders.begin(); it != current_orders.end();) {
                 if (!(*it)->isLiveOrder() && !((*it)->getOrderState() == OrderState::SentToExchange)) {
@@ -225,21 +219,6 @@ class Backtester {
                     ++it;
                 }
             }
-
-            // cout << "Done" << endl;
-        }
-
-        for (auto& it : tradelog.getTrades()) {
-             string s = (it->getSide() == 1) ? "Buy" : "Sell";
-                cout << "========== Trade Information ==========" << endl;
-                cout << "Trade ID: " << it->getID() << endl;
-                cout << "Security: " << *(it->getSecurity()) << endl;
-                cout << "Exchange: " << it->getExchange()->getName() << endl;
-                cout << "Timestamp: " << it->getTimestamp()->toString() << endl;
-                cout << "Side: " << s << endl;
-                cout << "Size: " << it->getBaseCurrencySize() << it->getSecurity()->getBase() << endl;
-                cout << "Parent Order ID: " << it->getParentOrder()->getID() << endl;
-                cout << "=======================================" << endl;
         }
     }
 
