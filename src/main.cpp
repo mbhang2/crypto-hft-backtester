@@ -17,10 +17,11 @@ int main(int argc, char* argv[]) {
 
     User user(stod(argv[1]), stod(argv[2]), argv[3]);
 
-    MovingAverageCross ma_cross(user, 1, 5, 20);
+    MovingAverageCross ma_cross(user, 1, 2, 5);
 
     Backtester backtester(user, &ma_cross);
     backtester.runBacktest(argv[4]);
+    backtester.getTradeLog().exportToCSV("./sample_data/sample_result.csv");
 
-    cout << "Strategy P&L: " << backtester.getTradeLog().computePNL() << endl;
+    cout << "Strategy Total Realized P&L: " << backtester.getTradeLog().computeTotalRealizedPNL() << endl;
 }

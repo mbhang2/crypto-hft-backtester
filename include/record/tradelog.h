@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+#include <iomanip>
 #include <stdexcept>
 #include <vector>
 #include "../backtesting/trade.h"
@@ -35,9 +37,23 @@ public:
     vector<std::shared_ptr<Trade>> getTrades() const {return trades;}
 
     /**
+     * Getter for balance history
+     */
+    vector<pair<std::shared_ptr<TimeType>, pair<double, double>>> getBalanceHistory() const {
+        return balance_history;
+    }
+
+    /**
+     * Add to balance history
+     */
+    void addBalanceHistory(std::shared_ptr<TimeType> tt, double spot_bal, double futures_bal) {
+        balance_history.emplace_back(make_pair(tt, make_pair(spot_bal, futures_bal)));
+    }
+
+    /**
      * Compute P&L.
      */
-    double computePNL() const {
+    double computeTotalRealizedPNL() const {
         double pnl = 0;
 
         for (auto& it : trades) {
@@ -47,6 +63,60 @@ public:
         return pnl;
     }
 
+    double computeWeightedAverageFillPrice(double size) const {
+        double checkedSize = 0.0;
+        double weightedSum = 0.0;
+
+        for (auto it = trades.rbegin(); it != trades.rend(); ++it) {
+        const auto& trade = *it;
+        double tradeSize = min(trade->getBaseCurrencySize(), size-checkedSize);
+        double tradePrice = trade->getPrice();
+
+        // Accumulate checked size
+        checkedSize += tradeSize;
+
+        // Update the weighted sum
+        weightedSum += tradeSize * tradePrice;
+
+        // Stop when checked size reaches the specified size
+        if (checkedSize == size) {
+            break;
+        }
+    }
+
+    // Calculate the weighted average
+    double weightedAverage = weightedSum / checkedSize;
+    return weightedAverage;
+    }
+
+    /**
+     * Function to compute Trading pairs
+     */
+    // vector<pair<vector<pair<std::shared_ptr<Trade>, double>>, vector<pair<std::shared_ptr<Trade>, double>>>> getTradePairs() {
+
+    // }
+
+    /**
+     * Export balance history to CSV format
+     */
+    void exportToCSV(const string& filename) {
+        std::ofstream outfile(filename);
+        outfile << std::fixed << std::setprecision(2);
+
+        if (outfile) {
+            outfile << "TIMESTAMP,SPOT_BALANCE,FUTURES_BALANCE" << "\n";
+            for (const auto& it : balance_history) {
+                outfile << it.first->toString() << "," << it.second.first << "," << it.second.second << "\n";
+            }
+            outfile.close();
+            std::cout << "Data exported to " << filename << std::endl;
+        } else {
+            std::cerr << "Error opening file for writing." << std::endl;
+        }
+    }
+
+
 private:
-    vector<std::shared_ptr<Trade>> trades;
+    vector<std::shared_ptr<Trade>> trades;      /*< Vector of pointers to trades */
+    vector<pair<std::shared_ptr<TimeType>, pair<double, double>>> balance_history;      /*< Vector recording real time balance */
 };
