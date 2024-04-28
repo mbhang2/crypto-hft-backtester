@@ -222,6 +222,11 @@ class Backtester {
         }
     }
 
+    /**
+     * Getter for trade log.
+     */
+    TradeLog& getTradeLog() {return tradelog;}
+
     private:
     User user;
     Strategy* strategy;
