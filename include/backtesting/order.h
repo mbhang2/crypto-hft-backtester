@@ -1,13 +1,12 @@
 #pragma once
 
-#include <chrono>
-#include <ctime>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include "../data/enum.h"
+#include "../data/util.h"
 #include "../data/exchange.h"
 #include "../data/security.h"
 #include "../data/timetype.h"
@@ -155,6 +154,11 @@ class Order {
         virtual bool checkFillability(double best_bid, double best_ask) = 0;
 
         /**
+         * Checks if the order could be triggered for stop and stop limit class
+         */
+        virtual void checkTriggered(double current_price) = 0;
+
+        /**
          * Fills the order and change the order status accordingly
          * @param qty Base currency quantity to fill.
         */
@@ -181,10 +185,9 @@ class Order {
             } else {
                 average_fill_price = (average_fill_price * filled_size + filled_price * qty)/(filled_size+qty);
                 filled_size += qty;
-                base_currency_size -= qty/leverage;
-                base_currency_size = int(base_currency_size/exchange->getTradingRules(market_type, *security)[1]) * exchange->getTradingRules(market_type, *security)[1];
+                leverage_adjusted_base_currency_size -= qty;
+                base_currency_size /= leverage;
                 quote_currency_size = base_currency_size * price;
-                leverage_adjusted_base_currency_size = base_currency_size * leverage;
 
                 if (base_currency_size > 0) {
                     state = OrderState::PartiallyFilled;
@@ -364,6 +367,9 @@ public:
         return false;
     }
 
+    void checkTriggered(double current_price) override {
+        return;
+    }
 
     /**
      * Modifies the order. 
@@ -452,8 +458,11 @@ public:
      * @return Boolean whether the order could be filled
      */
     bool checkFillability(double best_bid, double best_ask) override {
-        cout << "Market fillabilitiy called" << endl;
         return isLiveOrder();
+    }
+
+    void checkTriggered(double current_price) override {
+        return;
     }
 
     /**
@@ -508,17 +517,15 @@ public:
      * @param current_price Current trading price of a security.
      * @return Boolean whether the order is triggered
      */
-    bool checkTriggered(double current_price) {
+    void checkTriggered(double current_price) override {
         if (current_price <= 0.0) {
             throw invalid_argument("Current price must be positive");
-            return false;
+            return;
         }
 
         if ((side == 1 && current_price >= trigger_price) || (side == -1 && current_price <= trigger_price)) {
             triggered = true;
-            return true;
         }
-        return false;
     }
 
     /**
@@ -641,17 +648,15 @@ public:
      * @param current_price Current trading price of a security.
      * @return Boolean whether the order is triggered
      */
-    bool checkTriggered(double current_price) {
+    void checkTriggered(double current_price) override {
         if (current_price <= 0.0) {
             throw invalid_argument("Current price must be positive");
-            return false;
+            return;
         }
 
         if ((side == 1 && current_price >= trigger_price) || (side == -1 && current_price <= trigger_price)) {
             triggered = true;
-            return true;
         }
-        return false;
     }
 
     /**

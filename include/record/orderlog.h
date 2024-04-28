@@ -30,6 +30,11 @@ public:
     }
 
     /**
+     * Getter for number of Orders
+     */
+    size_t getNumOrders() const {return orders.size();}
+
+    /**
      * Retrieve an order by ID
      * @param order_id unique order id of an order to retrieve
      * @return reference to the order

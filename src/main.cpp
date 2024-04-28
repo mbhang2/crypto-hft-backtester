@@ -21,9 +21,4 @@ int main(int argc, char* argv[]) {
 
     Backtester backtester(user, &ma_cross);
     backtester.runBacktest("./sample_data/sample_input.csv");
-
-    // Market market(btcusdt, MarketType::Spot, "2024-04-19 20:30:23.123456789", -1, 2, 0, 5, MarginType::Isolated, 69321.23, binance, 1000000);
-    // cout << market.getSide() << endl;
-    // market.fillOrder(3, 60000);
-    // cout << market << endl;
 }
