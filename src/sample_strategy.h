@@ -50,8 +50,8 @@ class MovingAverageCross: public Strategy {
         /**
          * Constructor
          */
-        MovingAverageCross(User& user_, int candlestick_minute_ = 1, int short_length_ = 5, int long_length_ = 20): 
-                Strategy("Moving Average Cross", user_), candlestick_minute(candlestick_minute_), short_length(short_length_), long_length(long_length_) {}
+        MovingAverageCross(User& user_, int candlestick_second_ = 5, int short_length_ = 5, int long_length_ = 20): 
+                Strategy("Moving Average Cross", user_), candlestick_second(candlestick_second_), short_length(short_length_), long_length(long_length_) {}
 
         /**
          * Destructor
@@ -71,9 +71,9 @@ class MovingAverageCross: public Strategy {
             double trade_size = event_msg.size;
 
             if (candlestick_vector.empty()) {
-                string rounded_timestamp = roundDownTimestamp(trade_timestamp, candlestick_minute);
+                string rounded_timestamp = roundDownTimestamp(trade_timestamp, candlestick_second);
                 candlestick_vector.push_back(Candlestick(rounded_timestamp, trade_price, trade_price, trade_price, trade_price, trade_size));
-                next_candlestick_open = addMinutesToTimestamp(rounded_timestamp, candlestick_minute);
+                next_candlestick_open = addSecondsToTimestamp(rounded_timestamp, candlestick_second);
             } 
             else if (trade_timestamp.compare(next_candlestick_open) < 0) {
                 Candlestick cd = candlestick_vector.back();
@@ -85,9 +85,11 @@ class MovingAverageCross: public Strategy {
                 cd.volume_ += trade_size;
             } 
             else {
-                string rounded_timestamp = roundDownTimestamp(trade_timestamp, candlestick_minute);
-                next_candlestick_open = addMinutesToTimestamp(rounded_timestamp, candlestick_minute);
+                string rounded_timestamp = roundDownTimestamp(trade_timestamp, candlestick_second);
+                next_candlestick_open = addSecondsToTimestamp(rounded_timestamp, candlestick_second);
                 candlestick_vector.push_back(Candlestick(rounded_timestamp, trade_price, trade_price, trade_price, trade_price, trade_size));
+
+                // cout << rounded_timestamp << endl;
 
                 if (candlestick_vector.size() == long_length + 1) {
                     int index = 0;
@@ -126,21 +128,21 @@ class MovingAverageCross: public Strategy {
                     // Check long entry condition
                     if (prev_short_ma < prev_long_ma && short_ma > long_ma) {
                         if (curr_pos == 0) {
-                            Market* market = new Market(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, int(user.getCapital(event_msg.market_type) * 0.1 / trade_price), 0, 1, mt, trade_price, event_msg.exchange);
-                            orders.push_back(std::shared_ptr<Order>(market));
+                            Limit* limit = new Limit(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2), 0, 1, mt, trade_price, event_msg.exchange);
+                            orders.push_back(std::shared_ptr<Order>(limit));
                         } else {
-                            Market* market = new Market(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, int(user.getCapital(event_msg.market_type) * 0.1 / trade_price) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange);
-                            orders.push_back(std::shared_ptr<Order>(market));
+                            Limit* limit = new Limit(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange);
+                            orders.push_back(std::shared_ptr<Order>(limit));
                         }
                     }
                     // Check short entry condition
                     else if (prev_short_ma > prev_long_ma && short_ma < long_ma) {
                         if (curr_pos == 0) {
-                            Market* market = new Market(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, int(user.getCapital(event_msg.market_type) * 0.1 / trade_price), 0, 1, mt, trade_price, event_msg.exchange);
-                            orders.push_back(std::shared_ptr<Order>(market));
+                            Limit* limit = new Limit(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2), 0, 1, mt, trade_price, event_msg.exchange);
+                            orders.push_back(std::shared_ptr<Order>(limit));
                         } else {
-                            Market* market = new Market(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, int(user.getCapital(event_msg.market_type) * 0.1 / trade_price) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange);
-                            orders.push_back(std::shared_ptr<Order>(market));
+                            Limit* limit = new Limit(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange);
+                            orders.push_back(std::shared_ptr<Order>(limit));
                         }
                     }
 
@@ -167,46 +169,46 @@ class MovingAverageCross: public Strategy {
 
     protected:
         string next_candlestick_open;           /*< String timestamp for next candlestick open */
-        const int candlestick_minute;           /*< Candlestick timeframe in minutes */
+        const int candlestick_second;           /*< Candlestick timeframe in seconds */
         const int short_length;                 /*< Short moving average length */
         const int long_length;                  /*< Long moving average length */
         vector<Candlestick> candlestick_vector;   /*< Queue of candlesticks */
 
     private:
     /**
-     * Helper function that rounds down a timestamp to the nearest minute increment
+     * Helper function that rounds down a timestamp to the nearest second increment
      * @param inputTimestamp timestamp specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff'
-     * @param minute_increment minute resolution to round down to
+     * @param second_increment second resolution to round down to
      * @return rounded down timestamp in the same format
     */
-    string roundDownTimestamp(const string& input_timestamp, int minute_increment) {
+    string roundDownTimestamp(const string& input_timestamp, int second_increment) {
         // Parse the input timestamp
         tm tmStruct = {};
         istringstream ss(input_timestamp);
         ss >> get_time(&tmStruct, "%Y-%m-%d %H:%M:%S");
 
         // Calculate the rounded down timestamp
-        int totalMinutes = tmStruct.tm_hour * 60 + tmStruct.tm_min;
-        int roundedMinutes = (totalMinutes / minute_increment) * minute_increment;
-        tmStruct.tm_hour = roundedMinutes / 60;
-        tmStruct.tm_min = roundedMinutes % 60;
-        tmStruct.tm_sec = 0;
+        int total_seconds = tmStruct.tm_hour * 3600 + tmStruct.tm_min * 60 + tmStruct.tm_sec;
+        int roundedSeconds = total_seconds - (total_seconds % second_increment);
+        tmStruct.tm_hour = roundedSeconds / 3600;
+        tmStruct.tm_min = (roundedSeconds % 3600) / 60;
+        tmStruct.tm_sec = roundedSeconds % 60;
 
         // Convert back to string
         ostringstream result;
         result << put_time(&tmStruct, "%Y-%m-%d %H:%M:%S");
         result << ".000000000"; // Append fractional seconds
 
-    return result.str();
+        return result.str();
     }
 
     /**
-     * Helper function that adds given minutes to the timestamp
+     * Helper function that adds given seconds to the timestamp
      * @param inputTimestamp timestamp specified in format 'yyyy-MM-dd HH:mm:ss.fffffffff'
-     * @param minute_increment minute resolution to round down to
+     * @param second_increment second resolution to round down to
      * @return timestamp after adding time in the same format
     */
-    string addMinutesToTimestamp(const string& input_timestamp, int minutes_to_add) {
+    string addSecondsToTimestamp(const string& input_timestamp, int seconds_to_add) {
         // Parse the input timestamp
         tm tmStruct = {};
         istringstream ss(input_timestamp);
@@ -214,7 +216,7 @@ class MovingAverageCross: public Strategy {
 
         // Calculate the new timestamp
         time_t timestampInSeconds = mktime(&tmStruct);
-        timestampInSeconds += minutes_to_add * 60; // Convert minutes to seconds
+        timestampInSeconds += seconds_to_add; //
 
         // Convert back to struct tm
         tm newTmStruct = *localtime(&timestampInSeconds);

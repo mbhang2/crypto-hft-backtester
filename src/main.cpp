@@ -17,11 +17,13 @@ int main(int argc, char* argv[]) {
 
     User user(stod(argv[1]), stod(argv[2]), argv[3]);
 
-    MovingAverageCross ma_cross(user, 1, 2, 5);
+    MovingAverageCross ma_cross(user, 180, 5, 20);
 
     Backtester backtester(user, &ma_cross);
     backtester.runBacktest(argv[4]);
-    backtester.getTradeLog().exportToCSV("./sample_data/sample_result.csv");
+    backtester.getTradeLog().exportBalanceHistoryToCSV("./sample_data/sample_result.csv");
+    backtester.getTradeLog().exportTradeLogToCSV("./sample_data/sample_tradelog.csv");
 
-    cout << "Strategy Total Realized P&L: " << backtester.getTradeLog().computeTotalRealizedPNL() << endl;
+    cout << "Strategy Total P&L: " << backtester.getTradeLog().getBalanceHistory().back().second.first + backtester.getTradeLog().getBalanceHistory().back().second.first
+            - stod(argv[1]) - stod(argv[2]) << endl;
 }

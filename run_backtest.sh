@@ -14,6 +14,7 @@ g++ -std=c++20 -I./boost_1_84_0 ./src/main.cpp -o backtest_executable
 
 if [ $? -eq 0 ]; then
     ./backtest_executable "$arg1" "$arg2" "$arg3" "$arg4"
+    python3 ./src/main.py
 else
     echo "Compilation failed. Please check your code."
 fi
