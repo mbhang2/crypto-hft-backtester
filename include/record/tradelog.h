@@ -35,20 +35,17 @@ public:
     vector<std::shared_ptr<Trade>> getTrades() const {return trades;}
 
     /**
-     * Retrieve an trade by ID
-     * @param trade_id unique trade id of an trade to retrieve
-     * @return reference to the trade
+     * Compute P&L.
      */
-    // const Trade& getTradeByID(int trade_id) const {
-    //     for (const Trade& trade : trades) {
-    //         if (trade.getID() == trade_id) {
-    //             return trade;
-    //         }
-    //     }
-        
-    //     // Throw an exception when trade not found
-    //     throw runtime_error("trade with ID " + to_string(trade_id) + " not found.");
-    // }
+    double computePNL() const {
+        double pnl = 0;
+
+        for (auto& it : trades) {
+            pnl -= it->getSide() * it->getPrice() * it->getBaseCurrencySize() + it->getFee();
+        }
+
+        return pnl;
+    }
 
 private:
     vector<std::shared_ptr<Trade>> trades;

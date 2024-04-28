@@ -416,27 +416,6 @@ public:
 
         leverage_adjusted_base_currency_size = leverage * base_currency_size;
     }
-
-    /**
-     * Override << operator for Limit class.
-     */
-    // friend ostream& operator<<(ostream& os, const Limit& limit) {
-    //     string s = (limit.getSide() == 1) ? "Buy" : "Sell";
-    //     os << "========== Order Information ==========" << endl;
-    //     os << "Security: " << limit.getSecurity() << endl;
-    //     os << "Exchange: " << limit.getExchange().getName() << endl;
-    //     os << "Timestamp: " << limit.getTimestamp() << endl;
-    //     os << "Order Type: " << limit.getOrderType() << endl;
-    //     os << "Side: " << s << endl;
-    //     os << "Size: " << limit.getBaseCurrencySize() << limit.getSecurity().getBase() << endl;
-    //     os << "Margin Type: " << limit.getMarginType() << endl;
-    //     os << "Leverage: " << limit.getLeverage() << "x" << endl;
-    //     os << "Leverage Adjusted Size: " << limit.getLeverageAdjustedBaseCurrencySize() << limit.getSecurity().getBase() << endl;
-    //     os << "Price: " << limit.getPrice() << limit.getSecurity().getQuote() << endl;
-    //     os << "Order State: " << limit.getOrderState() << endl;
-    //     os << "=======================================" << endl;
-    //     return os;
-    // }
 };
 
 
@@ -464,26 +443,6 @@ public:
     void checkTriggered(double current_price) override {
         return;
     }
-
-    /**
-     * Override << operator for Market class.
-     */
-    // friend ostream& operator<<(ostream& os, Market& market) {
-    //     string s = (market.getSide() == 1) ? "Buy" : "Sell";
-    //     os << "========== Order Information ==========" << endl;
-    //     os << "Security: " << market.getSecurity() << endl;
-    //     os << "Exchange: " << market.getExchange()->getName() << endl;
-    //     os << "Timestamp: " << market.getTimestamp().toString() << endl;
-    //     os << "Order Type: " << market.getOrderType() << endl;
-    //     os << "Side: " << s << endl;
-    //     os << "Size: " << market.getBaseCurrencySize() << market.getSecurity()->getBase() << endl;
-    //     os << "Margin Type: " << market.getMarginType() << endl;
-    //     os << "Leverage: " << market.getLeverage() << "x" << endl;
-    //     os << "Leverage Adjusted Size: " << market.getLeverageAdjustedBaseCurrencySize() << market.getSecurity()->getBase() << endl;
-    //     os << "Order State: " << market.getOrderState() << endl;
-    //     os << "=======================================" << endl;
-    //     return os;
-    // }
 };
 
 
@@ -585,29 +544,6 @@ public:
      */
     double getTriggerPrice() const {return trigger_price;}
 
-    /**
-     * Override << operator for Limit class.
-     */
-    // friend ostream& operator<<(ostream& os, const Stop& stop) {
-    //     string s = (stop.getSide() == 1) ? "Buy" : "Sell";
-    //     string trigger_status = (stop.isTriggered() == 1) ? "Triggered" : "Not Triggered";
-    //     os << "========== Order Information ==========" << endl;
-    //     os << "Security: " << stop.getSecurity() << endl;
-    //     os << "Exchange: " << stop.getExchange().getName() << endl;
-    //     os << "Timestamp: " << stop.getTimestamp() << endl;
-    //     os << "Order Type: " << stop.getOrderType() << endl;
-    //     os << "Side: " << s << endl;
-    //     os << "Size: " << stop.getBaseCurrencySize() << stop.getSecurity().getBase() << endl;
-    //     os << "Margin Type: " << stop.getMarginType() << endl;
-    //     os << "Leverage: " << stop.getLeverage() << "x" << endl;
-    //     os << "Leverage Adjusted Size: " << stop.getLeverageAdjustedBaseCurrencySize() << stop.getSecurity().getBase() << endl;
-    //     os << "Trigger Price: " << stop.getTriggerPrice() << stop.getSecurity().getQuote() << endl;
-    //     os << "Trigger Status: " << trigger_status << endl;
-    //     os << "Order State: " << stop.getOrderState() << endl;
-    //     os << "=======================================" << endl;
-    //     return os;
-    // }
-
 private:
     bool triggered;         /*< Whether the trigger price has been hit */
     double trigger_price;   /*< Trigger price for the stop order */
@@ -623,7 +559,7 @@ public:
     /**
      * Constructor to create an order.
      */
-    StopLimit(std::shared_ptr<Security> security_, MarketType market_type_, std::shared_ptr<TimeType> timestamp_, int side_, double base_currency_size_, double quote_currency_size_, double price_, unsigned leverage_, MarginType margintype_, double trigger_price_, std::shared_ptr<Exchange> exchange_): 
+    StopLimit(std::shared_ptr<Security> security_, MarketType market_type_, std::shared_ptr<TimeType> timestamp_, int side_, double base_currency_size_, double quote_currency_size_, unsigned leverage_, MarginType margintype_, double price_, double trigger_price_, std::shared_ptr<Exchange> exchange_): 
             Order(security_, market_type_, timestamp_, "STOPLIMIT", side_, base_currency_size_, quote_currency_size_, leverage_, margintype_, price_, exchange_) {
                 triggered = false, trigger_price = trigger_price_;
             }
@@ -728,30 +664,6 @@ public:
      * Getter for trigger price.
      */
     double getTriggerPrice() const {return trigger_price;}
-
-    /**
-     * Override << operator for Limit class.
-     */
-    // friend ostream& operator<<(ostream& os, const StopLimit& stoplimit) {
-    //     string s = (stoplimit.getSide() == 1) ? "Buy" : "Sell";
-    //     string trigger_status = (stoplimit.isTriggered() == 1) ? "Triggered" : "Not Triggered";
-    //     os << "========== Order Information ==========" << endl;
-    //     os << "Security: " << stoplimit.getSecurity() << endl;
-    //     os << "Exchange: " << stoplimit.getExchange().getName() << endl;
-    //     os << "Timestamp: " << stoplimit.getTimestamp() << endl;
-    //     os << "Order Type: " << stoplimit.getOrderType() << endl;
-    //     os << "Side: " << s << endl;
-    //     os << "Size: " << stoplimit.getBaseCurrencySize() << stoplimit.getSecurity().getBase() << endl;
-    //     os << "Margin Type: " << stoplimit.getMarginType() << endl;
-    //     os << "Leverage: " << stoplimit.getLeverage() << "x" << endl;
-    //     os << "Leverage Adjusted Size: " << stoplimit.getLeverageAdjustedBaseCurrencySize() << stoplimit.getSecurity().getBase() << endl;
-    //     os << "Price: " << stoplimit.getPrice() << endl;
-    //     os << "Trigger Price: " << stoplimit.getTriggerPrice() << endl;
-    //     os << "Trigger Status: " << trigger_status << endl;
-    //     os << "Order State: " << stoplimit.getOrderState() << endl;
-    //     os << "=======================================" << endl;
-    //     return os;
-    // }
 
 private:
     bool triggered;         /*< Whether the trigger price has been hit */
