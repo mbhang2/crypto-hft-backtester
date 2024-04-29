@@ -57,6 +57,13 @@ public:
     ~User() {}
 
     /**
+     * Clear/Reset user's buying power
+     */
+    void Clear(map<MarketType, double> initial_buying_power) {
+        buying_power = initial_buying_power;
+    }
+
+    /**
      * Getter for user id
      */
     int getId() const { return id; }
@@ -77,11 +84,6 @@ public:
      * Getter for user's list of exchanges
      */
     vector<std::shared_ptr<Exchange>> getExchanges() const { return exchange_list; }
-
-    /**
-     * Getter for user's order log
-     */
-    OrderLog getOrderLog() const { return orderlog; }
 
     /**
      * Find exchange by name, case insensitive
@@ -109,7 +111,6 @@ public:
     map<MarketType, double> buying_power; /*< Buying power*/
     static int next_id; /*< Static member to track the next available ID */ 
     vector<std::shared_ptr<Exchange>> exchange_list; /*< List of exchanges for the user */
-    OrderLog orderlog;  /*< Order log */
 };
 
 int User::next_id = 0;

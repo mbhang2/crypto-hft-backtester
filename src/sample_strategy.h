@@ -58,6 +58,11 @@ class MovingAverageCross: public Strategy {
          */
         virtual ~MovingAverageCross() {}
 
+        void Clear() {
+            candlestick_vector.clear();
+            position.clear();
+        }
+
         /**
          * Triggers when a trade event message arrives
          * @param event_msg trade event message
@@ -88,8 +93,6 @@ class MovingAverageCross: public Strategy {
                 string rounded_timestamp = roundDownTimestamp(trade_timestamp, candlestick_second);
                 next_candlestick_open = addSecondsToTimestamp(rounded_timestamp, candlestick_second);
                 candlestick_vector.push_back(Candlestick(rounded_timestamp, trade_price, trade_price, trade_price, trade_price, trade_size));
-
-                // cout << rounded_timestamp << endl;
 
                 if (candlestick_vector.size() == long_length + 1) {
                     int index = 0;
@@ -128,21 +131,21 @@ class MovingAverageCross: public Strategy {
                     // Check long entry condition
                     if (prev_short_ma < prev_long_ma && short_ma > long_ma) {
                         if (curr_pos == 0) {
-                            Limit* limit = new Limit(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2), 0, 1, mt, trade_price, event_msg.exchange);
-                            orders.push_back(std::shared_ptr<Order>(limit));
+                            Market* market = new Market(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2), 0, 1, mt, trade_price, event_msg.exchange);
+                            orders.push_back(std::shared_ptr<Order>(market));
                         } else {
-                            Limit* limit = new Limit(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange);
-                            orders.push_back(std::shared_ptr<Order>(limit));
+                            Market* market = new Market(event_msg.security, event_msg.market_type, event_msg.timestamp, 1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange);
+                            orders.push_back(std::shared_ptr<Order>(market));
                         }
                     }
                     // Check short entry condition
                     else if (prev_short_ma > prev_long_ma && short_ma < long_ma) {
                         if (curr_pos == 0) {
-                            Limit* limit = new Limit(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2), 0, 1, mt, trade_price, event_msg.exchange);
-                            orders.push_back(std::shared_ptr<Order>(limit));
+                            Market* market = new Market(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2), 0, 1, mt, trade_price, event_msg.exchange);
+                            orders.push_back(std::shared_ptr<Order>(market));
                         } else {
-                            Limit* limit = new Limit(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange);
-                            orders.push_back(std::shared_ptr<Order>(limit));
+                            Market* market = new Market(event_msg.security, event_msg.market_type, event_msg.timestamp, -1, round(user.getCapital(event_msg.market_type) * 0.03 / trade_price, 2) + abs(curr_pos), 0, 1, mt, trade_price, event_msg.exchange);
+                            orders.push_back(std::shared_ptr<Order>(market));
                         }
                     }
 

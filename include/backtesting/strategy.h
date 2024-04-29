@@ -55,6 +55,11 @@ class Strategy {
         virtual ~Strategy() = default;
 
         /**
+         * Clear/Reset members
+         */
+        virtual void Clear() = 0;
+
+        /**
          * Triggers when a trade event message arrives
          * @param event_msg trade event message
          * @return vector of orders to submit. Return empty vector if no orders to submit.

@@ -22,6 +22,13 @@ public:
     ~OrderLog() {}
 
     /**
+     * Clear/Reset
+     */
+    void Clear() {
+        orders.clear();
+    }
+
+    /**
      * Add order to the order list
      * @param order order to add
      */
