@@ -220,6 +220,8 @@ class Order {
             long long time_difference = current_timestamp.toNanosecondsSinceEpoch() - timestamp->toNanosecondsSinceEpoch();
 
             if (time_difference >= exchange->getSendingLatency()) {
+                cout << "Latency: " << exchange->getSendingLatency() << endl;
+                cout << "Order arrived at the exchange at " << current_timestamp.toString() << endl;
                 state = OrderState::Working;
             }   
         }

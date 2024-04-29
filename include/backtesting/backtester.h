@@ -37,6 +37,31 @@ class Backtester {
      */
     Backtester(User& user_, Strategy* strategy_): user(user_), strategy(strategy_) {
         // Setup Orderbooks
+        loadOrderBook();
+    }
+
+    /**
+     * Destructor
+     */
+    ~Backtester() {}
+
+    /**
+     * Clears/Resets all members
+    */
+    void Clear(map<MarketType, double> initial_buying_power) {
+        orderbooks.clear();
+        loadOrderBook();
+        orderlog.Clear();
+        tradelog.Clear();
+        last_traded_price.clear();
+        user.Clear(initial_buying_power);
+        strategy->Clear();
+    }
+
+    /**
+     * Load Orderbook data.
+     */
+    void loadOrderBook() {
         for (auto&& exchanges : user.getExchanges()) {
             for (auto&& securities : exchanges->getListedSecurities(MarketType::Spot)) {
                 orderbooks[make_tuple(MarketType::Spot, *exchanges, *securities)] = make_shared<OrderBook>(exchanges, MarketType::Spot, securities);
@@ -46,11 +71,6 @@ class Backtester {
             }
         }
     }
-
-    /**
-     * Destructor
-     */
-    ~Backtester() {}
 
     /**
      * Run backtest
@@ -100,11 +120,11 @@ class Backtester {
             std::shared_ptr<TimeType> tt = std::make_shared<TimeType>(tokens[0]);
             std::shared_ptr<OrderBook> ob = getOrderbook(mt, *exchange_ptr, *security_ptr);
 
+
             if (tokens[2] == "T") {
                 last_traded_price[make_pair(mt, security_ptr)] = stod(tokens[6]);
                 vector<tuple<std::shared_ptr<Order>, double, double>> filled_orders = ob->tradeOccurred(last_traded_price[make_pair(mt, security_ptr)], stod(tokens[7]));
 
-                // @Todo: update buying power and positions
                 for (auto it : filled_orders) {
                     std::get<0>(it)->fillOrder(std::get<2>(it), std::get<1>(it));
 
@@ -167,12 +187,16 @@ class Backtester {
                     } else {
                         current_orders.push_back(it);
                         orderlog.addOrder(it);
+                        cout << "Trade added at time " << tt->toString() << endl;
                     }
                 }
             }
 
             // Work with orders
             for (auto&& it : current_orders) {
+                if (it->getOrderState() == OrderState::SentToExchange) {
+                    it->checkOrderReceived(*tt);
+                }
                 if (it->isLiveOrder() && (it->getOrderType() == "STOP" || it->getOrderType() == "STOPLIMIT")) {
                     it->checkTriggered(last_traded_price[make_pair(mt, security_ptr)]);
                 }
@@ -203,12 +227,6 @@ class Backtester {
 
                         user.updateBalance(it->getMarketType(), -trade->getSide() * fill_pair.first * fill_pair.second - trade->getFee());
                         }
-                }
-                if (it->getOrderState() == OrderState::SentToExchange) {
-                    it->checkOrderReceived(*tt);
-                    if (it->getOrderState() != OrderState::Working) {
-                        break;
-                    }
                 }
             }
 
@@ -246,6 +264,43 @@ class Backtester {
     }
 
     /**
+     * Run latency analysis.
+     * 
+     * Latency = [0, 10, 25, 50, 100, 200, 500, 1000] ns
+     */
+    void run_latency_analysis(const string& data_path, const string& output_path) {
+        map<MarketType, double> initial_buying_power = {{MarketType::Spot, user.getCapital(MarketType::Spot)}, {MarketType::Futures, user.getCapital(MarketType::Futures)}};
+        vector<int> latency_values = {0, 10, 25, 50, 100, 200, 500, 1000};
+
+        for (auto latency : latency_values) {
+            Clear(initial_buying_power);    // Reset
+
+            // Set latency value
+            for (auto exchange : user.getExchanges()) {
+                exchange->setSendingLatency(latency);
+                cout << exchange->getName() << ": " << exchange->getSendingLatency() << endl;
+            }
+
+            runBacktest(data_path);
+            latency_analysis_pnl.emplace_back(make_pair(latency, make_pair(tradelog.getBalanceHistory().back().second.first, tradelog.getBalanceHistory().back().second.second)));
+        }
+
+        std::ofstream outfile(output_path);
+        outfile << std::fixed << std::setprecision(2);
+
+        if (outfile) {
+            outfile << "LATENCY,SPOT_BALANCE,FUTURES_BALANCE" << "\n";
+            for (const auto& it : latency_analysis_pnl) {
+                outfile << it.first << "," << it.second.first << "," << it.second.second << "\n";
+            }
+            outfile.close();
+            std::cout << "Data exported to " << output_path << std::endl;
+        } else {
+            std::cerr << "Error opening file for writing." << std::endl;
+        }
+    }
+
+    /**
      * Getter for trade log.
      */
     TradeLog& getTradeLog() {return tradelog;}
@@ -257,6 +312,7 @@ class Backtester {
     OrderLog orderlog;
     TradeLog tradelog;
     map<pair<MarketType, std::shared_ptr<Security>>, double> last_traded_price;
+    vector<pair<int, pair<double, double>>> latency_analysis_pnl;
 
     std::shared_ptr<OrderBook> getOrderbook(MarketType market_type, const Exchange& exchange, const Security& security) {
         MarketKey key = make_tuple(market_type, exchange, security);

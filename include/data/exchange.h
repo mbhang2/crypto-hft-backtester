@@ -169,6 +169,16 @@ class Exchange {
         int getSendingLatency()const {return sending_latency;}
 
         /**
+         * Setter for the receiving latency.
+         */
+        void setReceivingLatency(int latency) {receiving_latency = latency;}
+
+        /**
+         * Setter for the sending latency.
+         */
+        void setSendingLatency(int latency) {sending_latency = latency;}
+
+        /**
          * Getter for maker fee.
          */
         double getMakerFee(MarketType market_type) const {return maker_fee.at(market_type);}

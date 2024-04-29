@@ -24,6 +24,14 @@ public:
     ~TradeLog() {}
 
     /**
+     * Clear/Reset
+     */
+    void Clear() {
+        trades.clear();
+        balance_history.clear();
+    }
+
+    /**
      * Add trade to the trade list
      * @param trade trade to add
      */
