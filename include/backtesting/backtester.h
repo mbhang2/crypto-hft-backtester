@@ -187,7 +187,6 @@ class Backtester {
                     } else {
                         current_orders.push_back(it);
                         orderlog.addOrder(it);
-                        cout << "Trade added at time " << tt->toString() << endl;
                     }
                 }
             }
@@ -278,7 +277,6 @@ class Backtester {
             // Set latency value
             for (auto exchange : user.getExchanges()) {
                 exchange->setSendingLatency(latency);
-                cout << exchange->getName() << ": " << exchange->getSendingLatency() << endl;
             }
 
             runBacktest(data_path);
