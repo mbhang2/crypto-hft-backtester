@@ -126,13 +126,15 @@ The **Crypto Trading Strategy Backtester** is a powerful tool designed to evalua
 
 ### 4.1 Running Backtest
 
-Ensure that the script file has the execution permission by running the following command in the terminal:
+1. Follow the comments in /src/backtest.cpp regarding adding your own strategy instance. 
+
+2. Ensure that the script file has the execution permission by running the following command in the terminal:
 
 ```console
 chmod +x ./run_backtest.sh
 ```
 
-Then run the following command:
+3. Then run the following command:
 
 ```console
 ./run_backtest.sh <Initial Spot Balance> <Initial Futures Balance> <Configuration Path> <Market Data Path>
@@ -141,13 +143,15 @@ Then run the following command:
 
 ### 4.2 Running Latency Analysis
 
-Ensure that the script file has the execution permission by running the following command in the terminal:
+1. Follow the comments in /src/latency_analysis.cpp regarding adding your own strategy instance. 
+
+2. Ensure that the script file has the execution permission by running the following command in the terminal:
 
 ```console
 chmod +x ./run_latency_analysis.sh
 ```
 
-Then run the following command:
+3. Then run the following command:
 
 ```console
 ./run_latency_analysis.sh <Initial Spot Balance> <Initial Futures Balance> <Configuration Path> <Market Data Path>
