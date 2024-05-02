@@ -5,11 +5,28 @@
 
 ## 1. Introduction
 
+The **Crypto Trading Strategy Backtester** is a powerful tool designed to evaluate and analyze trading strategies in the cryptocurrency market. Whether you're a seasoned trader or a beginner, this backtesting framework allows you to fine-tune your strategies, assess their performance, and make informed decisions.
+
+### Key Features:
+
+1. **Flexible Configuration:**
+   - Users can easily configure exchange trade rules, fee structures, and latency parameters to match their specific trading environment.
+   - Fine-tune your settings to simulate real-world conditions and optimize your strategy.
+
+2. **Automated Backtesting:**
+   - Simply feed the historical market data (in CSV format) and your custom C++ strategy file into the backtester.
+   - The backtester automatically runs the backtest, providing detailed performance metrics and visualizations.
+
+3. **Latency Analysis:**
+   - Gain insights into how latency impacts your strategy's profitability.
+   - Run latency analysis experiments to understand how changes in execution speed affect your overall profit and loss (PNL).
+
+
 ## 2. Class 
 
 ## 3. Data Input Format
 
-## 3.1 Exchange Configuration Json Format
+### 3.1 Exchange Configuration Json Format
 ``` cpp
 {
     "Exchange 1": {
@@ -75,7 +92,7 @@
 }
 ```
 
-## 3.2 Market Data CSV Format
+### 3.2 Market Data CSV Format
 
  - **COLLECTION_TIME**: UTC datetime when data arrived in format "*yyyy-mm-dd HH:MM:SS.fffffffff*".  
  - **MESSAGE_ID**: Unique id of the message (not required).
@@ -124,3 +141,14 @@ Then run the following command:
 
 ### 4.2 Running Latency Analysis
 
+Ensure that the script file has the execution permission by running the following command in the terminal:
+
+```console
+chmod +x ./run_latency_analysis.sh
+```
+
+Then run the following command:
+
+```console
+./run_latency_analysis.sh <Initial Spot Balance> <Initial Futures Balance> <Configuration Path> <Market Data Path>
+```
