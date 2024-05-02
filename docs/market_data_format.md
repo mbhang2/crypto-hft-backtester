@@ -1,0 +1,28 @@
+## CSV Line Format
+
+ - **COLLECTION_TIME**: UTC datetime when data arrived in format "*yyyy-mm-dd HH:MM:SS.fffffffff*".  
+ - **MESSAGE_ID**: Unique id of the message (not required).
+ - **MESSAGE_TYPE**: 
+	 - 'T' for trade updates.
+	 - "BID_UPDATE" or "ASK_UPDATE" for quote updates.
+	 - "BUY_SIDE_UPDATE" or "SELL_SIDE_UPDATE" for depth updates.
+- **SYMBOL**: Symbol of the instrument in pair notation *(Ex: BTC/USDT)*.
+- **MARKET_CENTER**: Market center (exchange) the update took place in.
+- **PRICE**:
+	- Trade price for trade updates.
+	- Updated orderbook level for depth updates.
+- **SIZE**:
+	- Trade size for trade updates.
+	- Updated orderbook size for depth updates.
+- **BID_PRICE_1**: best (highest) bid price.
+-  **BID_SIZE_1**: corresponding size.
+- **BID_PRICE_2**: second highest bid price.
+-  **BID_SIZE_2**: corresponding size.
+- **BID_PRICE_3**: third highest bid price.
+-  **BID_SIZE_3**: corresponding size.
+- **ASK_PRICE_1**: best (lowest) ask price.
+-  **ASK_SIZE_1**: corresponding size.
+- **ASK_PRICE_2**: second lowest ask price.
+-  **ASK_SIZE_2**: corresponding size.
+- **ASK_PRICE_3**: third lowest ask price.
+-  **ASK_SIZE_3**: corresponding size.
