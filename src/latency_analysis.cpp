@@ -17,8 +17,8 @@ int main(int argc, char* argv[]) {
 
     User user(stod(argv[1]), stod(argv[2]), argv[3]);
 
-    MovingAverageCross ma_cross(user, 180, 5, 20);
+    MovingAverageCross ma_cross(user, 180, 5, 20);  /*< Your straetgy class constructor */
 
-    Backtester backtester(user, &ma_cross);
+    Backtester backtester(user, &ma_cross);     /*< Replace "&ma_cross" with your strategy instance*/
     backtester.run_latency_analysis(argv[4], "./sample_data/sample_latency_analysis.csv");
 }
