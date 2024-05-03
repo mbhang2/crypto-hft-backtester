@@ -1,0 +1,70 @@
+\doxysection{Depth\+Event\+Msg Class Reference}
+\hypertarget{class_depth_event_msg}{}\label{class_depth_event_msg}\index{DepthEventMsg@{DepthEventMsg}}
+
+
+{\ttfamily \#include $<$eventmsg.\+h$>$}
+
+Inheritance diagram for Depth\+Event\+Msg\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_depth_event_msg}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_depth_event_msg_af606b41d0c7227f83698b99aeaeebe90}\label{class_depth_event_msg_af606b41d0c7227f83698b99aeaeebe90} 
+{\bfseries Depth\+Event\+Msg} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_time_type}{Time\+Type}} $>$ timestamp\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ exchange\+\_\+, Market\+Type market\+\_\+type\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_security}{Security}} $>$ security\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order_book}{Order\+Book}} $>$ orderbook\+\_\+, int side\+\_\+, double price\+\_\+, double size\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_event_msg}{Event\+Msg}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Event\+Msg} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_time_type}{Time\+Type}} $>$ timestamp\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ exchange\+\_\+, Market\+Type market\+\_\+type\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_security}{Security}} $>$ security\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order_book}{Order\+Book}} $>$ orderbook\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_depth_event_msg_a0fa10549472a725573714ebc4e3001af}\label{class_depth_event_msg_a0fa10549472a725573714ebc4e3001af} 
+int {\bfseries side}
+\item 
+\Hypertarget{class_depth_event_msg_ab4ddf1b6f6931e062e6a21183b3386ae}\label{class_depth_event_msg_ab4ddf1b6f6931e062e6a21183b3386ae} 
+double {\bfseries price}
+\item 
+\Hypertarget{class_depth_event_msg_a23e40f16cd2ac38d2cfe2478dd36b9a8}\label{class_depth_event_msg_a23e40f16cd2ac38d2cfe2478dd36b9a8} 
+double {\bfseries size}
+\end{DoxyCompactItemize}
+\doxysubsection*{Data Fields inherited from \mbox{\hyperlink{class_event_msg}{Event\+Msg}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_time_type}{Time\+Type}} $>$ {\bfseries timestamp}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ {\bfseries exchange}
+\item 
+Market\+Type {\bfseries market\+\_\+type}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_security}{Security}} $>$ {\bfseries security}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order_book}{Order\+Book}} $>$ {\bfseries orderbook}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+ostream \& \mbox{\hyperlink{class_depth_event_msg_af87c24e242ead4f989c3937f23e58278}{operator$<$$<$}} (ostream \&os, \mbox{\hyperlink{class_depth_event_msg}{Depth\+Event\+Msg}} \&msg)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Derived class for depth messages 
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_depth_event_msg_af87c24e242ead4f989c3937f23e58278}\label{class_depth_event_msg_af87c24e242ead4f989c3937f23e58278} 
+\index{DepthEventMsg@{DepthEventMsg}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!DepthEventMsg@{DepthEventMsg}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{ostream \&}]{os,  }\item[{\mbox{\hyperlink{class_depth_event_msg}{Depth\+Event\+Msg}} \&}]{msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+Override \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} operator for \doxylink{class_market}{Market} class. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/data/eventmsg.\+h\end{DoxyCompactItemize}

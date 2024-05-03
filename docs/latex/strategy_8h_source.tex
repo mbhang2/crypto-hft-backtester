@@ -1,0 +1,80 @@
+\doxysection{strategy.\+h}
+\hypertarget{strategy_8h_source}{}\label{strategy_8h_source}\index{include/backtesting/strategy.h@{include/backtesting/strategy.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ "{}order.h"{}}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}user.h"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}../data/eventmsg.h"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}../data/exchange.h"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}../data/security.h"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <tuple>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <unordered\_map>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_market_key_hash}{MarketKeyHash}}\ \{}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ operator()(\textcolor{keyword}{const}\ tuple<MarketType,\ Exchange,\ Security>\&\ key)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Combine\ the\ hash\ values\ of\ the\ components}}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ marketHash\ =\ \textcolor{keyword}{static\_cast<}\textcolor{keywordtype}{size\_t}\textcolor{keyword}{>}(get<0>(key));}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ exchangeHash\ =\ \mbox{\hyperlink{struct_exchange_1_1_hash}{Exchange::Hash}}\{\}(get<1>(key));}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{size\_t}\ securityHash\ =\ \mbox{\hyperlink{struct_security_1_1_hash}{Security::Hash}}\{\}(get<2>(key));}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Combine\ the\ hash\ values\ using\ XOR\ and\ shift}}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ marketHash\ \string^\ (exchangeHash\ <<\ 1)\ \string^\ (securityHash\ <<\ 2);}
+\DoxyCodeLine{00030\ \ \ \ \ \}}
+\DoxyCodeLine{00031\ \};}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00037\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_strategy}{Strategy}}\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }MarketKey\ =\ tuple<MarketType,\ Exchange,\ Security>;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{keyword}{using\ }MarketMap\ =\ unordered\_map<MarketKey,\ double,\ MarketKeyHash>;}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_strategy_a2021a15bbc4f0d13f7b92f8933db2235}{Strategy}}()\ \{\}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_strategy_aa7c76598cf22a0b88c6ea1ade7afe3f4}{Strategy}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ strategy\_name\_,\ \mbox{\hyperlink{class_user}{User}}\&\ user\_):\ strategy\_name(strategy\_name\_),\ user(user\_)\ \{\}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{class_strategy_a4762a086f587ed294ca7178e396f142f}{\string~Strategy}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_strategy_a2920265e6b43c6ccc8d573e48987b063}{Clear}}()\ =\ 0;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ vector<std::shared\_ptr<Order>>\ \mbox{\hyperlink{class_strategy_a04e8c19bddd4cda16237428a90a297e3}{onTrade}}(\mbox{\hyperlink{class_trade_event_msg}{TradeEventMsg}}\&\ event\_msg)\ =\ 0;}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ vector<std::shared\_ptr<Order>>\ \mbox{\hyperlink{class_strategy_afb75bb27418a68c89df0fd950c4a07fb}{onTopQuote}}(\mbox{\hyperlink{class_quote_event_msg}{QuoteEventMsg}}\&\ event\_msg)\ =\ 0;}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ vector<std::shared\_ptr<Order>>\ \mbox{\hyperlink{class_strategy_a6b605a98583392ba7d41f8ce5690d992}{onDepth}}(\mbox{\hyperlink{class_depth_event_msg}{DepthEventMsg}}\&\ event\_msg)\ =\ 0;}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{class_strategy_af21c148591c8fe7f8513804b53cd08d7}{getPosition}}(MarketType\ marketType,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_exchange}{Exchange}}\&\ exchange,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_security}{Security}}\&\ security)\ \{}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \ \ \ \ MarketKey\ key\ =\ make\_tuple(marketType,\ exchange,\ security);}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ it\ =\ position.find(key);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (it\ !=\ position.end())\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ it-\/>second;}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ position[key]\ =\ 0.0;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ 0.0;}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ MarketMap\ \mbox{\hyperlink{class_strategy_a6cf483e00b218d1f852c2b0007e27461}{getPositionMap}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ position;\}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_strategy_a839246fefbd4807abf02f24243547e8a}{updatePosition}}(MarketType\ marketType,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_exchange}{Exchange}}\&\ exchange,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{class_security}{Security}}\&\ security,\ \textcolor{keywordtype}{double}\ position\_change)\ \{}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ MarketKey\ key\ =\ make\_tuple(marketType,\ exchange,\ security);}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ position[key]\ +=\ position\_change;}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\ strategy\_name;}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_user}{User}}\ user;}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ MarketMap\ position;\ }
+\DoxyCodeLine{00123\ \};}
+
+\end{DoxyCode}

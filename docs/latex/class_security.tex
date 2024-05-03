@@ -1,0 +1,99 @@
+\doxysection{Security Class Reference}
+\hypertarget{class_security}{}\label{class_security}\index{Security@{Security}}
+
+
+{\ttfamily \#include $<$security.\+h$>$}
+
+\doxysubsubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_security_1_1_hash}{Hash}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_security_a07a91cdb9fa0ced4370bfb3df9d8d1dc}{Security}} (const string \&base\+\_\+, const string \&quote\+\_\+)
+\item 
+virtual \mbox{\hyperlink{class_security_a6c45e3c7bce9a3a831076af936e4df01}{\texorpdfstring{$\sim$}{\string~}\+Security}} ()
+\item 
+string \mbox{\hyperlink{class_security_a4c33c9a4b0e9934a341607823fb1fa5e}{get\+Base}} () const
+\item 
+string \mbox{\hyperlink{class_security_ac92d63d81bd258efd326786e48143d4b}{get\+Quote}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_security_a024b3f724d18d638daefa19bacf29633}\label{class_security_a024b3f724d18d638daefa19bacf29633} 
+const string {\bfseries base}
+\item 
+\Hypertarget{class_security_af221ccc79e238e15fa60c47be910896f}\label{class_security_af221ccc79e238e15fa60c47be910896f} 
+const string {\bfseries quote}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{class_security_ab0d8768fc305ba66e3156d2dd789ba45}{operator$<$$<$}} (std\+::ostream \&os, const \mbox{\hyperlink{class_security}{Security}} \&sec)
+\item 
+bool \mbox{\hyperlink{class_security_afee2f2b3e67daa0a8924503cffb31140}{operator==}} (const \mbox{\hyperlink{class_security}{Security}} \&lhs, const \mbox{\hyperlink{class_security}{Security}} \&rhs)
+\item 
+bool \mbox{\hyperlink{class_security_a6b814f2b43178aea5f19a0f2bfd70ddb}{operator!=}} (const \mbox{\hyperlink{class_security}{Security}} \&lhs, const \mbox{\hyperlink{class_security}{Security}} \&rhs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Abstract class for securities. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_security_a07a91cdb9fa0ced4370bfb3df9d8d1dc}\label{class_security_a07a91cdb9fa0ced4370bfb3df9d8d1dc} 
+\index{Security@{Security}!Security@{Security}}
+\index{Security@{Security}!Security@{Security}}
+\doxysubsubsection{\texorpdfstring{Security()}{Security()}}
+{\footnotesize\ttfamily Security\+::\+Security (\begin{DoxyParamCaption}\item[{const string \&}]{base\+\_\+,  }\item[{const string \&}]{quote\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor to create security. \Hypertarget{class_security_a6c45e3c7bce9a3a831076af936e4df01}\label{class_security_a6c45e3c7bce9a3a831076af936e4df01} 
+\index{Security@{Security}!````~Security@{\texorpdfstring{$\sim$}{\string~}Security}}
+\index{````~Security@{\texorpdfstring{$\sim$}{\string~}Security}!Security@{Security}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Security()}{\string~Security()}}
+{\footnotesize\ttfamily virtual Security\+::\texorpdfstring{$\sim$}{\string~}\+Security (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+Destructor. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_security_a4c33c9a4b0e9934a341607823fb1fa5e}\label{class_security_a4c33c9a4b0e9934a341607823fb1fa5e} 
+\index{Security@{Security}!getBase@{getBase}}
+\index{getBase@{getBase}!Security@{Security}}
+\doxysubsubsection{\texorpdfstring{getBase()}{getBase()}}
+{\footnotesize\ttfamily string Security\+::get\+Base (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Getter for base \Hypertarget{class_security_ac92d63d81bd258efd326786e48143d4b}\label{class_security_ac92d63d81bd258efd326786e48143d4b} 
+\index{Security@{Security}!getQuote@{getQuote}}
+\index{getQuote@{getQuote}!Security@{Security}}
+\doxysubsubsection{\texorpdfstring{getQuote()}{getQuote()}}
+{\footnotesize\ttfamily string Security\+::get\+Quote (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Getter for quote 
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_security_a6b814f2b43178aea5f19a0f2bfd70ddb}\label{class_security_a6b814f2b43178aea5f19a0f2bfd70ddb} 
+\index{Security@{Security}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!Security@{Security}}
+\doxysubsubsection{\texorpdfstring{operator"!=}{operator!=}}
+{\footnotesize\ttfamily bool operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_security}{Security}} \&}]{lhs,  }\item[{const \mbox{\hyperlink{class_security}{Security}} \&}]{rhs }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+Not equal operator. \Hypertarget{class_security_ab0d8768fc305ba66e3156d2dd789ba45}\label{class_security_ab0d8768fc305ba66e3156d2dd789ba45} 
+\index{Security@{Security}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!Security@{Security}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily std\+::ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{const \mbox{\hyperlink{class_security}{Security}} \&}]{sec }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+Override \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} operator \Hypertarget{class_security_afee2f2b3e67daa0a8924503cffb31140}\label{class_security_afee2f2b3e67daa0a8924503cffb31140} 
+\index{Security@{Security}!operator==@{operator==}}
+\index{operator==@{operator==}!Security@{Security}}
+\doxysubsubsection{\texorpdfstring{operator==}{operator==}}
+{\footnotesize\ttfamily bool operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_security}{Security}} \&}]{lhs,  }\item[{const \mbox{\hyperlink{class_security}{Security}} \&}]{rhs }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+Equal operator. Compares if the base and quote are the same. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/data/security.\+h\end{DoxyCompactItemize}

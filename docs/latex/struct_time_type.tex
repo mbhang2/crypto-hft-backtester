@@ -1,0 +1,87 @@
+\doxysection{Time\+Type Struct Reference}
+\hypertarget{struct_time_type}{}\label{struct_time_type}\index{TimeType@{TimeType}}
+
+
+{\ttfamily \#include $<$timetype.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{struct_time_type_ab0ca5dda71790ce1b120c144cd2292c8}{Time\+Type}} (const std\+::string \&timestamp\+Str)
+\item 
+std\+::string \mbox{\hyperlink{struct_time_type_af298a42f692b23c2a5c031e3f1c55a32}{to\+String}} () const
+\item 
+long long \mbox{\hyperlink{struct_time_type_afbdf9cbffe79956a0eb1c2efdf43779f}{to\+Nanoseconds\+Since\+Epoch}} () const
+\item 
+bool \mbox{\hyperlink{struct_time_type_a14467631bb513efc46cd3c980e7521a6}{is\+Leap\+Year}} (int y) const
+\item 
+long long \mbox{\hyperlink{struct_time_type_ae8cd0ccb4ce9f3524545d070c4e5cd1d}{calculate\+Seconds\+In\+Year}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_time_type_aa2b79dd6f02d3f1e65b554daa80cf714}\label{struct_time_type_aa2b79dd6f02d3f1e65b554daa80cf714} 
+int {\bfseries year}
+\item 
+\Hypertarget{struct_time_type_a1c9e3896a2fd0d8f56198d478245685d}\label{struct_time_type_a1c9e3896a2fd0d8f56198d478245685d} 
+int {\bfseries month}
+\item 
+\Hypertarget{struct_time_type_ada3ef4d26ce68536b4ea21ba1e956977}\label{struct_time_type_ada3ef4d26ce68536b4ea21ba1e956977} 
+int {\bfseries day}
+\item 
+\Hypertarget{struct_time_type_ac212cf90e199457ef616ed1fe19cf785}\label{struct_time_type_ac212cf90e199457ef616ed1fe19cf785} 
+int {\bfseries hour}
+\item 
+\Hypertarget{struct_time_type_a3c08c47d7dfcc88db0c30b169bc60ba6}\label{struct_time_type_a3c08c47d7dfcc88db0c30b169bc60ba6} 
+int {\bfseries minute}
+\item 
+\Hypertarget{struct_time_type_a1183d6695f68ef9e51cff248175c6f29}\label{struct_time_type_a1183d6695f68ef9e51cff248175c6f29} 
+int {\bfseries second}
+\item 
+\Hypertarget{struct_time_type_aa092574aef77cadb952134dce8c18515}\label{struct_time_type_aa092574aef77cadb952134dce8c18515} 
+int {\bfseries subsecond}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Struct for recording timestamps 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{struct_time_type_ab0ca5dda71790ce1b120c144cd2292c8}\label{struct_time_type_ab0ca5dda71790ce1b120c144cd2292c8} 
+\index{TimeType@{TimeType}!TimeType@{TimeType}}
+\index{TimeType@{TimeType}!TimeType@{TimeType}}
+\doxysubsubsection{\texorpdfstring{TimeType()}{TimeType()}}
+{\footnotesize\ttfamily Time\+Type\+::\+Time\+Type (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{timestamp\+Str }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{struct_time_type_ae8cd0ccb4ce9f3524545d070c4e5cd1d}\label{struct_time_type_ae8cd0ccb4ce9f3524545d070c4e5cd1d} 
+\index{TimeType@{TimeType}!calculateSecondsInYear@{calculateSecondsInYear}}
+\index{calculateSecondsInYear@{calculateSecondsInYear}!TimeType@{TimeType}}
+\doxysubsubsection{\texorpdfstring{calculateSecondsInYear()}{calculateSecondsInYear()}}
+{\footnotesize\ttfamily long long Time\+Type\+::calculate\+Seconds\+In\+Year (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Helper function to calculate seconds in the current year \Hypertarget{struct_time_type_a14467631bb513efc46cd3c980e7521a6}\label{struct_time_type_a14467631bb513efc46cd3c980e7521a6} 
+\index{TimeType@{TimeType}!isLeapYear@{isLeapYear}}
+\index{isLeapYear@{isLeapYear}!TimeType@{TimeType}}
+\doxysubsubsection{\texorpdfstring{isLeapYear()}{isLeapYear()}}
+{\footnotesize\ttfamily bool Time\+Type\+::is\+Leap\+Year (\begin{DoxyParamCaption}\item[{int}]{y }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Helper function to calculate leap year \Hypertarget{struct_time_type_afbdf9cbffe79956a0eb1c2efdf43779f}\label{struct_time_type_afbdf9cbffe79956a0eb1c2efdf43779f} 
+\index{TimeType@{TimeType}!toNanosecondsSinceEpoch@{toNanosecondsSinceEpoch}}
+\index{toNanosecondsSinceEpoch@{toNanosecondsSinceEpoch}!TimeType@{TimeType}}
+\doxysubsubsection{\texorpdfstring{toNanosecondsSinceEpoch()}{toNanosecondsSinceEpoch()}}
+{\footnotesize\ttfamily long long Time\+Type\+::to\+Nanoseconds\+Since\+Epoch (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Return nanoseconds time \Hypertarget{struct_time_type_af298a42f692b23c2a5c031e3f1c55a32}\label{struct_time_type_af298a42f692b23c2a5c031e3f1c55a32} 
+\index{TimeType@{TimeType}!toString@{toString}}
+\index{toString@{toString}!TimeType@{TimeType}}
+\doxysubsubsection{\texorpdfstring{toString()}{toString()}}
+{\footnotesize\ttfamily std\+::string Time\+Type\+::to\+String (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Return string format 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/data/timetype.\+h\end{DoxyCompactItemize}

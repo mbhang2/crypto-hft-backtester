@@ -1,0 +1,107 @@
+\doxysection{User Class Reference}
+\hypertarget{class_user}{}\label{class_user}\index{User@{User}}
+
+
+{\ttfamily \#include $<$user.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_user_a4a0137053e591fbb79d9057dd7d2283d}{User}} ()
+\item 
+\mbox{\hyperlink{class_user_ae08ff12eb855150f464a2190c3589f24}{User}} (double spot\+\_\+balance\+\_\+, double futures\+\_\+balance\+\_\+, const string \&json\+\_\+file\+\_\+path)
+\item 
+\mbox{\hyperlink{class_user_ac00b72ad64eb4149f7b21b9f5468c2b2}{\texorpdfstring{$\sim$}{\string~}\+User}} ()
+\item 
+void \mbox{\hyperlink{class_user_a2ad0bc578cdc14e52af2a7165388250e}{Clear}} (map$<$ Market\+Type, double $>$ initial\+\_\+buying\+\_\+power)
+\item 
+int \mbox{\hyperlink{class_user_a010077fcd52d32fd3b4e1171f748a86a}{get\+Id}} () const
+\item 
+double \mbox{\hyperlink{class_user_a2880bc504fcf8354e9b3120033931914}{get\+Capital}} (Market\+Type market\+\_\+type) const
+\item 
+void \mbox{\hyperlink{class_user_a2cf699778c9315b5bef7abe1f7cef80a}{update\+Balance}} (Market\+Type market\+\_\+type, double change)
+\item 
+vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ $>$ \mbox{\hyperlink{class_user_ae7e8a7e9029679016fab12868820063f}{get\+Exchanges}} () const
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ \mbox{\hyperlink{class_user_aa9ba3799ef87445442f406e30fa78437}{find\+Exchange}} (const string \&name)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000003}{Todo}}](Reach goal) Add restristictions per subaccount 
+
+(Reach goal) Manage risks/positions per subaccounts/users for a firm (tree structure) \end{DoxyRefDesc}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_user_a4a0137053e591fbb79d9057dd7d2283d}\label{class_user_a4a0137053e591fbb79d9057dd7d2283d} 
+\index{User@{User}!User@{User}}
+\index{User@{User}!User@{User}}
+\doxysubsubsection{\texorpdfstring{User()}{User()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily User\+::\+User (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Default constructor. \Hypertarget{class_user_ae08ff12eb855150f464a2190c3589f24}\label{class_user_ae08ff12eb855150f464a2190c3589f24} 
+\index{User@{User}!User@{User}}
+\index{User@{User}!User@{User}}
+\doxysubsubsection{\texorpdfstring{User()}{User()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily User\+::\+User (\begin{DoxyParamCaption}\item[{double}]{spot\+\_\+balance\+\_\+,  }\item[{double}]{futures\+\_\+balance\+\_\+,  }\item[{const string \&}]{json\+\_\+file\+\_\+path }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor for user \Hypertarget{class_user_ac00b72ad64eb4149f7b21b9f5468c2b2}\label{class_user_ac00b72ad64eb4149f7b21b9f5468c2b2} 
+\index{User@{User}!````~User@{\texorpdfstring{$\sim$}{\string~}User}}
+\index{````~User@{\texorpdfstring{$\sim$}{\string~}User}!User@{User}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}User()}{\string~User()}}
+{\footnotesize\ttfamily User\+::\texorpdfstring{$\sim$}{\string~}\+User (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Destructor for user 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_user_a2ad0bc578cdc14e52af2a7165388250e}\label{class_user_a2ad0bc578cdc14e52af2a7165388250e} 
+\index{User@{User}!Clear@{Clear}}
+\index{Clear@{Clear}!User@{User}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily void User\+::\+Clear (\begin{DoxyParamCaption}\item[{map$<$ Market\+Type, double $>$}]{initial\+\_\+buying\+\_\+power }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Clear/\+Reset user\textquotesingle{}s buying power \Hypertarget{class_user_aa9ba3799ef87445442f406e30fa78437}\label{class_user_aa9ba3799ef87445442f406e30fa78437} 
+\index{User@{User}!findExchange@{findExchange}}
+\index{findExchange@{findExchange}!User@{User}}
+\doxysubsubsection{\texorpdfstring{findExchange()}{findExchange()}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ User\+::find\+Exchange (\begin{DoxyParamCaption}\item[{const string \&}]{name }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Find exchange by name, case insensitive 
+\begin{DoxyParams}{Parameters}
+{\em name} & name of the exchange to find \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+pointer to the exchange 
+\end{DoxyReturn}
+\Hypertarget{class_user_a2880bc504fcf8354e9b3120033931914}\label{class_user_a2880bc504fcf8354e9b3120033931914} 
+\index{User@{User}!getCapital@{getCapital}}
+\index{getCapital@{getCapital}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getCapital()}{getCapital()}}
+{\footnotesize\ttfamily double User\+::get\+Capital (\begin{DoxyParamCaption}\item[{Market\+Type}]{market\+\_\+type }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Getter for buying power. \Hypertarget{class_user_ae7e8a7e9029679016fab12868820063f}\label{class_user_ae7e8a7e9029679016fab12868820063f} 
+\index{User@{User}!getExchanges@{getExchanges}}
+\index{getExchanges@{getExchanges}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getExchanges()}{getExchanges()}}
+{\footnotesize\ttfamily vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ $>$ User\+::get\+Exchanges (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Getter for user\textquotesingle{}s list of exchanges \Hypertarget{class_user_a010077fcd52d32fd3b4e1171f748a86a}\label{class_user_a010077fcd52d32fd3b4e1171f748a86a} 
+\index{User@{User}!getId@{getId}}
+\index{getId@{getId}!User@{User}}
+\doxysubsubsection{\texorpdfstring{getId()}{getId()}}
+{\footnotesize\ttfamily int User\+::get\+Id (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Getter for user id \Hypertarget{class_user_a2cf699778c9315b5bef7abe1f7cef80a}\label{class_user_a2cf699778c9315b5bef7abe1f7cef80a} 
+\index{User@{User}!updateBalance@{updateBalance}}
+\index{updateBalance@{updateBalance}!User@{User}}
+\doxysubsubsection{\texorpdfstring{updateBalance()}{updateBalance()}}
+{\footnotesize\ttfamily void User\+::update\+Balance (\begin{DoxyParamCaption}\item[{Market\+Type}]{market\+\_\+type,  }\item[{double}]{change }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Update buying power. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/backtesting/user.\+h\end{DoxyCompactItemize}
