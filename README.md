@@ -1,5 +1,14 @@
 # group_04_project
 
+## Team members
+
+**Min Hyuk (Michael) Bhang**
+
+
+
+- Email: [mbhang2@illinois.edu](/ie421_high_frequency_trading_spring_2024/ie421_hft_spring_2024_group_04/group_04_project/-/blob/main/mbhang2@illinois.edu) 
+- LinkedIn: [Min Hyuk Bhang](https://www.linkedin.com/in/michael-bhang/)
+
 
 
 ## Getting started
