@@ -10,6 +10,15 @@ I am Min Hyuk (Michael) Bhang, an undergraduate majoring in Industiral Engineeri
 - LinkedIn: [Min Hyuk Bhang](https://www.linkedin.com/in/michael-bhang/)
 
 
+**Ze-Xuan Liu**
+
+This is Ze-Xuan Liu, a third year PhD student interested in operational management. I am currently leading research 
+projects in online decision-making and supply chain management. In my spare time, I am a Solana chain ethusiast and 
+developing decentralized arbitrage and market making strategies. 
+
+- Email: [zexuanl5@illinois.edu](mailto:zexuanl5@illinois.edu)
+- LinkedIn: 
+
 
 ## Getting started
 
