@@ -1,0 +1,168 @@
+\doxysection{Strategy Class Reference}
+\hypertarget{class_strategy}{}\label{class_strategy}\index{Strategy@{Strategy}}
+
+
+{\ttfamily \#include $<$strategy.\+h$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_strategy_a0e04429774e98d8cfed4f61765481b25}\label{class_strategy_a0e04429774e98d8cfed4f61765481b25} 
+using {\bfseries Market\+Key} = tuple$<$Market\+Type, \mbox{\hyperlink{class_exchange}{Exchange}}, \mbox{\hyperlink{class_security}{Security}}$>$
+\item 
+\Hypertarget{class_strategy_a2e7e59637551cdbbaf59994da968ea15}\label{class_strategy_a2e7e59637551cdbbaf59994da968ea15} 
+using {\bfseries Market\+Map} = unordered\+\_\+map$<$Market\+Key, double, \mbox{\hyperlink{struct_market_key_hash}{Market\+Key\+Hash}}$>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_strategy_a2021a15bbc4f0d13f7b92f8933db2235}{Strategy}} ()
+\item 
+\mbox{\hyperlink{class_strategy_aa7c76598cf22a0b88c6ea1ade7afe3f4}{Strategy}} (const string \&strategy\+\_\+name\+\_\+, \mbox{\hyperlink{class_user}{User}} \&user\+\_\+)
+\item 
+virtual \mbox{\hyperlink{class_strategy_a4762a086f587ed294ca7178e396f142f}{\texorpdfstring{$\sim$}{\string~}\+Strategy}} ()=default
+\item 
+virtual void \mbox{\hyperlink{class_strategy_a2920265e6b43c6ccc8d573e48987b063}{Clear}} ()=0
+\item 
+virtual vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order}{Order}} $>$ $>$ \mbox{\hyperlink{class_strategy_a04e8c19bddd4cda16237428a90a297e3}{on\+Trade}} (\mbox{\hyperlink{class_trade_event_msg}{Trade\+Event\+Msg}} \&event\+\_\+msg)=0
+\item 
+virtual vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order}{Order}} $>$ $>$ \mbox{\hyperlink{class_strategy_afb75bb27418a68c89df0fd950c4a07fb}{on\+Top\+Quote}} (\mbox{\hyperlink{class_quote_event_msg}{Quote\+Event\+Msg}} \&event\+\_\+msg)=0
+\item 
+virtual vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order}{Order}} $>$ $>$ \mbox{\hyperlink{class_strategy_a6b605a98583392ba7d41f8ce5690d992}{on\+Depth}} (\mbox{\hyperlink{class_depth_event_msg}{Depth\+Event\+Msg}} \&event\+\_\+msg)=0
+\item 
+double \mbox{\hyperlink{class_strategy_af21c148591c8fe7f8513804b53cd08d7}{get\+Position}} (Market\+Type market\+Type, const \mbox{\hyperlink{class_exchange}{Exchange}} \&exchange, const \mbox{\hyperlink{class_security}{Security}} \&security)
+\item 
+Market\+Map \mbox{\hyperlink{class_strategy_a6cf483e00b218d1f852c2b0007e27461}{get\+Position\+Map}} () const
+\item 
+void \mbox{\hyperlink{class_strategy_a839246fefbd4807abf02f24243547e8a}{update\+Position}} (Market\+Type market\+Type, const \mbox{\hyperlink{class_exchange}{Exchange}} \&exchange, const \mbox{\hyperlink{class_security}{Security}} \&security, double position\+\_\+change)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_strategy_a5522c2b6cbb1473b466586630588e0e2}\label{class_strategy_a5522c2b6cbb1473b466586630588e0e2} 
+const string {\bfseries strategy\+\_\+name}
+\item 
+\Hypertarget{class_strategy_a4865b38d56fa09f4893f41644914a90b}\label{class_strategy_a4865b38d56fa09f4893f41644914a90b} 
+\mbox{\hyperlink{class_user}{User}} {\bfseries user}
+\item 
+\Hypertarget{class_strategy_a33f97f64c75a3f146d9932f25dc38904}\label{class_strategy_a33f97f64c75a3f146d9932f25dc38904} 
+Market\+Map {\bfseries position}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Abstract class for strategy 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_strategy_a2021a15bbc4f0d13f7b92f8933db2235}\label{class_strategy_a2021a15bbc4f0d13f7b92f8933db2235} 
+\index{Strategy@{Strategy}!Strategy@{Strategy}}
+\index{Strategy@{Strategy}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{Strategy()}{Strategy()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Strategy\+::\+Strategy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Default constructor \Hypertarget{class_strategy_aa7c76598cf22a0b88c6ea1ade7afe3f4}\label{class_strategy_aa7c76598cf22a0b88c6ea1ade7afe3f4} 
+\index{Strategy@{Strategy}!Strategy@{Strategy}}
+\index{Strategy@{Strategy}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{Strategy()}{Strategy()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Strategy\+::\+Strategy (\begin{DoxyParamCaption}\item[{const string \&}]{strategy\+\_\+name\+\_\+,  }\item[{\mbox{\hyperlink{class_user}{User}} \&}]{user\+\_\+ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructor \Hypertarget{class_strategy_a4762a086f587ed294ca7178e396f142f}\label{class_strategy_a4762a086f587ed294ca7178e396f142f} 
+\index{Strategy@{Strategy}!````~Strategy@{\texorpdfstring{$\sim$}{\string~}Strategy}}
+\index{````~Strategy@{\texorpdfstring{$\sim$}{\string~}Strategy}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{\texorpdfstring{$\sim$}{\string~}Strategy()}{\string~Strategy()}}
+{\footnotesize\ttfamily virtual Strategy\+::\texorpdfstring{$\sim$}{\string~}\+Strategy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [default]}}
+
+Destructor 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_strategy_a2920265e6b43c6ccc8d573e48987b063}\label{class_strategy_a2920265e6b43c6ccc8d573e48987b063} 
+\index{Strategy@{Strategy}!Clear@{Clear}}
+\index{Clear@{Clear}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{Clear()}{Clear()}}
+{\footnotesize\ttfamily virtual void Strategy\+::\+Clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Clear/\+Reset members \Hypertarget{class_strategy_af21c148591c8fe7f8513804b53cd08d7}\label{class_strategy_af21c148591c8fe7f8513804b53cd08d7} 
+\index{Strategy@{Strategy}!getPosition@{getPosition}}
+\index{getPosition@{getPosition}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{getPosition()}{getPosition()}}
+{\footnotesize\ttfamily double Strategy\+::get\+Position (\begin{DoxyParamCaption}\item[{Market\+Type}]{market\+Type,  }\item[{const \mbox{\hyperlink{class_exchange}{Exchange}} \&}]{exchange,  }\item[{const \mbox{\hyperlink{class_security}{Security}} \&}]{security }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Getter for position 
+\begin{DoxyParams}{Parameters}
+{\em market\+Type} & market type (spot or futures) \\
+\hline
+{\em exchange} & exchange \\
+\hline
+{\em security} & security \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_strategy_a6cf483e00b218d1f852c2b0007e27461}\label{class_strategy_a6cf483e00b218d1f852c2b0007e27461} 
+\index{Strategy@{Strategy}!getPositionMap@{getPositionMap}}
+\index{getPositionMap@{getPositionMap}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{getPositionMap()}{getPositionMap()}}
+{\footnotesize\ttfamily Market\+Map Strategy\+::get\+Position\+Map (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+Getter for the map itself. \Hypertarget{class_strategy_a6b605a98583392ba7d41f8ce5690d992}\label{class_strategy_a6b605a98583392ba7d41f8ce5690d992} 
+\index{Strategy@{Strategy}!onDepth@{onDepth}}
+\index{onDepth@{onDepth}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{onDepth()}{onDepth()}}
+{\footnotesize\ttfamily virtual vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order}{Order}} $>$ $>$ Strategy\+::on\+Depth (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_depth_event_msg}{Depth\+Event\+Msg}} \&}]{event\+\_\+msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Triggers when a change in orderbook message arrives 
+\begin{DoxyParams}{Parameters}
+{\em event\+\_\+msg} & order book update event message \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of orders to submit. Return empty vector if no orders to submit. 
+\end{DoxyReturn}
+\Hypertarget{class_strategy_afb75bb27418a68c89df0fd950c4a07fb}\label{class_strategy_afb75bb27418a68c89df0fd950c4a07fb} 
+\index{Strategy@{Strategy}!onTopQuote@{onTopQuote}}
+\index{onTopQuote@{onTopQuote}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{onTopQuote()}{onTopQuote()}}
+{\footnotesize\ttfamily virtual vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order}{Order}} $>$ $>$ Strategy\+::on\+Top\+Quote (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_quote_event_msg}{Quote\+Event\+Msg}} \&}]{event\+\_\+msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Triggers when a change in top quote (BBO) message arrives 
+\begin{DoxyParams}{Parameters}
+{\em event\+\_\+msg} & BBO update event message \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of orders to submit. Return empty vector if no orders to submit. 
+\end{DoxyReturn}
+\Hypertarget{class_strategy_a04e8c19bddd4cda16237428a90a297e3}\label{class_strategy_a04e8c19bddd4cda16237428a90a297e3} 
+\index{Strategy@{Strategy}!onTrade@{onTrade}}
+\index{onTrade@{onTrade}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{onTrade()}{onTrade()}}
+{\footnotesize\ttfamily virtual vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order}{Order}} $>$ $>$ Strategy\+::on\+Trade (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_trade_event_msg}{Trade\+Event\+Msg}} \&}]{event\+\_\+msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+Triggers when a trade event message arrives 
+\begin{DoxyParams}{Parameters}
+{\em event\+\_\+msg} & trade event message \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+vector of orders to submit. Return empty vector if no orders to submit. 
+\end{DoxyReturn}
+\Hypertarget{class_strategy_a839246fefbd4807abf02f24243547e8a}\label{class_strategy_a839246fefbd4807abf02f24243547e8a} 
+\index{Strategy@{Strategy}!updatePosition@{updatePosition}}
+\index{updatePosition@{updatePosition}!Strategy@{Strategy}}
+\doxysubsubsection{\texorpdfstring{updatePosition()}{updatePosition()}}
+{\footnotesize\ttfamily void Strategy\+::update\+Position (\begin{DoxyParamCaption}\item[{Market\+Type}]{market\+Type,  }\item[{const \mbox{\hyperlink{class_exchange}{Exchange}} \&}]{exchange,  }\item[{const \mbox{\hyperlink{class_security}{Security}} \&}]{security,  }\item[{double}]{position\+\_\+change }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Update position 
+\begin{DoxyParams}{Parameters}
+{\em market\+Type} & market type (spot or futures) \\
+\hline
+{\em exchange} & exchange \\
+\hline
+{\em security} & security \\
+\hline
+{\em position\+\_\+change} & change in position \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/backtesting/strategy.\+h\end{DoxyCompactItemize}

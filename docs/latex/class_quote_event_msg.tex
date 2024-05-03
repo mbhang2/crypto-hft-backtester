@@ -1,0 +1,73 @@
+\doxysection{Quote\+Event\+Msg Class Reference}
+\hypertarget{class_quote_event_msg}{}\label{class_quote_event_msg}\index{QuoteEventMsg@{QuoteEventMsg}}
+
+
+{\ttfamily \#include $<$eventmsg.\+h$>$}
+
+Inheritance diagram for Quote\+Event\+Msg\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_quote_event_msg}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_quote_event_msg_a0227db3b05bcf6fa6e9e2e5c9bbf0fcf}\label{class_quote_event_msg_a0227db3b05bcf6fa6e9e2e5c9bbf0fcf} 
+{\bfseries Quote\+Event\+Msg} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_time_type}{Time\+Type}} $>$ timestamp\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ exchange\+\_\+, Market\+Type market\+\_\+type\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_security}{Security}} $>$ security\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order_book}{Order\+Book}} $>$ orderbook\+\_\+, double bid\+\_\+price\+\_\+, double bid\+\_\+size\+\_\+, double ask\+\_\+price\+\_\+, double ask\+\_\+size\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_event_msg}{Event\+Msg}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Event\+Msg} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_time_type}{Time\+Type}} $>$ timestamp\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ exchange\+\_\+, Market\+Type market\+\_\+type\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_security}{Security}} $>$ security\+\_\+, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order_book}{Order\+Book}} $>$ orderbook\+\_\+)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_quote_event_msg_a70b89f77ea74d8138db7831900e74d5b}\label{class_quote_event_msg_a70b89f77ea74d8138db7831900e74d5b} 
+double {\bfseries bid\+\_\+price}
+\item 
+\Hypertarget{class_quote_event_msg_a9ca442b4e757c56f9ecf4ce6c308d5c8}\label{class_quote_event_msg_a9ca442b4e757c56f9ecf4ce6c308d5c8} 
+double {\bfseries bid\+\_\+size}
+\item 
+\Hypertarget{class_quote_event_msg_a0d31db2691ec31dc4ef00b7ac727f40a}\label{class_quote_event_msg_a0d31db2691ec31dc4ef00b7ac727f40a} 
+double {\bfseries ask\+\_\+price}
+\item 
+\Hypertarget{class_quote_event_msg_ac5b47df3b3aed157620cef55f54123b1}\label{class_quote_event_msg_ac5b47df3b3aed157620cef55f54123b1} 
+double {\bfseries ask\+\_\+size}
+\end{DoxyCompactItemize}
+\doxysubsection*{Data Fields inherited from \mbox{\hyperlink{class_event_msg}{Event\+Msg}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{struct_time_type}{Time\+Type}} $>$ {\bfseries timestamp}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_exchange}{Exchange}} $>$ {\bfseries exchange}
+\item 
+Market\+Type {\bfseries market\+\_\+type}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_security}{Security}} $>$ {\bfseries security}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_order_book}{Order\+Book}} $>$ {\bfseries orderbook}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+ostream \& \mbox{\hyperlink{class_quote_event_msg_a5b20750dde7e1e8ad344900d9aa342bb}{operator$<$$<$}} (ostream \&os, \mbox{\hyperlink{class_quote_event_msg}{Quote\+Event\+Msg}} \&msg)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Derived class for quote update messages 
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{class_quote_event_msg_a5b20750dde7e1e8ad344900d9aa342bb}\label{class_quote_event_msg_a5b20750dde7e1e8ad344900d9aa342bb} 
+\index{QuoteEventMsg@{QuoteEventMsg}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!QuoteEventMsg@{QuoteEventMsg}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily ostream \& operator$<$$<$ (\begin{DoxyParamCaption}\item[{ostream \&}]{os,  }\item[{\mbox{\hyperlink{class_quote_event_msg}{Quote\+Event\+Msg}} \&}]{msg }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+Override \texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} operator for \doxylink{class_market}{Market} class. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/data/eventmsg.\+h\end{DoxyCompactItemize}

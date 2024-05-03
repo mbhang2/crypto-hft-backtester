@@ -1,0 +1,89 @@
+\doxysection{user.\+h}
+\hypertarget{user_8h_source}{}\label{user_8h_source}\index{include/backtesting/user.h@{include/backtesting/user.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}../data/exchange.h"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}../record/orderlog.h"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}../rapidjson/document.h"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}../rapidjson/filereadstream.h"{}}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00019\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_user}{User}}\ \{}
+\DoxyCodeLine{00020\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{class_user_a4a0137053e591fbb79d9057dd7d2283d}{User}}()\ \{\}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{class_user_ae08ff12eb855150f464a2190c3589f24}{User}}(\textcolor{keywordtype}{double}\ spot\_balance\_,\ \textcolor{keywordtype}{double}\ futures\_balance\_,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ json\_file\_path)\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{id}\ =\ ++next\_id;\ \textcolor{comment}{//\ Assign\ a\ unique\ ID}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ buying\_power[MarketType::Spot]\ =\ spot\_balance\_;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ buying\_power[MarketType::Futures]\ =\ futures\_balance\_;}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ FILE*\ json\_file\ =\ fopen(json\_file\_path.c\_str(),\ \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!json\_file)\ \{}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ \ \ \ \ cerr\ <<\ \textcolor{stringliteral}{"{}Error\ opening\ JSON\ file:\ "{}}\ <<\ json\_file\_path\ <<\ endl;}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ buffer[65536];}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ FileReadStream\ fs(json\_file,\ buffer,\ \textcolor{keyword}{sizeof}(buffer));}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ Document\ data;}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ data.ParseStream(fs);}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ fclose(json\_file);}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ exchange\ :\ data.GetObject())\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_exchange}{Exchange}}*\ exchange\_\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_exchange}{Exchange}}(exchange.name.GetString());}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \ \ \ \ exchange\_-\/>\mbox{\hyperlink{class_exchange_afde29e3ed9364146384d6d617c182b78}{loadJson}}(json\_file\_path);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \ \ \ \ exchange\_list.push\_back(std::shared\_ptr<Exchange>(exchange\_));}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{class_user_ac00b72ad64eb4149f7b21b9f5468c2b2}{\string~User}}()\ \{\}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_user_a2ad0bc578cdc14e52af2a7165388250e}{Clear}}(map<MarketType,\ double>\ initial\_buying\_power)\ \{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ buying\_power\ =\ initial\_buying\_power;}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{class_user_a010077fcd52d32fd3b4e1171f748a86a}{getId}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ id;\ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{class_user_a2880bc504fcf8354e9b3120033931914}{getCapital}}(MarketType\ market\_type)\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ buying\_power.at(market\_type);\}}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_user_a2cf699778c9315b5bef7abe1f7cef80a}{updateBalance}}(MarketType\ market\_type,\ \textcolor{keywordtype}{double}\ change)\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ buying\_power[market\_type]\ +=\ change;}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00086\ \ \ \ \ vector<std::shared\_ptr<Exchange>>\ \mbox{\hyperlink{class_user_ae7e8a7e9029679016fab12868820063f}{getExchanges}}()\textcolor{keyword}{\ const\ }\{\ \textcolor{keywordflow}{return}\ exchange\_list;\ \}}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00093\ \ \ \ \ std::shared\_ptr<Exchange>\ \mbox{\hyperlink{class_user_aa9ba3799ef87445442f406e30fa78437}{findExchange}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ name)\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{comment}{//\ Convert\ the\ target\ name\ to\ lowercase\ for\ case-\/insensitive\ comparison}}
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{keywordtype}{string}\ lowercase\_name\ =\ name;}
+\DoxyCodeLine{00096\ \ \ \ \ transform(lowercase\_name.begin(),\ lowercase\_name.end(),\ lowercase\_name.begin(),\ ::tolower);}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\&\ exchange\ :\ exchange\_list)\ \{}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ exchangeName\ =\ exchange-\/>getName();}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ transform(exchangeName.begin(),\ exchangeName.end(),\ exchangeName.begin(),\ ::tolower);}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (exchangeName\ ==\ lowercase\_name)\ \{}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ exchange;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keyword}{nullptr};\ \textcolor{comment}{//\ Exchange\ not\ found}}
+\DoxyCodeLine{00107\ \ \ \ \ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordtype}{int}\ id;\ \textcolor{comment}{/*<\ Unique\ user\ id\ */}}
+\DoxyCodeLine{00111\ \ \ \ \ map<MarketType,\ double>\ buying\_power;\ \textcolor{comment}{/*<\ Buying\ power*/}}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ next\_id;\ \textcolor{comment}{/*<\ Static\ member\ to\ track\ the\ next\ available\ ID\ */}\ }
+\DoxyCodeLine{00113\ \ \ \ \ vector<std::shared\_ptr<Exchange>>\ exchange\_list;\ \textcolor{comment}{/*<\ List\ of\ exchanges\ for\ the\ user\ */}}
+\DoxyCodeLine{00114\ \};}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \textcolor{keywordtype}{int}\ User::next\_id\ =\ 0;}
+
+\end{DoxyCode}

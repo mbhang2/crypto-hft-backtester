@@ -1,0 +1,101 @@
+\doxysection{eventmsg.\+h}
+\hypertarget{eventmsg_8h_source}{}\label{eventmsg_8h_source}\index{include/data/eventmsg.h@{include/data/eventmsg.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}./exchange.h"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}./security.h"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}./timetype.h"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}../backtesting/orderbook.h"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_event_msg}{EventMsg}}\ \{}
+\DoxyCodeLine{00018\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{class_event_msg}{EventMsg}}(std::shared\_ptr<TimeType>\ timestamp\_,\ std::shared\_ptr<Exchange>\ exchange\_,\ MarketType\ market\_type\_,\ std::shared\_ptr<Security>\ security\_,\ std::shared\_ptr<OrderBook>\ orderbook\_)}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ :\ timestamp(timestamp\_),\ exchange(exchange\_),\ market\_type(market\_type\_),\ security(security\_),\ orderbook(orderbook\_)\ \{\}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ std::shared\_ptr<TimeType>\ timestamp;\ \ \ \ \textcolor{comment}{/*<\ timestamp\ of\ an\ event\ */}}
+\DoxyCodeLine{00023\ \ \ \ \ std::shared\_ptr<Exchange>\ exchange;\ \ \ \ \ \textcolor{comment}{/*<\ exchange\ an\ event\ occurred\ */}}
+\DoxyCodeLine{00024\ \ \ \ \ MarketType\ market\_type;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{/*<\ Market\ type\ (Futures\ or\ spot)\ */}}
+\DoxyCodeLine{00025\ \ \ \ \ std::shared\_ptr<Security>\ security;\ \ \ \ \ \textcolor{comment}{/*<\ Instrument\ an\ event\ occurred\ */}}
+\DoxyCodeLine{00026\ \ \ \ \ std::shared\_ptr<OrderBook>\ orderbook;\ \ \ \textcolor{comment}{/*<\ Orderbook\ */}}
+\DoxyCodeLine{00027\ \};}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00032\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_trade_event_msg}{TradeEventMsg}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_event_msg}{EventMsg}}\ \{}
+\DoxyCodeLine{00033\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{class_trade_event_msg}{TradeEventMsg}}(std::shared\_ptr<TimeType>\ timestamp\_,\ std::shared\_ptr<Exchange>\ exchange\_,\ MarketType\ market\_type\_,\ std::shared\_ptr<Security>\ security\_,\ std::shared\_ptr<OrderBook>\ orderbook\_,\ \textcolor{keywordtype}{double}\ price\_,\ \textcolor{keywordtype}{double}\ size\_):\ }
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_event_msg}{EventMsg}}(timestamp\_,\ exchange\_,\ market\_type\_,\ security\_,\ orderbook\_),\ price(price\_),\ size(size\_)\ \{\}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{double}\ price;\ \ \textcolor{comment}{/*<\ price\ at\ which\ the\ trade\ occurred\ */}}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{double}\ size;\ \ \ \textcolor{comment}{/*<\ size\ of\ the\ trade\ in\ base\ currency\ */}\ }
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{friend}\ ostream\&\ \mbox{\hyperlink{class_trade_event_msg_a2d370779555210c8e178e4684096e063}{operator<<}}(ostream\&\ os,\ \mbox{\hyperlink{class_trade_event_msg}{TradeEventMsg}}\&\ msg)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}==========\ Trade\ Event\ =========="{}}\ <<\ endl;}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Timestamp:\ "{}}\ <<\ msg.timestamp-\/>toString()\ <<\ endl;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Market:\ "{}}\ <<\ msg.market\_type\ <<\ endl;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Security:\ "{}}\ <<\ msg.security\ <<\ endl;}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Exchange:\ "{}}\ <<\ msg.exchange-\/>getName()\ <<\ endl;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Price:\ "{}}\ <<\ msg.price\ <<\ endl;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Size:\ "{}}\ <<\ msg.size\ <<\ msg.security-\/>getBase()\ <<\ endl;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}======================================="{}}\ <<\ endl;}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os;}
+\DoxyCodeLine{00053\ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \};}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00060\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_quote_event_msg}{QuoteEventMsg}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_event_msg}{EventMsg}}\ \{}
+\DoxyCodeLine{00061\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{class_quote_event_msg}{QuoteEventMsg}}(std::shared\_ptr<TimeType>\ timestamp\_,\ std::shared\_ptr<Exchange>\ exchange\_,\ MarketType\ market\_type\_,\ std::shared\_ptr<Security>\ security\_,\ std::shared\_ptr<OrderBook>\ orderbook\_,\ \textcolor{keywordtype}{double}\ bid\_price\_,\ \textcolor{keywordtype}{double}\ bid\_size\_,\ \textcolor{keywordtype}{double}\ ask\_price\_,\ \textcolor{keywordtype}{double}\ ask\_size\_):\ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_event_msg}{EventMsg}}(timestamp\_,\ exchange\_,\ market\_type\_,\ security\_,\ orderbook\_),\ bid\_price(bid\_price\_),\ bid\_size(bid\_size\_),\ ask\_price(ask\_price\_),\ ask\_size(ask\_size\_)\ \{\}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keywordtype}{double}\ bid\_price;\ \ \textcolor{comment}{/*<\ best\ bid\ price\ */}}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordtype}{double}\ bid\_size;\ \ \ \textcolor{comment}{/*<\ best\ bid\ size\ in\ base\ currency\ */}}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordtype}{double}\ ask\_price;\ \ \textcolor{comment}{/*<\ best\ ask\ price\ */}}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordtype}{double}\ ask\_size;\ \ \ \textcolor{comment}{/*<\ best\ ask\ size\ in\ base\ currency\ */}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keyword}{friend}\ ostream\&\ \mbox{\hyperlink{class_quote_event_msg_a5b20750dde7e1e8ad344900d9aa342bb}{operator<<}}(ostream\&\ os,\ \mbox{\hyperlink{class_quote_event_msg}{QuoteEventMsg}}\&\ msg)\ \{}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}==========\ Quote\ Update\ =========="{}}\ <<\ endl;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Timestamp:\ "{}}\ <<\ msg.timestamp-\/>toString()\ <<\ endl;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Market:\ "{}}\ <<\ msg.market\_type\ <<\ endl;}
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Security:\ "{}}\ <<\ msg.security\ <<\ endl;}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Exchange:\ "{}}\ <<\ msg.exchange-\/>getName()\ <<\ endl;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Bid\ price:\ "{}}\ <<\ msg.bid\_price\ <<\ endl;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Bid\ size:\ "{}}\ <<\ msg.bid\_size\ <<\ msg.security-\/>getBase()\ <<\ endl;}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Ask\ price:\ "{}}\ <<\ msg.ask\_price\ <<\ endl;}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Ask\ size:\ "{}}\ <<\ msg.ask\_size\ <<\ msg.security-\/>getBase()\ <<\ endl;}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}======================================="{}}\ <<\ endl;}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os;}
+\DoxyCodeLine{00085\ \ \ \ \ \}}
+\DoxyCodeLine{00086\ \};}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00092\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_depth_event_msg}{DepthEventMsg}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_event_msg}{EventMsg}}\ \{}
+\DoxyCodeLine{00093\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{class_depth_event_msg}{DepthEventMsg}}(std::shared\_ptr<TimeType>\ timestamp\_,\ std::shared\_ptr<Exchange>\ exchange\_,\ MarketType\ market\_type\_,\ std::shared\_ptr<Security>\ security\_,\ std::shared\_ptr<OrderBook>\ orderbook\_,\ \textcolor{keywordtype}{int}\ side\_,\ \textcolor{keywordtype}{double}\ price\_,\ \textcolor{keywordtype}{double}\ size\_):\ }
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_event_msg}{EventMsg}}(timestamp\_,\ exchange\_,\ market\_type\_,\ security\_,\ orderbook\_),\ side(side\_),\ price(price\_),\ size(size\_)\ \{\}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordtype}{int}\ side;\ \ \ \ \ \ \textcolor{comment}{/*<\ indicates\ bid\ (1)\ or\ ask\ (-\/1)\ side\ of\ the\ order\ book\ */}}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordtype}{double}\ price;\ \ \textcolor{comment}{/*<\ price\ for\ the\ entry\ in\ the\ order\ book\ */}}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keywordtype}{double}\ size;\ \ \ \textcolor{comment}{/*<\ base\ currency\ size\ associated\ with\ the\ book\ entry\ */}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keyword}{friend}\ ostream\&\ \mbox{\hyperlink{class_depth_event_msg_af87c24e242ead4f989c3937f23e58278}{operator<<}}(ostream\&\ os,\ \mbox{\hyperlink{class_depth_event_msg}{DepthEventMsg}}\&\ msg)\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}==========\ Quote\ Update\ =========="{}}\ <<\ endl;}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Timestamp:\ "{}}\ <<\ msg.timestamp-\/>toString()\ <<\ endl;}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Market:\ "{}}\ <<\ msg.market\_type\ <<\ endl;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Security:\ "{}}\ <<\ msg.security\ <<\ endl;}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Exchange:\ "{}}\ <<\ msg.exchange-\/>getName()\ <<\ endl;}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Side:\ "{}}\ <<\ msg.side\ <<\ endl;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Price:\ "{}}\ <<\ msg.price\ <<\ msg.security-\/>getBase()\ <<\ endl;}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}Size:\ "{}}\ <<\ msg.size\ <<\ endl;}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ os\ <<\ \textcolor{stringliteral}{"{}======================================="{}}\ <<\ endl;}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ os;}
+\DoxyCodeLine{00115\ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \};}
+
+\end{DoxyCode}
