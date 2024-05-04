@@ -134,7 +134,7 @@ Conversely, market takers are the swift actors. Market takers prioritize immedia
 
 #### 2.3.8 Fees
 
-![Binance trading fee example](../images/trading_fee.png)
+![Trading fee structure example](../images/exchange_fee_structure.png)
 *Market makers pay lesser fee (could even get paid) than market takers.*
 
 Cryptocurrency exchanges charge fees for facilitating trades on their platforms. The specific fee structure varies across exchanges and can depend on factors like trading volume, type of order, and membership status. **Makers pay less fee than the takers**, which incentivizes the traders to become market makers and add liquidity to the market.
