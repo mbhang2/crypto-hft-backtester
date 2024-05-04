@@ -179,7 +179,11 @@ Cryptocurrency exchanges charge fees for facilitating trades on their platforms.
 
 7. Record user's trades that took place.
 
+Once the backtesting is over, list of trades is outputted to the CSV file to aid further data manipulation/analysis for the user.
+
 ## 5. Latency Analysis
+
+Current version of latency analysis performs backteset given hypothetical sending latency of 0, 10, 25, 50, 100, 200, 500, 1000 nanoseconds. Then the software outputs the latency vs P&L CSV file as well as the log-latency vs P&L plot to visualize the effect of latency to the user's strategy.
 
 ## 6. Future Work
 
