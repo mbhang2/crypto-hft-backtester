@@ -89,7 +89,7 @@ class Backtester {
         ifstream file(data_path);
 
         if (!file.is_open()) {
-            cerr << "Error opening the file." << endl;
+            throw invalid_argument("Error opening the file");
             return;
         }
 
@@ -294,7 +294,7 @@ class Backtester {
             outfile.close();
             std::cout << "Data exported to " << output_path << std::endl;
         } else {
-            std::cerr << "Error opening file for writing." << std::endl;
+            throw runtime_error("Error opening file for writing");
         }
     }
 

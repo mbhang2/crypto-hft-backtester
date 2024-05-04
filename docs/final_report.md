@@ -139,6 +139,101 @@ Conversely, market takers are the swift actors. Market takers prioritize immedia
 
 Cryptocurrency exchanges charge fees for facilitating trades on their platforms. The specific fee structure varies across exchanges and can depend on factors like trading volume, type of order, and membership status. **Makers pay less fee than the takers**, which incentivizes the traders to become market makers and add liquidity to the market.
 
+#### 2.3.9 Trading Rules
+
+![trade_rules](../images/trade_rules.png)
+
+Exchanges have trading rules that each orders need to meet to be accepted.
+
+* **Minimum Tick Size**:
+    * Refers to the minimum price movement for a given cryptocurrency or stock.
+    * Determines how much the price can change in a single step.
+    * Smaller tick sizes allow for finer price granularity.
+
+* **Minimum Order Quantity/Value**:
+    * Smallest amount of a cryptocurrency that can be bought or sold in a single trade.
+    * Ensures that orders contribute meaningfully to market liquidity.
+
+* **Maximum Order Quantity/Value**:
+    * Exchanges often impose maximum order quantities to prevent market manipulation and maintain liquidity.
+    * These limits vary based on the specific cryptocurrency being traded.
+
+#### 2.3.10 Market Type
+
+In the crypto market, two major market types are spot/margin and perpetual futures.
+
+| **Aspect** | **Spot/Margin** | **Perpetual Futures** |
+|--------|-------------|-------------------|
+| **Ownership** | Direct ownership | No ownership |
+| **Settlement** | Immediate | No contract expiration date; indefinite holding |
+| **Leverage** | Partially available for margin | Available (sometimes up to 125x) | 
+| **Risk Level** | Low - Mid | High |
+| **Liquidation Risk** | Margin call possible if trading on margin | Liquidation possible |
+
+**Spot/Margin**:
+
+* Refers to the direct exchange of cryptocurrencies for immediate delivery and settlement.
+* Could use leverage to trade the spot market on a margin.
+* When a trader buys a cryptocurrency in the spot market, the trader actually own the asset and can use it (transfer, hold, or use for transactions).
+* Transactions are settled “on the spot,” meaning ownership of the asset is transferred immediately.
+
+**Perpetual Futures**:
+
+* Derivative contracts that allow traders to speculate on the price movement of a cryptocurrency without owning the underlying asset.
+* Traders don’t own the actual cryptocurrency; they trade contracts representing its value.
+* Perpetual futures do not have an expiry date; traders can hold positions indefinitely.
+* Perpetual futures allow for leverage, potentially leading to higher profits or losses.
+
+#### 2.3.11 Leverage
+
+Leverage refers to using borrowed capital to open a trading position, allowing traders to control a larger position size than their available capital. In the crypto market, leverage enables traders to amplify both potential gains and potential losses. In the crypto market, there are two types of leverages: cross and isolated.
+
+**Cross Margin**:
+
+* In cross margin mode, your entire account balance is used to margin all open positions.
+* P&L from one position can support another position that is close to liquidation.
+* Cross margin carries the risk of losing the entire account if liquidation occurs.
+* Traders using cross margin must add more funds to prevent liquidation.
+
+**Isolated Margin**:
+
+* In isolated margin mode, you allocate margin specifically to a single position or trading pair.
+* Trader transfers funds into the isolated margin for a specific trade, wchi allows traders to manage risk for a specific position by choosing how much margin is allocated to it.
+* Only the funds allocated to a position can be liquidated, limiting potential losses.
+
+#### 2.3.12 Order Type
+
+Four major type of orders are: Limit, Market, Stop, and Stop Limit.
+
+**Limit**: 
+* Allows investors to buy or sell securities at a specific price in the future.
+* Trader sets the maximum or minimum price at which the trader is willing to buy or sell.
+* The order will only be filled if the market reaches the pre-defined level.
+* Limit orders provide **control over execution price** but **no guarantee of execution**.
+
+![limit order](../images/limit.png)
+
+**Market**:
+* Instructs the exchange to buy or sell immediately at the current market price.
+* When placed:
+    * If buying, trader will pay a price at or near the posted ask (selling) price.
+    * If selling, trader will receive a price at or near the posted bid (buying) price.
+* Market orders **guarantee immediate execution** but **not a specific price**.
+
+![market order](../images/market.png)
+
+**Stop**:
+* Becomes a market order when the stock reaches a specified price.
+* Often used to limit losses or lock in profits.
+
+![stop order](../images/stop.png)
+
+**Stop Limit**:
+* Combines features of stop and limit orders; becomes a limit order when the stock reaches a specified price.
+* Trader sets both a stop price (when the order becomes active) and a limit price (the maximum or minimum price you’re willing to accept).
+
+![stop limit order](../images/stoplimit.png)
+
 ## 3. Tools and Technology
 
 ### 3.1 Programming Languages
@@ -186,5 +281,38 @@ Once the backtesting is over, list of trades is outputted to the CSV file to aid
 Current version of latency analysis performs backteset given hypothetical sending latency of 0, 10, 25, 50, 100, 200, 500, 1000 nanoseconds. Then the software outputs the latency vs P&L CSV file as well as the log-latency vs P&L plot to visualize the effect of latency to the user's strategy.
 
 ## 6. Future Work
+
+1. Class Exchange: More Freedom in Latency Configuration
+
+    * Latency, in fact, is not set throughout the backtesting period, but could vary based on time of day, and day of week.
+    * We plan to have a method for the user to be able to configure latency more freely and realistically.
+
+2. Class Order: Ensure Exchange's Market Type Supports Certain Order Type
+
+    * There could be a case where some exchange does not support certain order type in a certain market type.
+    * Further research needs to be done to identify and include these restrictions.
+
+3. Class Order: Advanced Order Types
+
+    * There are more advanced order types that has not been yet implemented such as trailing stop, or one-cancels-other (OCO).
+
+4. Class Order: Rate Limit
+
+    * When trading through an API, exchanges have rate limit, which limits the number/weight of API calls in a given rolling time window.
+    * Further research needs to be done to implement rate limit feature, which has different allowance per user level and different rate per different API calls.
+
+5. Class User: Add Restriction per Subaccount
+
+    * User can have multiple subaccounts, and there can be restriction on those subaccounts, for example, this account can only trade spot without leverage.
+
+6. Class User: Risk/Position Management per Firm/User/Subaccount
+
+    * Suppose a user has two subaccounts that are each long in Spot BTC/USDT and long 10x in BTC/USDT perpetual futures. User has great exposure to risk regarding the price movement of BTC/USDT.
+    * Implement a method to return or visualize the exposure to certain security.
+
+7. General: Exception Logger
+
+    * Currently, a fatal error (such as not meeting trade rules) throws an exception.
+    * We would like to have an error logger that could record all these errors.
 
 ## 7. Project Reflections
