@@ -71,7 +71,6 @@ class OrderBook {
          * @param price level price level of the new order
          * @param order_side order side of the new order
          * @param my_order boolean whether the new order is my order
-         * @todo Consider a case where placing order will instantly fill, but not all
          */
         pair<std::shared_ptr<Order>, vector<pair<double, double>>> addOrder(double price_level, int order_side, double order_size, std::shared_ptr<Order> order_ptr) {
             if (price_level <= 0) {
