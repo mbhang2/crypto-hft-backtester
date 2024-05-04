@@ -24,7 +24,7 @@ The **Crypto Trading Strategy Backtester** is a powerful tool designed to evalua
 
 ## 2. Doxygen 
 
-[Doxygen Documentation](./html/index.html)
+[Doxygen Documentation](https://crypto-backtesting.static.domains/)
 
 ## 3. Data Input Format
 
