@@ -6,5 +6,6 @@ var searchData=
   ['tostring_3',['toString',['../struct_time_type.html#af298a42f692b23c2a5c031e3f1c55a32',1,'TimeType']]],
   ['trade_4',['Trade',['../class_trade.html',1,'Trade'],['../class_trade.html#a18317a837bc360766702a3a8f49a1a4d',1,'Trade::Trade()']]],
   ['tradeeventmsg_5',['TradeEventMsg',['../class_trade_event_msg.html',1,'']]],
-  ['tradeoccurred_6',['tradeOccurred',['../class_order_book.html#af542d82f221cbeac9f13a6bc03238447',1,'OrderBook']]]
+  ['tradelog_6',['TradeLog',['../class_trade_log.html',1,'TradeLog'],['../class_trade_log.html#ae68d7efbdb17a230fe018c05d0810228',1,'TradeLog::TradeLog()']]],
+  ['tradeoccurred_7',['tradeOccurred',['../class_order_book.html#af542d82f221cbeac9f13a6bc03238447',1,'OrderBook']]]
 ];

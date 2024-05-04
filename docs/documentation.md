@@ -22,7 +22,9 @@ The **Crypto Trading Strategy Backtester** is a powerful tool designed to evalua
    - Run latency analysis experiments to understand how changes in execution speed affect your overall profit and loss (PNL).
 
 
-## 2. Class 
+## 2. Doxygen 
+
+[Doxygen Documentation](./html/index.html)
 
 ## 3. Data Input Format
 

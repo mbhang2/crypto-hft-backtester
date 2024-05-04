@@ -1,0 +1,33 @@
+\doxysection{orderlog.\+h}
+\hypertarget{orderlog_8h_source}{}\label{orderlog_8h_source}\index{include/record/orderlog.h@{include/record/orderlog.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}../backtesting/order.h"{}}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00012\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_order_log}{OrderLog}}\ \{}
+\DoxyCodeLine{00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{class_order_log_abadb1ec021feceb773c085af7cbbb1bd}{OrderLog}}()\ \{\}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{class_order_log_a2e13b49e490b1b048b66c0ecf0f6b6ed}{\string~OrderLog}}()\ \{\}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_order_log_a364881030cada547b496dd48dd62c3ae}{Clear}}()\ \{}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ orders.clear();}
+\DoxyCodeLine{00029\ \ \ \ \ \}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_order_log_a5b47e6c7f1678b6e1631ed52a2bf3c8a}{addOrder}}(std::shared\_ptr<Order>\ order)\ \{}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ orders.push\_back(order);}
+\DoxyCodeLine{00037\ \ \ \ \ \}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00042\ \ \ \ \ vector<std::shared\_ptr<Order>>\ \mbox{\hyperlink{class_order_log_a5c08c91abb037b3a5a94469fe32db51c}{getOrders}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ orders;\}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00045\ \ \ \ \ vector<std::shared\_ptr<Order>>\ orders;}
+\DoxyCodeLine{00046\ \};}
+
+\end{DoxyCode}

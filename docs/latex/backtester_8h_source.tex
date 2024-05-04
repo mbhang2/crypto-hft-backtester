@@ -43,8 +43,8 @@
 \DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_backtester_a180ef377e8377d2a41118192065c13f3}{Clear}}(map<MarketType,\ double>\ initial\_buying\_power)\ \{}
 \DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ orderbooks.clear();}
 \DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_backtester_a0753f6abe047c911a1eca665bb4faa40}{loadOrderBook}}();}
-\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ orderlog.Clear();}
-\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ tradelog.Clear();}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ orderlog.\mbox{\hyperlink{class_order_log_a364881030cada547b496dd48dd62c3ae}{Clear}}();}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ tradelog.\mbox{\hyperlink{class_trade_log_a4ff9d7bdbc9bebba7b63ddff20210c11}{Clear}}();}
 \DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ last\_traded\_price.clear();}
 \DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ user.\mbox{\hyperlink{class_user_a2ad0bc578cdc14e52af2a7165388250e}{Clear}}(initial\_buying\_power);}
 \DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ strategy-\/>\mbox{\hyperlink{class_strategy_a2920265e6b43c6ccc8d573e48987b063}{Clear}}();}
@@ -107,7 +107,7 @@
 \DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::get<0>(it)-\/>fillOrder(std::get<2>(it),\ std::get<1>(it));}
 \DoxyCodeLine{00130\ }
 \DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_trade}{Trade}}*\ trade\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_trade}{Trade}}(std::get<0>(it),\ tt,\ std::get<0>(it)-\/>getSide(),\ std::get<2>(it),\ std::get<1>(it),\ \textcolor{keyword}{true});}
-\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.addTrade(std::shared\_ptr<Trade>(trade));}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.\mbox{\hyperlink{class_trade_log_a598aa363c377f2feb233d079ecf4c8c8}{addTrade}}(std::shared\_ptr<Trade>(trade));}
 \DoxyCodeLine{00133\ }
 \DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user.\mbox{\hyperlink{class_user_a2cf699778c9315b5bef7abe1f7cef80a}{updateBalance}}(std::get<0>(it)-\/>getMarketType(),\ -\/trade-\/>\mbox{\hyperlink{class_trade_adabb51e18619aa90309c4fc159bd4de2}{getSide}}()\ *\ std::get<2>(it)\ *\ std::get<1>(it)\ -\/\ trade-\/>\mbox{\hyperlink{class_trade_a5bb023743197f90c8dcfbd1159795b7c}{getFee}}());}
 \DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ strategy-\/>\mbox{\hyperlink{class_strategy_a839246fefbd4807abf02f24243547e8a}{updatePosition}}(std::get<0>(it)-\/>getMarketType(),\ *std::get<0>(it)-\/>getExchange(),\ *std::get<0>(it)-\/>getSecurity(),\ std::get<0>(it)-\/>getSide()*std::get<2>(it));}
@@ -126,7 +126,7 @@
 \DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::get<0>(it)-\/>fillOrder(std::get<2>(it),\ std::get<1>(it));}
 \DoxyCodeLine{00149\ }
 \DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_trade}{Trade}}*\ trade\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_trade}{Trade}}(std::get<0>(it),\ tt,\ std::get<0>(it)-\/>getSide(),\ std::get<2>(it),\ std::get<1>(it),\ \textcolor{keyword}{true});}
-\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.addTrade(std::shared\_ptr<Trade>(trade));}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.\mbox{\hyperlink{class_trade_log_a598aa363c377f2feb233d079ecf4c8c8}{addTrade}}(std::shared\_ptr<Trade>(trade));}
 \DoxyCodeLine{00152\ }
 \DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user.\mbox{\hyperlink{class_user_a2cf699778c9315b5bef7abe1f7cef80a}{updateBalance}}(std::get<0>(it)-\/>getMarketType(),\ -\/trade-\/>\mbox{\hyperlink{class_trade_adabb51e18619aa90309c4fc159bd4de2}{getSide}}()\ *\ std::get<2>(it)\ *\ std::get<1>(it)\ -\/\ trade-\/>\mbox{\hyperlink{class_trade_a5bb023743197f90c8dcfbd1159795b7c}{getFee}}());}
 \DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ strategy-\/>\mbox{\hyperlink{class_strategy_a839246fefbd4807abf02f24243547e8a}{updatePosition}}(std::get<0>(it)-\/>getMarketType(),\ *std::get<0>(it)-\/>getExchange(),\ *std::get<0>(it)-\/>getSecurity(),\ std::get<0>(it)-\/>getSide()*std::get<2>(it));}
@@ -144,7 +144,7 @@
 \DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ std::get<0>(it)-\/>fillOrder(std::get<2>(it),\ std::get<1>(it));}
 \DoxyCodeLine{00167\ }
 \DoxyCodeLine{00168\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_trade}{Trade}}*\ trade\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_trade}{Trade}}(std::get<0>(it),\ tt,\ std::get<0>(it)-\/>getSide(),\ std::get<2>(it),\ std::get<1>(it),\ \textcolor{keyword}{true});}
-\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.addTrade(std::shared\_ptr<Trade>(trade));}
+\DoxyCodeLine{00169\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.\mbox{\hyperlink{class_trade_log_a598aa363c377f2feb233d079ecf4c8c8}{addTrade}}(std::shared\_ptr<Trade>(trade));}
 \DoxyCodeLine{00170\ }
 \DoxyCodeLine{00171\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user.\mbox{\hyperlink{class_user_a2cf699778c9315b5bef7abe1f7cef80a}{updateBalance}}(std::get<0>(it)-\/>getMarketType(),\ -\/trade-\/>\mbox{\hyperlink{class_trade_adabb51e18619aa90309c4fc159bd4de2}{getSide}}()\ *\ std::get<2>(it)\ *\ std::get<1>(it)\ -\/\ trade-\/>\mbox{\hyperlink{class_trade_a5bb023743197f90c8dcfbd1159795b7c}{getFee}}());}
 \DoxyCodeLine{00172\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ strategy-\/>\mbox{\hyperlink{class_strategy_a839246fefbd4807abf02f24243547e8a}{updatePosition}}(std::get<0>(it)-\/>getMarketType(),\ *std::get<0>(it)-\/>getExchange(),\ *std::get<0>(it)-\/>getSecurity(),\ std::get<0>(it)-\/>getSide()*std::get<2>(it));}
@@ -164,7 +164,7 @@
 \DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ it-\/>rejectOrder();}
 \DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{00188\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_orders.push\_back(it);}
-\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ orderlog.addOrder(it);}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ orderlog.\mbox{\hyperlink{class_order_log_a5b47e6c7f1678b6e1631ed52a2bf3c8a}{addOrder}}(it);}
 \DoxyCodeLine{00190\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
@@ -200,7 +200,7 @@
 \DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00223\ }
 \DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_trade}{Trade}}*\ trade\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{class_trade}{Trade}}(it,\ tt,\ it-\/>getSide(),\ fill\_pair.second,\ fill\_pair.first,\ \textcolor{keyword}{false});}
-\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.addTrade(std::shared\_ptr<Trade>(trade));}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.\mbox{\hyperlink{class_trade_log_a598aa363c377f2feb233d079ecf4c8c8}{addTrade}}(std::shared\_ptr<Trade>(trade));}
 \DoxyCodeLine{00226\ }
 \DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user.\mbox{\hyperlink{class_user_a2cf699778c9315b5bef7abe1f7cef80a}{updateBalance}}(it-\/>getMarketType(),\ -\/trade-\/>\mbox{\hyperlink{class_trade_adabb51e18619aa90309c4fc159bd4de2}{getSide}}()\ *\ fill\_pair.first\ *\ fill\_pair.second\ -\/\ trade-\/>\mbox{\hyperlink{class_trade_a5bb023743197f90c8dcfbd1159795b7c}{getFee}}());}
 \DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
@@ -217,8 +217,8 @@
 \DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00240\ }
 \DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Record\ balance\ history}}
-\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tradelog.getTrades().empty())\ \{}
-\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.addBalanceHistory(tt,\ user.\mbox{\hyperlink{class_user_a2880bc504fcf8354e9b3120033931914}{getCapital}}(MarketType::Spot),\ user.\mbox{\hyperlink{class_user_a2880bc504fcf8354e9b3120033931914}{getCapital}}(MarketType::Futures));}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tradelog.\mbox{\hyperlink{class_trade_log_a75d6cc25a7bbb5c4e1881a7845b1c8cd}{getTrades}}().empty())\ \{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.\mbox{\hyperlink{class_trade_log_a6d4f5279c3e3cb755b23879ba275948e}{addBalanceHistory}}(tt,\ user.\mbox{\hyperlink{class_user_a2880bc504fcf8354e9b3120033931914}{getCapital}}(MarketType::Spot),\ user.\mbox{\hyperlink{class_user_a2880bc504fcf8354e9b3120033931914}{getCapital}}(MarketType::Futures));}
 \DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ spot\_cap\ =\ user.\mbox{\hyperlink{class_user_a2880bc504fcf8354e9b3120033931914}{getCapital}}(MarketType::Spot);}
 \DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ futures\_cap\ =\ user.\mbox{\hyperlink{class_user_a2880bc504fcf8354e9b3120033931914}{getCapital}}(MarketType::Futures);}
@@ -235,7 +235,7 @@
 \DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00259\ }
-\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.addBalanceHistory(tt,\ spot\_cap,\ futures\_cap);}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tradelog.\mbox{\hyperlink{class_trade_log_a6d4f5279c3e3cb755b23879ba275948e}{addBalanceHistory}}(tt,\ spot\_cap,\ futures\_cap);}
 \DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00263\ \ \ \ \ \}}
@@ -253,7 +253,7 @@
 \DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00281\ }
 \DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_backtester_a167ccd6bb7d79d1dfb4ed4c2e8ed5e4a}{runBacktest}}(data\_path);}
-\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ latency\_analysis\_pnl.emplace\_back(make\_pair(latency,\ make\_pair(tradelog.getBalanceHistory().back().second.first,\ tradelog.getBalanceHistory().back().second.second)));}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ \ \ latency\_analysis\_pnl.emplace\_back(make\_pair(latency,\ make\_pair(tradelog.\mbox{\hyperlink{class_trade_log_a01f5e9a5905fe5b99459ebf5cb30b03f}{getBalanceHistory}}().back().second.first,\ tradelog.\mbox{\hyperlink{class_trade_log_a01f5e9a5905fe5b99459ebf5cb30b03f}{getBalanceHistory}}().back().second.second)));}
 \DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00285\ }
 \DoxyCodeLine{00286\ \ \ \ \ \ \ \ \ std::ofstream\ outfile(output\_path);}
@@ -271,14 +271,14 @@
 \DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \}}
 \DoxyCodeLine{00299\ \ \ \ \ \}}
 \DoxyCodeLine{00300\ }
-\DoxyCodeLine{00304\ \ \ \ \ TradeLog\&\ \mbox{\hyperlink{class_backtester_aaef48001493b6e07442d29a8bb30ace3}{getTradeLog}}()\ \{\textcolor{keywordflow}{return}\ tradelog;\}}
+\DoxyCodeLine{00304\ \ \ \ \ \mbox{\hyperlink{class_trade_log}{TradeLog}}\&\ \mbox{\hyperlink{class_backtester_aaef48001493b6e07442d29a8bb30ace3}{getTradeLog}}()\ \{\textcolor{keywordflow}{return}\ tradelog;\}}
 \DoxyCodeLine{00305\ }
 \DoxyCodeLine{00306\ \ \ \ \ \textcolor{keyword}{private}:}
 \DoxyCodeLine{00307\ \ \ \ \ \mbox{\hyperlink{class_user}{User}}\ user;}
 \DoxyCodeLine{00308\ \ \ \ \ \mbox{\hyperlink{class_strategy}{Strategy}}*\ strategy;}
 \DoxyCodeLine{00309\ \ \ \ \ MarketMap\ orderbooks;}
-\DoxyCodeLine{00310\ \ \ \ \ OrderLog\ orderlog;}
-\DoxyCodeLine{00311\ \ \ \ \ TradeLog\ tradelog;}
+\DoxyCodeLine{00310\ \ \ \ \ \mbox{\hyperlink{class_order_log}{OrderLog}}\ orderlog;}
+\DoxyCodeLine{00311\ \ \ \ \ \mbox{\hyperlink{class_trade_log}{TradeLog}}\ tradelog;}
 \DoxyCodeLine{00312\ \ \ \ \ map<pair<MarketType,\ std::shared\_ptr<Security>>,\ \textcolor{keywordtype}{double}>\ last\_traded\_price;}
 \DoxyCodeLine{00313\ \ \ \ \ vector<pair<int,\ pair<double,\ double>>>\ latency\_analysis\_pnl;}
 \DoxyCodeLine{00314\ }
