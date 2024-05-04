@@ -1,0 +1,120 @@
+\doxysection{tradelog.\+h}
+\hypertarget{tradelog_8h_source}{}\label{tradelog_8h_source}\index{include/record/tradelog.h@{include/record/tradelog.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <iomanip>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}../backtesting/trade.h"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacestd}{std}};}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00014\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_trade_log}{TradeLog}}\ \{}
+\DoxyCodeLine{00015\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{class_trade_log_ae68d7efbdb17a230fe018c05d0810228}{TradeLog}}()\ \{\}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{class_trade_log_a324323095c5e79288a80b31762fe9dab}{\string~TradeLog}}()\ \{\}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_trade_log_a4ff9d7bdbc9bebba7b63ddff20210c11}{Clear}}()\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ trades.clear();}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ balance\_history.clear();}
+\DoxyCodeLine{00032\ \ \ \ \ \}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_trade_log_a598aa363c377f2feb233d079ecf4c8c8}{addTrade}}(std::shared\_ptr<Trade>\ trade)\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ trades.push\_back(trade);}
+\DoxyCodeLine{00040\ \ \ \ \ \}}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00045\ \ \ \ \ vector<std::shared\_ptr<Trade>>\ \mbox{\hyperlink{class_trade_log_a75d6cc25a7bbb5c4e1881a7845b1c8cd}{getTrades}}()\textcolor{keyword}{\ const\ }\{\textcolor{keywordflow}{return}\ trades;\}}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00050\ \ \ \ \ vector<pair<std::shared\_ptr<TimeType>,\ pair<double,\ double>>>\ \mbox{\hyperlink{class_trade_log_a01f5e9a5905fe5b99459ebf5cb30b03f}{getBalanceHistory}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ balance\_history;}
+\DoxyCodeLine{00052\ \ \ \ \ \}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_trade_log_a6d4f5279c3e3cb755b23879ba275948e}{addBalanceHistory}}(std::shared\_ptr<TimeType>\ tt,\ \textcolor{keywordtype}{double}\ spot\_bal,\ \textcolor{keywordtype}{double}\ futures\_bal)\ \{}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ balance\_history.emplace\_back(make\_pair(tt,\ make\_pair(spot\_bal,\ futures\_bal)));}
+\DoxyCodeLine{00059\ \ \ \ \ \}}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{class_trade_log_a6751ceafad15bf9d07d3bce3bc6e6591}{computeTotalRealizedPNL}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ pnl\ =\ 0;}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\&\ it\ :\ trades)\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \ \ \ \ pnl\ -\/=\ it-\/>getSide()\ *\ it-\/>getPrice()\ *\ it-\/>getBaseCurrencySize()\ +\ it-\/>getFee();}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ pnl;}
+\DoxyCodeLine{00072\ \ \ \ \ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{double}\ computeWeightedAverageFillPrice(\textcolor{keywordtype}{double}\ size)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ checkedSize\ =\ 0.0;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ weightedSum\ =\ 0.0;}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ it\ =\ trades.rbegin();\ it\ !=\ trades.rend();\ ++it)\ \{}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ trade\ =\ *it;}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ tradeSize\ =\ min(trade-\/>getBaseCurrencySize(),\ size-\/checkedSize);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ tradePrice\ =\ trade-\/>getPrice();}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Accumulate\ checked\ size}}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ checkedSize\ +=\ tradeSize;}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Update\ the\ weighted\ sum}}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ weightedSum\ +=\ tradeSize\ *\ tradePrice;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Stop\ when\ checked\ size\ reaches\ the\ specified\ size}}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (checkedSize\ ==\ size)\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00093\ \ \ \ \ \}}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{comment}{//\ Calculate\ the\ weighted\ average}}
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordtype}{double}\ weightedAverage\ =\ weightedSum\ /\ checkedSize;}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordflow}{return}\ weightedAverage;}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{comment}{//\ vector<pair<vector<pair<std::shared\_ptr<Trade>,\ double>>,\ vector<pair<std::shared\_ptr<Trade>,\ double>>>>\ getTradePairs()\ \{}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{comment}{//\ \}}}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_trade_log_ab643de73dd98e203604e0d7b142c93aa}{exportBalanceHistoryToCSV}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ filename)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \ \ std::ofstream\ outfile(filename);}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ outfile\ <<\ std::fixed\ <<\ std::setprecision(2);}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (outfile)\ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ outfile\ <<\ \textcolor{stringliteral}{"{}TIMESTAMP,SPOT\_BALANCE,FUTURES\_BALANCE"{}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00116\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ it\ :\ balance\_history)\ \{}
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outfile\ <<\ it.first-\/>toString()\ <<\ \textcolor{stringliteral}{"{},"{}}\ <<\ it.second.first\ <<\ \textcolor{stringliteral}{"{},"{}}\ <<\ it.second.second\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \ \ \ \ outfile.close();}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Data\ exported\ to\ "{}}\ <<\ filename\ <<\ std::endl;}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error\ opening\ file\ for\ writing."{}}\ <<\ std::endl;}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00124\ \ \ \ \ \}}
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00129\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_trade_log_add2d268714d59f2037a24a7745b9850c}{exportTradeLogToCSV}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{string}\&\ filename)\ \{}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \ \ std::ofstream\ outfile(filename);}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ outfile\ <<\ std::fixed\ <<\ std::setprecision(2);}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (outfile)\ \{}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \ \ \ \ outfile\ <<\ \textcolor{stringliteral}{"{}TIMESTAMP,SECURITY,MARKET\_TYPE,EXCHANGE,SIDE,SIZE,FEE"{}}\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ it\ :\ trades)\ \{}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{string}\ s\ =\ (it-\/>getSide()\ ==\ 1)\ ?\ \textcolor{stringliteral}{"{}Buy"{}}\ :\ \textcolor{stringliteral}{"{}sell"{}};}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ outfile\ <<\ it-\/>getTimestamp()-\/>toString()\ <<\ \textcolor{stringliteral}{"{},"{}}\ <<\ *(it-\/>getSecurity())\ <<\ \textcolor{stringliteral}{"{},"{}}\ <<\ it-\/>getParentOrder()-\/>getMarketType()\ <<\ \textcolor{stringliteral}{"{},"{}}\ <<\ it-\/>getExchange()-\/>getName()\ }
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ <<\ \textcolor{stringliteral}{"{},"{}}\ <<\ s\ <<\ \textcolor{stringliteral}{"{},"{}}\ <<\ it-\/>getBaseCurrencySize()\ <<\ \textcolor{stringliteral}{"{},"{}}\ <<\ it-\/>getFee()\ <<\ \textcolor{stringliteral}{"{}\(\backslash\)n"{}};}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \ \ \ \ outfile.close();}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Data\ exported\ to\ "{}}\ <<\ filename\ <<\ std::endl;}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \}\ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \ \ \ \ std::cerr\ <<\ \textcolor{stringliteral}{"{}Error\ opening\ file\ for\ writing."{}}\ <<\ std::endl;}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00145\ \ \ \ \ \}}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00149\ \ \ \ \ vector<std::shared\_ptr<Trade>>\ trades;\ \ \ \ \ \ \textcolor{comment}{/*<\ Vector\ of\ pointers\ to\ trades\ */}}
+\DoxyCodeLine{00150\ \ \ \ \ vector<pair<std::shared\_ptr<TimeType>,\ pair<double,\ double>>>\ balance\_history;\ \ \ \ \ \ \textcolor{comment}{/*<\ Vector\ recording\ real\ time\ balance\ */}}
+\DoxyCodeLine{00151\ \};}
+
+\end{DoxyCode}
