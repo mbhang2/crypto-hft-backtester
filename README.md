@@ -9,8 +9,12 @@
 - Email: [mbhang2@illinois.edu](/ie421_high_frequency_trading_spring_2024/ie421_hft_spring_2024_group_04/group_04_project/-/blob/main/mbhang2@illinois.edu) 
 - LinkedIn: [Min Hyuk Bhang](https://www.linkedin.com/in/michael-bhang/)
 
+**Jiayuan (Jerry) Hong**
+I am a proficient software engineer transitioning from full-stack development to system engineering, with a newfound passion for C/C++ and CUDA programming. My expertise extends to modern CPU architecture, and I will have valuable experience working on the trade execution system of CME Globex at CME Group, focusing on high-frequency trading performance.
 
-
+As a quick learner, I excel in collaborating with clients to develop efficient, scalable, and user-friendly solutions that address real-world challenges. Goal-oriented and resourceful, I am committed to moving projects forward, taking responsibility for any challenges and obstacles that arise. I'm so exited to explore the wonderful world of trading systems and I'm ready for the challenges ahead!
+- Email: jh79@illinois.edu
+- LinkedIn: [Jiayuan Hong](https://www.linkedin.com/in/jiayuan-hong-a624121a0/)
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
