@@ -74,7 +74,9 @@ $(function() {
 <div class="textblock">Here is a list of all documented struct and union fields with links to the struct/union documentation for each field:</div>
 
 <h3><a id="index_a" name="index_a"></a>- a -</h3><ul>
-<li>addOrder()&#160;:&#160;<a class="el" href="class_order_book.html#a95387368053c1012225455fb5b9b6835">OrderBook</a></li>
+<li>addBalanceHistory()&#160;:&#160;<a class="el" href="class_trade_log.html#a6d4f5279c3e3cb755b23879ba275948e">TradeLog</a></li>
+<li>addOrder()&#160;:&#160;<a class="el" href="class_order_book.html#a95387368053c1012225455fb5b9b6835">OrderBook</a>, <a class="el" href="class_order_log.html#a5b47e6c7f1678b6e1631ed52a2bf3c8a">OrderLog</a></li>
+<li>addTrade()&#160;:&#160;<a class="el" href="class_trade_log.html#a598aa363c377f2feb233d079ecf4c8c8">TradeLog</a></li>
 </ul>
 
 
@@ -90,13 +92,16 @@ $(function() {
 <li>checkFillability()&#160;:&#160;<a class="el" href="class_limit.html#a7a239e7099989c965b1d986bf848d934">Limit</a>, <a class="el" href="class_market.html#a13b68f3a618fa8bc9a06c8198c305475">Market</a>, <a class="el" href="class_order.html#a734636fd339bfcb70dd76517a8cbefbc">Order</a>, <a class="el" href="class_stop.html#addf7a4f7909ed34c8f43319f26ed6bcd">Stop</a>, <a class="el" href="class_stop_limit.html#a3794a97d7b3271e2fd93ca9561ebc370">StopLimit</a></li>
 <li>checkOrderReceived()&#160;:&#160;<a class="el" href="class_order.html#aab55bc27a8b27588d5d0fc3c8dfebb29">Order</a></li>
 <li>checkTriggered()&#160;:&#160;<a class="el" href="class_limit.html#af763a06a33c11d03c3917da3dcb491f4">Limit</a>, <a class="el" href="class_market.html#a755dd872b09dd0b8d0f6e774ea0855a4">Market</a>, <a class="el" href="class_order.html#a4b4d4ccb868579c8108dcdc844055a02">Order</a>, <a class="el" href="class_stop.html#aac0e53df09828605b4be7a06a06714b2">Stop</a>, <a class="el" href="class_stop_limit.html#ab3c01af06158a736e18985540c2cda75">StopLimit</a></li>
-<li>Clear()&#160;:&#160;<a class="el" href="class_backtester.html#a180ef377e8377d2a41118192065c13f3">Backtester</a>, <a class="el" href="class_strategy.html#a2920265e6b43c6ccc8d573e48987b063">Strategy</a>, <a class="el" href="class_user.html#a2ad0bc578cdc14e52af2a7165388250e">User</a></li>
+<li>Clear()&#160;:&#160;<a class="el" href="class_backtester.html#a180ef377e8377d2a41118192065c13f3">Backtester</a>, <a class="el" href="class_order_log.html#a364881030cada547b496dd48dd62c3ae">OrderLog</a>, <a class="el" href="class_strategy.html#a2920265e6b43c6ccc8d573e48987b063">Strategy</a>, <a class="el" href="class_trade_log.html#a4ff9d7bdbc9bebba7b63ddff20210c11">TradeLog</a>, <a class="el" href="class_user.html#a2ad0bc578cdc14e52af2a7165388250e">User</a></li>
+<li>computeTotalRealizedPNL()&#160;:&#160;<a class="el" href="class_trade_log.html#a6751ceafad15bf9d07d3bce3bc6e6591">TradeLog</a></li>
 <li>countDigitsAfterDecimal()&#160;:&#160;<a class="el" href="class_order.html#a4bf5d617862d6f9578b5b2ca8305f2eb">Order</a></li>
 </ul>
 
 
 <h3><a id="index_e" name="index_e"></a>- e -</h3><ul>
 <li>Exchange()&#160;:&#160;<a class="el" href="class_exchange.html#ae0c535ddace2066533e39bab4326257c">Exchange</a></li>
+<li>exportBalanceHistoryToCSV()&#160;:&#160;<a class="el" href="class_trade_log.html#ab643de73dd98e203604e0d7b142c93aa">TradeLog</a></li>
+<li>exportTradeLogToCSV()&#160;:&#160;<a class="el" href="class_trade_log.html#add2d268714d59f2037a24a7745b9850c">TradeLog</a></li>
 </ul>
 
 
@@ -109,6 +114,7 @@ $(function() {
 
 
 <h3><a id="index_g" name="index_g"></a>- g -</h3><ul>
+<li>getBalanceHistory()&#160;:&#160;<a class="el" href="class_trade_log.html#a01f5e9a5905fe5b99459ebf5cb30b03f">TradeLog</a></li>
 <li>getBase()&#160;:&#160;<a class="el" href="class_security.html#a4c33c9a4b0e9934a341607823fb1fa5e">Security</a></li>
 <li>getBaseCurrencySize()&#160;:&#160;<a class="el" href="class_order.html#accc9a886be0fc5b2319155912ad8f5cb">Order</a>, <a class="el" href="class_trade.html#aa102f4ff73035fd47e79b6b7a0c615e9">Trade</a></li>
 <li>getBestAsk()&#160;:&#160;<a class="el" href="class_order_book.html#a4bfe3757085beb1142c20187565f4b7f">OrderBook</a></li>
@@ -129,6 +135,7 @@ $(function() {
 <li>getMarginType()&#160;:&#160;<a class="el" href="class_order.html#abcec4591a9f10b4f25c60d98867decce">Order</a></li>
 <li>getMarketType()&#160;:&#160;<a class="el" href="class_order.html#add52ded9b5e1ef59942bbe62ff45244d">Order</a>, <a class="el" href="class_order_book.html#ad8b8df03f65a11f919eba7b90c9b86f3">OrderBook</a></li>
 <li>getName()&#160;:&#160;<a class="el" href="class_exchange.html#a2d9744c05e66be11466c27b68becaec3">Exchange</a></li>
+<li>getOrders()&#160;:&#160;<a class="el" href="class_order_log.html#a5c08c91abb037b3a5a94469fe32db51c">OrderLog</a></li>
 <li>getOrderSide()&#160;:&#160;<a class="el" href="class_order_book.html#abe632dddc5e60ea648cce40e5ef933d8">OrderBook</a></li>
 <li>getOrderState()&#160;:&#160;<a class="el" href="class_order.html#ac7947c0adf7ccb40cd99ce4a998ca892">Order</a></li>
 <li>getOrderType()&#160;:&#160;<a class="el" href="class_order.html#ae3074099204de9ab60a396deb38f5a26">Order</a></li>
@@ -145,6 +152,7 @@ $(function() {
 <li>getTakerFee()&#160;:&#160;<a class="el" href="class_exchange.html#a65970416b7a2d9bd5f726a13e4bd24c9">Exchange</a></li>
 <li>getTimestamp()&#160;:&#160;<a class="el" href="class_order.html#ae1067a7f932a51fa1937f206ff463c42">Order</a>, <a class="el" href="class_trade.html#a97379f4ead39fdecaaec2fa439e2fef5">Trade</a></li>
 <li>getTradeLog()&#160;:&#160;<a class="el" href="class_backtester.html#aaef48001493b6e07442d29a8bb30ace3">Backtester</a></li>
+<li>getTrades()&#160;:&#160;<a class="el" href="class_trade_log.html#a75d6cc25a7bbb5c4e1881a7845b1c8cd">TradeLog</a></li>
 <li>getTradingRules()&#160;:&#160;<a class="el" href="class_exchange.html#a740f16ee64748be4760ba5d69a4858b8">Exchange</a></li>
 <li>getTriggerPrice()&#160;:&#160;<a class="el" href="class_stop.html#ae64400514efd2c045ce467f1617f95c8">Stop</a>, <a class="el" href="class_stop_limit.html#a4d5bdda371d40d94423e29f5effb2f5f">StopLimit</a></li>
 </ul>
@@ -180,6 +188,7 @@ $(function() {
 <li>operator==()&#160;:&#160;<a class="el" href="class_exchange.html#ac14cbdc01c4f7bdecfef2a8842c3200e">Exchange</a>, <a class="el" href="class_security.html#afee2f2b3e67daa0a8924503cffb31140">Security</a></li>
 <li>Order()&#160;:&#160;<a class="el" href="class_order.html#ac9d356d64f4aef1d7f2c4b48c961a5c7">Order</a></li>
 <li>OrderBook()&#160;:&#160;<a class="el" href="class_order_book.html#ab7779f6548074971a90f3c95a8b5bf5a">OrderBook</a></li>
+<li>OrderLog()&#160;:&#160;<a class="el" href="class_order_log.html#abadb1ec021feceb773c085af7cbbb1bd">OrderLog</a></li>
 </ul>
 
 
@@ -209,6 +218,7 @@ $(function() {
 <li>toNanosecondsSinceEpoch()&#160;:&#160;<a class="el" href="struct_time_type.html#afbdf9cbffe79956a0eb1c2efdf43779f">TimeType</a></li>
 <li>toString()&#160;:&#160;<a class="el" href="struct_time_type.html#af298a42f692b23c2a5c031e3f1c55a32">TimeType</a></li>
 <li>Trade()&#160;:&#160;<a class="el" href="class_trade.html#a18317a837bc360766702a3a8f49a1a4d">Trade</a></li>
+<li>TradeLog()&#160;:&#160;<a class="el" href="class_trade_log.html#ae68d7efbdb17a230fe018c05d0810228">TradeLog</a></li>
 <li>tradeOccurred()&#160;:&#160;<a class="el" href="class_order_book.html#af542d82f221cbeac9f13a6bc03238447">OrderBook</a></li>
 </ul>
 
@@ -225,9 +235,11 @@ $(function() {
 <li>~Exchange()&#160;:&#160;<a class="el" href="class_exchange.html#a38dcc26639aac9c11b32c5e50d1ee91c">Exchange</a></li>
 <li>~Order()&#160;:&#160;<a class="el" href="class_order.html#a83b60c5e72e0e4e941ae05abf6f0cc09">Order</a></li>
 <li>~OrderBook()&#160;:&#160;<a class="el" href="class_order_book.html#a86634c6dec6be6a7f1a04db14f3f33fa">OrderBook</a></li>
+<li>~OrderLog()&#160;:&#160;<a class="el" href="class_order_log.html#a2e13b49e490b1b048b66c0ecf0f6b6ed">OrderLog</a></li>
 <li>~Security()&#160;:&#160;<a class="el" href="class_security.html#a6c45e3c7bce9a3a831076af936e4df01">Security</a></li>
 <li>~Strategy()&#160;:&#160;<a class="el" href="class_strategy.html#a4762a086f587ed294ca7178e396f142f">Strategy</a></li>
 <li>~Trade()&#160;:&#160;<a class="el" href="class_trade.html#af782d8f554c5a170b859e548cd4f9cf4">Trade</a></li>
+<li>~TradeLog()&#160;:&#160;<a class="el" href="class_trade_log.html#a324323095c5e79288a80b31762fe9dab">TradeLog</a></li>
 <li>~User()&#160;:&#160;<a class="el" href="class_user.html#ac00b72ad64eb4149f7b21b9f5468c2b2">User</a></li>
 </ul>
 </div><!-- contents -->
