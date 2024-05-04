@@ -112,6 +112,30 @@ Three major components of an order book are:
 
 Latency refers to the time delay between the initiation (sending out) of a trade and its receival. In our backtester, order submission-reception latency is considered.
 
+#### 2.3.6 Updates
+
+**Trade Update**: Called when trade occurred.
+
+**Quote Update**: Called when top quote (best bid or ask) price and/or size is updated.
+
+**Depth Update**: Called when non-best bid or ask price and/or size is updated.
+
+#### 2.3.7 Market "Maker" vs Market "Taker"
+
+In financial markets, the interplay between liquidity providers and liquidity consumers is fundamental to the efficient functioning of trading systems. Two key roles emerge from this dynamic: market makers and market takers. Each plays a distinct part in shaping market behavior and ensuring the smooth execution of trades.
+
+**Market Making**
+
+Market makers play a crucial role in financial markets. They are like the architects who construct the framework for trading. A market maker’s primary goal is to provide liquidity by continuously offering to buy and sell a particular security by maintaining a tight bid-ask spread. Market makers profit from the difference between these two prices (the spread). They constantly adjust their quotes based on market conditions, ensuring that buyers and sellers can execute trades efficiently. In return for providing liquidity, market makers receive a premium from market takers.
+
+**Market Taking**
+
+Conversely, market takers are the swift actors. Market takers prioritize immediacy over getting the best price, and take the existing bid or ask price set by market makers. By executing trades promptly, market takers ensure that liquidity remains available. 
+
+#### 2.3.8 Fees
+
+Cryptocurrency exchanges charge fees for facilitating trades on their platforms. The specific fee structure varies across exchanges and can depend on factors like trading volume, type of order, and membership status. **Makers pay less fee than the takers**, which incentivizes the traders to become market makers and add liquidity to the market.
+
 ## 3. Tools and Technology
 
 ### 3.1 Programming Languages
@@ -134,4 +158,26 @@ Latency refers to the time delay between the initiation (sending out) of a trade
 
 - **[RapidJSON](https://rapidjson.org/)**: A powerful JSON parser and generator designed specifically for C++. We utilized it to read exchange configuration JSON file quickly.
 
-## 4. 
+## 4. Backtesting Algorithm
+
+![Backtesting algorithm](../images/algorithm.png)
+
+1. Market data parser reads data line by line.
+
+2. Update order book data accordingly, and check if any of the user's order resting on the orderbook has been filled either partially or fully.
+
+3. User's strategy's function is called based on the update type.
+
+4. If user submitted new order(s) add them to the current orders.
+
+5. Check if order arrived at the exchange (based on sending latency).
+
+6. Check if order could be filled immediately.
+
+7. Record user's trades that took place.
+
+## 5. Latency Analysis
+
+## 6. Future Work
+
+## 7. Project Reflections
