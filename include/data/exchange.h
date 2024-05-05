@@ -49,7 +49,7 @@ class Exchange {
         bool loadJson(const string& json_file_path) {
             FILE* json_file = fopen(json_file_path.c_str(), "r");
             if (!json_file) {
-                cerr << "Error opening JSON file: " << json_file_path << endl;
+                throw runtime_error("Error opening Json file: " + json_file_path);
                 return false;
             }
 
