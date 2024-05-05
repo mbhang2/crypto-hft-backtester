@@ -17,7 +17,7 @@ projects in online decision-making and supply chain management. In my spare time
 developing decentralized arbitrage and market making strategies. 
 
 - Email: [zexuanl5@illinois.edu](mailto:zexuanl5@illinois.edu)
-- LinkedIn: 
+- LinkedIn: [Ze-Xuan Liu](https://www.linkedin.com/in/zexuan-liu-b1966119b/)
 
 
 ## Getting started
