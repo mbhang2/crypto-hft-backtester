@@ -22,12 +22,18 @@ I am Min Hyuk (Michael) Bhang, an undergraduate majoring in Industiral Engineeri
 I am a proficient software engineer transitioning from full-stack development to system engineering, with a newfound passion for C/C++ and CUDA programming. My expertise extends to modern CPU architecture, and I will have valuable experience working on the trade execution system of CME Globex at CME Group, focusing on high-frequency trading performance.
 
 As a quick learner, I excel in collaborating with clients to develop efficient, scalable, and user-friendly solutions that address real-world challenges. Goal-oriented and resourceful, I am committed to moving projects forward, taking responsibility for any challenges and obstacles that arise. I'm so exited to explore the wonderful world of trading systems and I'm ready for the challenges ahead!
+
 - Email: jh79@illinois.edu
 - LinkedIn: [Jiayuan Hong](https://www.linkedin.com/in/jiayuan-hong-a624121a0/)
 
 **Zexuan Liu**
 
-"TBA"
+This is Ze-Xuan Liu, a third year PhD student interested in operational management. I am currently leading research 
+projects in online decision-making and supply chain management. In my spare time, I am a Solana chain ethusiast and 
+developing decentralized arbitrage and market making strategies. 
+
+- Email: [zexuanl5@illinois.edu](mailto:zexuanl5@illinois.edu)
+- LinkedIn: [Ze-Xuan Liu](https://www.linkedin.com/in/zexuan-liu-b1966119b/)
 
 ### 2.2 Terminology
 
@@ -317,3 +323,37 @@ Current version of latency analysis performs backteset given hypothetical sendin
     * We would like to have an error logger that could record all these errors.
 
 ## 7. Project Reflections
+
+**Min Hyuk (Michael) Bhang**
+
+1. **What did you specifically do individually for this project?**
+    * Developing backtesting main framework and latency analysis
+    * Setting up to have configuration customizable
+    * Writing sample strategy to test backtesting
+    * Order, Trade, Message, Security, TimeType, Exchange, User, Record classes
+    * Improving Orderbook class
+    * Implementing external libraries (Boost, RapidJson)
+    * Documentation
+
+2. **What did you learn as a result of doing your project?**
+
+    From this project, I was not only able to further understand the market microstructure, but, more importantly, was able to train what core developers do at HFT firms: developing backtesting engines for the firm, and handling market data and order entries.
+
+3. **If you had a time machine and could go back to the beginning, what would you have done differently?**
+
+    If I could go back to the beginning of the project, I would like to make use of smart pointers from the start of the project. While developing the main backtesting framework, we got stuck in various memory and lifetime issues for a while since we were quite skeptical towards the use of pointers. However, smart pointers have resolved all of those immediately; if we have employed it since the beginning, we could have had more time developing more advanced features.
+
+4. **If you were to continue working on this project, what would you continue to do to improve it, how, and why?**
+
+    If I were to continue working on this project, I would like to support more advanced order types, improve latency analysis tool as well as also supporting real-time paper and actual trading through API access, as mentioned in the future work section above.
+
+5. **What advice do you offer to future students taking this course and working on their semester long project?**
+
+    First and foremost, I would like to recommend future students to make a great use of Large Language Models (LLM) such as ChatGPT or Copilot to aid the coding process. LLMs have been extremely helpful, acting as the fourth-member of the team.
+
+    Also, drawing out the entire architecture and sub-algorithms during the planning process and in-line commenting as coding are crucial. Drawing out the architecture and sub-algorithms enables the group to understand the development steps by heart. In addition, by commmenting and having legible codes, your teammates could easily go over the code and provide any necessary help without any struggle.
+
+
+**Jiayuan (Jerry) Hong**
+
+**Zexuan Liu**
