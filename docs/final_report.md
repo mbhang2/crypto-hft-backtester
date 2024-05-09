@@ -19,15 +19,18 @@ I am Min Hyuk (Michael) Bhang, an undergraduate majoring in Industiral Engineeri
 
 **Jiayuan (Jerry) Hong**
 
-I am a proficient software engineer transitioning from full-stack development to system engineering, with a newfound passion for C/C++ and CUDA programming. My expertise extends to modern CPU architecture, and I will have valuable experience working on the trade execution system of CME Globex at CME Group, focusing on high-frequency trading performance.
-
-As a quick learner, I excel in collaborating with clients to develop efficient, scalable, and user-friendly solutions that address real-world challenges. Goal-oriented and resourceful, I am committed to moving projects forward, taking responsibility for any challenges and obstacles that arise. I'm so exited to explore the wonderful world of trading systems and I'm ready for the challenges ahead!
+I am a proficient software engineer transitioning from full-stack development to system engineering, with a neI am a proficient software engineer transitioning from full-stack development to system engineering, with a newfound passion for C/C++ and CUDA programming. My expertise extends to modern CPU architecture, and I will have valuable experience working on the trade execution system of CME Globex at CME Group, focusing on high-frequency trading performance. Goal-oriented and resourceful, I am committed to moving projects forward, taking responsibility for any challenges and obstacles that arise. I'm so exited to explore the wonderful world of trading systems and I'm ready for the challenges ahead!
 - Email: jh79@illinois.edu
 - LinkedIn: [Jiayuan Hong](https://www.linkedin.com/in/jiayuan-hong-a624121a0/)
 
 **Zexuan Liu**
 
-"TBA"
+This is Ze-Xuan Liu, a third year PhD student interested in operational management. I am currently leading research 
+projects in online decision-making and supply chain management. In my spare time, I am a Solana chain ethusiast and 
+developing decentralized arbitrage and market making strategies. 
+
+- Email: [zexuanl5@illinois.edu](mailto:zexuanl5@illinois.edu)
+- LinkedIn: [Ze-Xuan Liu](https://www.linkedin.com/in/zexuan-liu-b1966119b/)
 
 ### 2.2 Terminology
 
