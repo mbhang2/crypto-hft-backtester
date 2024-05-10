@@ -325,3 +325,20 @@ Current version of latency analysis performs backteset given hypothetical sendin
     * We would like to have an error logger that could record all these errors.
 
 ## 7. Project Reflections
+Throughout this project, we explored the complexities of developing a cryptocurrency backtesting software that can simulate real-world trading scenarios. 
+We encountered various challenges, such as handling latency differences, implementing order matching logic, and ensuring compatibility with different exchange configurations. 
+It is a prototype at the moment and can be further developed to include more advanced features and functionalities, such as additional order types, randomized spread with monte carlo simulation and more realistic latency configuration.
+
+We first adopted CMAKE for the project, but later switched to a simpler Makefile due to the project's size and complexity. 
+Also, we prepared a complicated CI/CD infrastructure, but later which was used little. We learned that it is important to keep the project simple and focused on the main goal. And we need better pre-project brainstorming to avoid unnecessary work -- pay attention before starting the project.
+
+We also learned the importance of effective communication and collaboration among team members. For example, we sometimes had different interpretations of one design idea because of languages and terms we used. We think it would be better if we can have a more detailed document to review after each meeting and that can align our understanding.
+
+We are also enjoyed in the process of learning new technologies and tools, such as Doxygen, RapidJSON and the most importantly, the crypto market. 
+
+- Ze-Xuan Liu:
+  - I learned a lot from Jiayuan and Michael:
+    - Jiayuan is always curious and eager to learn. We had several discussions about the project and also extensions to the finance, crypto markets and job market. I enjoyed a lot from our conversations.
+    - Michael is a very responsible programmer and trader. He always finishes his part on time and tries to solve the problem by himself. His altitude towards the project inspired me a lot. Also, he is a good team leader that can always keep the project on track.
+  - I think I should have put more effort into the project. I basically designed and deployed the infrastructure of CI/CD, building process and the project design. But I made it too complicated and do not shift my focus to the main goal of the project. After that, I switched to finish the data processing part but after a while michael found he has an exising code base can be used. I literally feel I worked as a consultant for this project like debug and design,  but has few code input. 
+  - I also learned that there are few document and too many different designs in crypto world. Almost all CEXes have their own API and fee structures. It need large effort to design a trading bot and backtesting environment to fit in the production environment.
