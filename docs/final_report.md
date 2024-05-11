@@ -19,10 +19,7 @@ I am Min Hyuk (Michael) Bhang, an undergraduate majoring in Industiral Engineeri
 
 **Jiayuan (Jerry) Hong**
 
-I am a proficient software engineer transitioning from full-stack development to system engineering, with a newfound passion for C/C++ and CUDA programming. My expertise extends to modern CPU architecture, and I will have valuable experience working on the trade execution system of CME Globex at CME Group, focusing on high-frequency trading performance.
-
-As a quick learner, I excel in collaborating with clients to develop efficient, scalable, and user-friendly solutions that address real-world challenges. Goal-oriented and resourceful, I am committed to moving projects forward, taking responsibility for any challenges and obstacles that arise. I'm so exited to explore the wonderful world of trading systems and I'm ready for the challenges ahead!
-
+I am a proficient software engineer transitioning from full-stack development to system engineering, with a neI am a proficient software engineer transitioning from full-stack development to system engineering, with a newfound passion for C/C++ and CUDA programming. My expertise extends to modern CPU architecture, and I will have valuable experience working on the trade execution system of CME Globex at CME Group, focusing on high-frequency trading performance. Goal-oriented and resourceful, I am committed to moving projects forward, taking responsibility for any challenges and obstacles that arise. I'm so exited to explore the wonderful world of trading systems and I'm ready for the challenges ahead!
 - Email: jh79@illinois.edu
 - LinkedIn: [Jiayuan Hong](https://www.linkedin.com/in/jiayuan-hong-a624121a0/)
 
@@ -61,7 +58,12 @@ A trading strategy is a systematic methodology used for buying and selling in th
 
 #### 2.2.3 Backtesting
 
+
+
 Backtesting refers to the process of evaluating a trading strategy or investment approach using historical data. Traders and investors use backtesting to assess how a particular strategy would have performed in the past, assuming it was applied consistently.
+
+#### 2.2.4 Order Match Engine
+An order matching engine (OME) is a software system that matches buy and sell orders from market participants to facilitate the execution of trades.
 
 ### 2.3 Market Microstructure
 
@@ -356,4 +358,27 @@ Current version of latency analysis performs backteset given hypothetical sendin
 
 **Jiayuan (Jerry) Hong**
 
-**Zexuan Liu**
+**Zexuan Liu**Throughout this project, we explored the complexities of developing a cryptocurrency backtesting software that can simulate real-world trading scenarios. 
+We encountered various challenges, such as handling latency differences, implementing order matching logic, and ensuring compatibility with different exchange configurations. 
+It is a prototype at the moment and can be further developed to include more advanced features and functionalities, such as additional order types, randomized spread with monte carlo simulation and more realistic latency configuration.
+
+We first adopted CMAKE for the project, but later switched to a simpler Makefile due to the project's size and complexity. 
+Also, we prepared a complicated CI/CD infrastructure, but later which was used little. We learned that it is important to keep the project simple and focused on the main goal. And we need better pre-project brainstorming to avoid unnecessary work -- pay attention before starting the project.
+
+We also learned the importance of effective communication and collaboration among team members. For example, we sometimes had different interpretations of one design idea because of languages and terms we used. We think it would be better if we can have a more detailed document to review after each meeting and that can align our understanding.
+
+We are also enjoyed in the process of learning new technologies and tools, such as Doxygen, RapidJSON and the most importantly, the crypto market. 
+
+- Ze-Xuan Liu:
+  - I learned a lot from Jiayuan and Michael:
+    - Jiayuan is always curious and eager to learn. We had several discussions about the project and also extensions to the finance, crypto markets and job market. I enjoyed a lot from our conversations.
+    - Michael is a very responsible programmer and trader. He always finishes his part on time and tries to solve the problem by himself. His altitude towards the project inspired me a lot. Also, he is a good team leader that can always keep the project on track.
+  - I think I should have put more effort into the project. I basically designed and deployed the infrastructure of CI/CD, building process and the project design. But I made it too complicated and do not shift my focus to the main goal of the project. After that, I switched to finish the data processing part but after a while michael found he has an exising code base can be used. I literally feel I worked as a consultant for this project like debug and design,  but has few code input. 
+  - I also learned that there are few document and too many different designs in crypto world. Almost all CEXes have their own API and fee structures. It need large effort to design a trading bot and backtesting environment to fit in the production environment.
+
+- Jiayuan Hong:
+  - I gained much knowledge from Zexuan and Michael
+    - Zexuan is very knowledgable and patient. He loves to share with me about his ideas and what projects he is working on. He has an enthusiasm about quantitive trading, crypto, and currencies, always inspiring me in quant field.
+    - Michael has a strong C++ programming skills and tons of knowledge about finance. We worked on the order book and match engine together. Michael is a great leader, teacher and always inspired me to learn more about finance world.
+  - In this project, I mainly work on the order book and order match engine. Choosing the right data structure (map, priority queue) and build the OME. We also add Self-match prevention (SME) into the match engine to prevent self-match order.
+  - In the design process, I firstly had a meeting with Michael and developed a simplified order book which can support basic `addLevel` `addOrder`, `tradeHappened`. Then, when we are given real-world market data, we developed more practical APIs to help us manage the order book. And OME will help us match the resting orders with an aggressive order. In this coming summer, I will continue to learn more about trading system and work on some real-world project in CME Group. And I would love to continue share something interesting with my teammates here.
