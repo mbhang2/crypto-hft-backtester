@@ -357,12 +357,22 @@ Current version of latency analysis performs backteset given hypothetical sendin
 
 
 **Jiayuan (Jerry) Hong**
-
-- I gained much knowledge from Zexuan and Michael
+1. **What did you specifically do individually for this project?**
+  In this project, I mainly work on the order book and order match engine. Choosing the right data structure (map, priority queue) and build the OME. We also add Self-match prevention (SME) into the match engine to prevent self-match order. In the design process, I firstly had a meeting with Michael and developed a simplified order book which can support basic `addLevel` `addOrder`, `tradeHappened`. Then, when we are given real-world market data, we developed more practical APIs to help us manage the order book. And OME will help us match the resting orders with an aggressive order.
+   
+1. **What did you learn as a result of doing your project?**
+   In this project, I learned tons of things not only the knowledge about financial market and backtesting, but also how we could utilize different tools to help us write clean and efficient code.
+    
+    Most importanntly, learning from other people
     - Zexuan is very knowledgable and patient. He loves to share with me about his ideas and what projects he is working on. He has an enthusiasm about quantitive trading, crypto, and currencies, always inspiring me in quant field.
     - Michael has a strong C++ programming skills and tons of knowledge about finance. We worked on the order book and match engine together. Michael is a great leader, teacher and always inspired me to learn more about finance world.
-- In this project, I mainly work on the order book and order match engine. Choosing the right data structure (map, priority queue) and build the OME. We also add Self-match prevention (SME) into the match engine to prevent self-match order.
-- In the design process, I firstly had a meeting with Michael and developed a simplified order book which can support basic `addLevel` `addOrder`, `tradeHappened`. Then, when we are given real-world market data, we developed more practical APIs to help us manage the order book. And OME will help us match the resting orders with an aggressive order. In this coming summer, I will continue to learn more about trading system and work on some real-world project in CME Group. And I would love to continue share something interesting with my teammates here.
+2. **If you had a time machine and could go back to the beginning, what would you have done differently?**
+   I will firstly learn more basic financial knowledge and how the HFT works as well as some cores idea and design patterns of order match engine. Therefore I will quickly finished developing the Orderbook class and implementing all necessary functions. And I could have more time for some advanced functions and latency-analysis staff.
+3. **If you were to continue working on this project, what would you continue to do to improve it, how, and why?**
+   If I were to continue working on the project, I will design more advacned API and thinking in a more system-design level and borrow some ideas from industry, for example, maybe could we use a distributed/multi-threaded system to run our backtesting software.
+4. **What advice do you offer to future students taking this course and working on their semester long project?**
+   Before the designing, it is good to have a basic foundation knowledge of financial/trading system. Before writing any code, you are supposed to have an overall design or a blueprint in your brain. Then divide that into different stages and small pieces and appropriately schedule your design timeline. Additionally, taking the advantage of using tools like ChatGPT and copilot can be very helpful and benefitical.
+
 
 **Zexuan Liu**
 Throughout this project, we explored the complexities of developing a cryptocurrency backtesting software that can simulate real-world trading scenarios. 
