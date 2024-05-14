@@ -71,6 +71,18 @@ public:
         return pnl;
     }
 
+    double computeTotalRealizedPNL(MarketType mt) const {
+        double pnl = 0;
+
+        for (auto& it : trades) {
+            if (it->getParentOrder()->getMarketType() == mt) {
+                pnl -= it->getSide() * it->getPrice() * it->getBaseCurrencySize() + it->getFee();
+            }
+        }
+
+        return pnl;
+    }
+
     double computeWeightedAverageFillPrice(double size) const {
         double checkedSize = 0.0;
         double weightedSum = 0.0;
@@ -131,11 +143,11 @@ public:
         outfile << std::fixed << std::setprecision(2);
 
         if (outfile) {
-            outfile << "TIMESTAMP,SECURITY,MARKET_TYPE,EXCHANGE,SIDE,SIZE,FEE" << "\n";
+            outfile << "TIMESTAMP,SECURITY,MARKET_TYPE,EXCHANGE,SIDE,PRICE,SIZE,FEE" << "\n";
             for (const auto& it : trades) {
                 string s = (it->getSide() == 1) ? "Buy" : "sell";
                 outfile << it->getTimestamp()->toString() << "," << *(it->getSecurity()) << "," << it->getParentOrder()->getMarketType() << "," << it->getExchange()->getName() 
-                        << "," << s << "," << it->getBaseCurrencySize() << "," << it->getFee() << "\n";
+                        << "," << s << "," << it->getPrice() << "," << it->getBaseCurrencySize() << "," << it->getFee() << "\n";
             }
             outfile.close();
             std::cout << "Data exported to " << filename << std::endl;

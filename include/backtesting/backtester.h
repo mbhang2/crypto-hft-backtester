@@ -84,6 +84,9 @@ class Backtester {
      * @param data_path file path for market data input
      */
     void runBacktest(const string& data_path) {
+        double spot_buying_power = user.getCapital(MarketType::Spot);
+        double futures_buying_power = user.getCapital(MarketType::Futures);
+
         vector<std::shared_ptr<Order>> current_orders;
         vector<TimeType*> timetype_vector;
         ifstream file(data_path);
@@ -131,7 +134,12 @@ class Backtester {
                     Trade* trade = new Trade(std::get<0>(it), tt, std::get<0>(it)->getSide(), std::get<2>(it), std::get<1>(it), true);
                     tradelog.addTrade(std::shared_ptr<Trade>(trade));
 
-                    user.updateBalance(std::get<0>(it)->getMarketType(), -trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee());
+                    if (trade->getParentOrder()->getMarketType() == MarketType::Spot) {
+                        spot_buying_power -= trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee();
+                    } else {
+                        futures_buying_power -= trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee();
+                    }
+
                     strategy->updatePosition(std::get<0>(it)->getMarketType(), *std::get<0>(it)->getExchange(), *std::get<0>(it)->getSecurity(), std::get<0>(it)->getSide()*std::get<2>(it));
                 }
 
@@ -150,7 +158,11 @@ class Backtester {
                     Trade* trade = new Trade(std::get<0>(it), tt, std::get<0>(it)->getSide(), std::get<2>(it), std::get<1>(it), true);
                     tradelog.addTrade(std::shared_ptr<Trade>(trade));
 
-                    user.updateBalance(std::get<0>(it)->getMarketType(), -trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee());
+                    if (trade->getParentOrder()->getMarketType() == MarketType::Spot) {
+                        spot_buying_power -= trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee();
+                    } else {
+                        futures_buying_power -= trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee();
+                    }
                     strategy->updatePosition(std::get<0>(it)->getMarketType(), *std::get<0>(it)->getExchange(), *std::get<0>(it)->getSecurity(), std::get<0>(it)->getSide()*std::get<2>(it));
                 }
 
@@ -168,7 +180,11 @@ class Backtester {
                     Trade* trade = new Trade(std::get<0>(it), tt, std::get<0>(it)->getSide(), std::get<2>(it), std::get<1>(it), true);
                     tradelog.addTrade(std::shared_ptr<Trade>(trade));
 
-                    user.updateBalance(std::get<0>(it)->getMarketType(), -trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee());
+                    if (trade->getParentOrder()->getMarketType() == MarketType::Spot) {
+                        spot_buying_power -= trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee();
+                    } else {
+                        futures_buying_power -= trade->getSide() * std::get<2>(it) * std::get<1>(it) - trade->getFee();
+                    }
                     strategy->updatePosition(std::get<0>(it)->getMarketType(), *std::get<0>(it)->getExchange(), *std::get<0>(it)->getSecurity(), std::get<0>(it)->getSide()*std::get<2>(it));
                 }
 
@@ -224,8 +240,12 @@ class Backtester {
                         Trade* trade = new Trade(it, tt, it->getSide(), fill_pair.second, fill_pair.first, false);
                         tradelog.addTrade(std::shared_ptr<Trade>(trade));
 
-                        user.updateBalance(it->getMarketType(), -trade->getSide() * fill_pair.first * fill_pair.second - trade->getFee());
+                        if (trade->getParentOrder()->getMarketType() == MarketType::Spot) {
+                            spot_buying_power -= trade->getSide() * fill_pair.first * fill_pair.second - trade->getFee();
+                        } else {
+                            futures_buying_power -= trade->getSide() * fill_pair.first * fill_pair.second - trade->getFee();
                         }
+                    }
                 }
             }
 
@@ -248,16 +268,16 @@ class Backtester {
                 for (const auto& pair : strategy->getPositionMap()) {
                     if (pair.second != 0) {
                         if (std::get<0>(pair.first) == MarketType::Spot) {
-                            double pos = strategy->getPosition(MarketType::Spot, *exchange_ptr, *security_ptr);
-                            spot_cap += pos * (tradelog.computeWeightedAverageFillPrice(abs(pos)) - last_traded_price[{MarketType::Spot, security_ptr}]);
+                            double pos = strategy->getPosition(MarketType::Spot, std::get<1>(pair.first), std::get<2>(pair.first));
+                            spot_cap -= pos * -last_traded_price[{MarketType::Spot, security_ptr}];
                         } else {
-                            double pos = strategy->getPosition(MarketType::Futures, *exchange_ptr, *security_ptr);
-                            spot_cap += pos * (tradelog.computeWeightedAverageFillPrice(abs(pos)) - last_traded_price[{MarketType::Futures, security_ptr}]);
+                            double pos = strategy->getPosition(MarketType::Futures, std::get<1>(pair.first), std::get<2>(pair.first));
+                            futures_cap -= pos * -last_traded_price[{MarketType::Futures, security_ptr}];
                         }
                     }
                 }
 
-                tradelog.addBalanceHistory(tt, spot_cap, futures_cap);
+                tradelog.addBalanceHistory(tt, spot_cap + tradelog.computeTotalRealizedPNL(MarketType::Spot), futures_cap + tradelog.computeTotalRealizedPNL(MarketType::Futures));
             }
         }
     }
