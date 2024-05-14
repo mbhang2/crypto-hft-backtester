@@ -24,6 +24,6 @@ int main(int argc, char* argv[]) {
     backtester.getTradeLog().exportBalanceHistoryToCSV("./sample_data/sample_result.csv");
     backtester.getTradeLog().exportTradeLogToCSV("./sample_data/sample_tradelog.csv");
 
-    cout << "Strategy Total P&L: " << backtester.getTradeLog().getBalanceHistory().back().second.first + backtester.getTradeLog().getBalanceHistory().back().second.first
+    cout << "Strategy Total P&L: " << backtester.getTradeLog().getBalanceHistory().back().second.first + backtester.getTradeLog().getBalanceHistory().back().second.second
             - stod(argv[1]) - stod(argv[2]) << endl;
 }
