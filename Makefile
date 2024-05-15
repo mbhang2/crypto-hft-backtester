@@ -9,7 +9,7 @@ APP_INCLUDE = $(wildcard include/backtesting/*.h)
 ##############################################
 # only need to change this part
 # add more source files here to be compiled
-APP_SOURCES = src/main.cpp
+APP_SOURCES = src/backtest.cpp
 
 # add more test files here to be compiled
 APP_TESTS = tests/unit_tests/order_unit_test.cpp
