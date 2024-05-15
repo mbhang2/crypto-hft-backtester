@@ -371,23 +371,20 @@ The current version of latency analysis performs a backtest given hypothetical s
    Before designing, it is good to have a basic foundation knowledge of financial/trading systems. Before writing any code, you are supposed to have an overall design or a blueprint in your brain. Then divide that into different stages and small pieces and appropriately schedule your design timeline. Additionally, taking advantage of using tools like ChatGPT and Copilot can be very helpful and beneficial.
 
 
-**Zexuan Liu**
-Throughout this project, we explored the complexities of developing cryptocurrency backtesting software that can simulate real-world trading scenarios. 
-We encountered various challenges, such as handling latency differences, implementing order-matching logic, and ensuring compatibility with different exchange configurations. 
-It is a prototype at the moment and can be further developed to include more advanced features and functionalities, such as additional order types, randomized spread with Monte Carlo simulation, and more realistic latency configuration.
+**Ze-Xuan Liu**
+1. **What did you specifically do individually for this project?**
 
-We first adopted CMAKE for the project but later switched to a simpler Makefile due to the project's size and complexity. 
-Also, we prepared a complicated CI/CD infrastructure, but later which was used little. We learned that it is important to keep the project simple and focused on the main goal. And we need better pre-project brainstorming to avoid unnecessary work -- pay attention before starting the project.
+    I mainly worked on the project framework design (CI/CD and classes) and data processing part. I designed the project structure and implemented the CI/CD pipeline. I also worked on the data processing part, including reading the exchange configuration JSON file and parsing the market data CSV file. I also helped with the code review, unit test and debugging process.
 
-We also learned the importance of effective communication and collaboration among team members. For example, we sometimes had different interpretations of one design idea because of the languages and terms we used. We think it would be better if we could have a more detailed document to review after each meeting and that can align our understanding.
+2. **What did you learn as a result of doing your project?**
+    I learnt that a project should be started with a clear goal and simple infrastructure design. We first adopted CMAKE for the project but later switched to a simpler Makefile due to the project's size and complexity.
+    Also, we prepared a complicated CI/CD infrastructure, but later which was used little. We learned that it is important to keep the project simple and focused on the main goal. And we need better pre-project brainstorming to avoid unnecessary work -- pay attention before starting the project.
 
-We also enjoyed in the process of learning new technologies and tools, such as Doxygen, RapidJSON, and most importantly, the crypto market. 
+3. **If you had a time machine and could go back to the beginning, what would you have done differently?**
+    I would spend the first two weeks with my teammates together to write down the project design and decide the job duties and tools we will use. I also would like to have a more detailed document to review after each meeting and that can align our understanding.
 
-**Key Points**:
-- I learned a lot from Jiayuan and Michael:
-    - Jiayuan is always curious and eager to learn. We had several discussions about the project and also extensions to the finance, crypto markets, and job market. I enjoyed a lot from our conversations.
-    - Michael is a very responsible programmer and trader. He always finishes his part on time and tries to solve the problem by himself. His attitude towards the project inspired me a lot. Also, he is a good team leader who can always keep the project on track.
-- I think I should have put more effort into the project. I basically designed and deployed the infrastructure of CI/CD, the building process, and the project design. However, I made it too complicated and do not shift my focus to the main goal of the project. After that, I switched to finish the data processing part but after a while michael found he has an exising code base can be used. I literally feel I worked as a consultant for this project like debug and design,  but has few code input. 
-- I also learned that there are few document and too many different designs in crypto world. Almost all CEXes have their own API and fee structures. It need large effort to design a trading bot and backtesting environment to fit in the production environment.
+4. **If you were to continue working on this project, what would you continue to do to improve it, how, and why?**
+    I would add more kinds of order types, randomized spread with Monte Carlo simulation, and more realistic latency configuration. I would also like to add a GUI and a clear input and output for the testing policy.
 
-
+5. **What advice do you offer to future students taking this course and working on their semester long project?**
+   I would recommend future students to keep everything simple. Make a prototype first and do agile developemnt to gradually improve the project once we have a prototype.
