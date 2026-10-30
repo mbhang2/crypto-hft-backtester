@@ -137,3 +137,9 @@ Temporary Items
 /googletest/
 
 ./cmake/
+# Build outputs
+build/
+backtest_executable
+latency_executable
+bin/
+boost_1_*/

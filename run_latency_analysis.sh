@@ -10,7 +10,9 @@ arg2="$2"
 arg3="$3"
 arg4="$4"
 
-g++ -std=c++20 -I./boost_1_84_0 ./src/latency_analysis.cpp -o latency_executable
+# Boost is header-only here: brew install boost (macOS) or apt install libboost-dev
+BOOST_INCLUDE="${BOOST_INCLUDE:-$(brew --prefix 2>/dev/null || echo /usr)/include}"
+g++ -std=c++20 -O2 -I"$BOOST_INCLUDE" ./src/latency_analysis.cpp -o latency_executable
 
 if [ $? -eq 0 ]; then
     ./latency_executable "$arg1" "$arg2" "$arg3" "$arg4"

@@ -1,7 +1,8 @@
 # Variables
 CC = g++
 #CFLAGS = -std=c++20 --coverage -ftest-coverage -fprofile-arcs -fprofile-dir=build/coverage -I./boost_1_84_0
-CFLAGS = -std=c++20 -I./boost_1_84_0
+BOOST_INCLUDE ?= $(shell brew --prefix 2>/dev/null || echo /usr)/include
+CFLAGS = -std=c++20 -O2 -I$(BOOST_INCLUDE)
 APP = crypto_back_testing
 APP_TESTER = crypto_tests
 APP_INCLUDE = $(wildcard include/backtesting/*.h)
