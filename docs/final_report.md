@@ -10,9 +10,8 @@ Our proposed semester-long project aims to create specialized backtesting softwa
 
 **Min Hyuk (Michael) Bhang**
 
-
     
-- Email: [mbhang2@illinois.edu](/fin556_algo_market_micro_fall_2023/fin556_algo_fall_2023_group_02/group_02_project/-/blob/main/mbhang2@illinois.edu) 
+- Email: [mbhang2@illinois.edu](mailto:mbhang2@illinois.edu) 
 - LinkedIn: [Min Hyuk Bhang](https://www.linkedin.com/in/michael-bhang/)
 
 **Jiayuan (Jerry) Hong**
@@ -349,8 +348,7 @@ The current version of latency analysis performs a backtest given hypothetical s
 
 5. **What advice do you offer to future students taking this course and working on their semester long project?**
 
-
-    Also, drawing out the entire architecture and sub-algorithms during the planning process and in-line commenting as coding is crucial. Drawing out the architecture and sub-algorithms enables the group to understand the development steps by heart. In addition, by commenting and having legible codes, your teammates could easily go over the code and provide any necessary help without any struggle.
+    Drawing out the entire architecture and sub-algorithms during the planning process and in-line commenting as coding is crucial. Drawing out the architecture and sub-algorithms enables the group to understand the development steps by heart. In addition, by commenting and having legible codes, your teammates could easily go over the code and provide any necessary help without any struggle.
 
 
 **Jiayuan (Jerry) Hong**
